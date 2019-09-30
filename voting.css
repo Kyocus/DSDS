@@ -1,0 +1,13 @@
+*{
+	box-sizing: border-box;
+}
+
+
+div.navbar{
+	background-color: lightgray;
+	font-size: x-large;
+	font-weight: bold;
+}
+div.navbar > a{
+	margin-right: 1em;
+}
