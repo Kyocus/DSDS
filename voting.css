@@ -8,6 +8,13 @@ div.navbar{
 	font-size: x-large;
 	font-weight: bold;
 }
-div.navbar > a{
+div.navbar > span{
 	margin-right: 1em;
+	color: royalblue;
+	cursor: pointer;
+}
+
+h2{
+	text-align: center;
+	background-color: lightsteelblue;
 }
