@@ -25,7 +25,7 @@ var Decision = (function () {
 			this.expirationDate = data.expirationDate;
 			this.href = data.href;
 			this.name = data.name;
-			this.scope = data.scope;
+			this.group = data.group;
 			this.status = data.status;
 			this.statusDate = data.statusDate;
 			// Entity[]
@@ -37,7 +37,7 @@ var Decision = (function () {
 			this.expirationDate = null;
 			this.href = "";
 			this.name = "";
-			this.scope = null;
+			this.group = null;
 			this.status = null;
 			this.statusDate = null;
 			this.voters = [];
@@ -97,9 +97,133 @@ var Entity = (function () {
 	return constructor;
 })();
 
+var testDecisions = (function () {
+
+	var returnMe = [];
+
+	for (let i = 0; i < Math.random() * 50; i++) {
+
+		returnMe.push(getTestDecision());
+	}
+
+	return returnMe;
+
+	function getTestDecision() {
+		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		return {
+			attachments: [],
+			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			description: "description",
+			expirationDate: new Date(),
+			href: id,
+			name: "decision " + id,
+			group: Math.floor(Math.random() * 10000),
+			status: Math.floor(Math.random() * 5),
+			statusDate: new Date(Math.floor(Math.random() * 10000000000)),
+			voters: []
+		};
+	}
+
+})();
+
+var testEntities = (function () {
+
+	var returnMe = [];
+
+	for (let i = 0; i < Math.random() * 50; i++) {
+
+		returnMe.push(getTestEntity());
+	}
+
+	return returnMe;
+
+	function getTestEntity() {
+		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		return {
+			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			description: "description",
+			href: id,
+			name: "entity " + id,
+			parent: null
+		};
+	}
+
+})();
+
+var testGroups = (function () {
+
+	var returnMe = [];
+
+	for (let i = 0; i < Math.random() * 50; i++) {
+
+		returnMe.push(getTestGroup());
+	}
+
+	return returnMe;
+
+	function getTestGroup() {
+		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		return {
+			children: [],
+			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			description: "group desc",
+			href: id,
+			name: "group " + id,
+			parent: null
+
+		};
+	}
+})();
+
 Vue.component('nav-bar', {
-	methods: {},
+	methods: {
+		showDecisions: function () {
+			this.$emit("showdecisions");
+		},
+		showGroups: function () {
+			this.$emit("showgroups");
+		},
+		showEntities: function () {
+			this.$emit("showentities");
+		}
+
+	},
 	template: $("#tmpNavBar").html()
+});
+
+Vue.component('data-table', {
+	model: {
+		event: "change"
+	},
+	props: ["columns", "data", "header"],
+	methods: {
+
+		setupDataTable: function () {
+
+			var selector = "#tblList";
+
+			if (this.dt) {
+				this.dt.destroy(false);
+				$(selector).empty();
+				// $(selector).html(this.$options.template);
+			}
+			this.dt = $(selector).DataTable({
+					data: this.data,
+					columns: this.columns
+				});
+		}
+
+	},
+	computed: {},
+	watch: {
+		data: function (current, old) {
+			this.setupDataTable();
+		}
+	},
+	mounted: function () {
+		this.setupDataTable();
+	},
+	template: $("#tmpDataTable").html()
 });
 
 Vue.component('decision-detail', {
@@ -112,89 +236,7 @@ Vue.component('decision-detail', {
 		};
 	},
 	props: ["decision", "editable"],
-	methods: {
-
-		function () {
-			var dt = $("#tblDecisions").DataTable({
-					data: [{
-							attachments: [],
-							creationDate: new Date(),
-							description: "description",
-							expirationDate: new Date(),
-							name: "decision 4",
-							scope: 234,
-							status: 1,
-							statusDate: new Date(),
-							voters: []
-						}, {
-							attachments: [],
-							creationDate: new Date(),
-							description: "description",
-							expirationDate: new Date(),
-							name: "decision 5",
-							scope: 156,
-							status: 4,
-							statusDate: new Date(),
-							voters: []
-						}, {
-							attachments: [],
-							creationDate: new Date(),
-							description: "description",
-							expirationDate: new Date(),
-							name: "decision 6354",
-							scope: 1895,
-							status: 2,
-							statusDate: new Date(),
-							voters: []
-						}
-					],
-					columns: [{
-							data: "name",
-							className: "name",
-							render: function (a, b, c) {
-								return "<a href=\"/LOCUS/Travel/TravelRequestDetail?id=" + c.travelRequestId + "\">" + name + "</a>";
-							},
-							title: "Name"
-						}, {
-							data: "status",
-							className: "status",
-							render: function (a, b, c) {
-								return statuses.get(a);
-							},
-							title: "Status"
-						}, {
-							data: "scope",
-							className: "scope",
-							render: $.fn.dataTable.render.text(),
-							title: "Scope"
-						}, {
-							data: "creationDate",
-							className: "created",
-							render: function (a, b, c) {
-								return new Date(a).toLocaleString("en-us", dateTimeOptions);
-							},
-							title: "Created"
-						}, {
-							data: "expirationDate",
-							className: "expiration",
-							render: function (a, b, c) {
-								return new Date(a).toLocaleString("en-us", dateTimeOptions);
-							},
-							title: "Expires"
-						}, {
-							data: "attachments",
-							className: "attachments",
-							render: function (a, b, c) {
-								return "<a href=\"/LOCUS/Travel/TravelRequestDetail?id=" + c.travelRequestId + "\">" + name + "</a>";
-							},
-							title: "Attachments"
-						}
-
-					]
-				});
-		}
-
-	},
+	methods: {},
 	computed: {},
 	watch: {
 		comment: {
@@ -211,35 +253,6 @@ Vue.component('decision-detail', {
 		this.data = new Decision(this.decision);
 	},
 	template: $("#tmpDecisionDetail").html()
-});
-
-Vue.component('data-table', {
-	model: {
-		event: "change"
-	},
-	data: function () {
-		return {
-			data: {}
-		};
-	},
-	props: ["columns", "query", "header"],
-	methods: {},
-	computed: {},
-	watch: {
-		comment: {
-			handler: function (current, old) {
-				this.$emit("change", current);
-				//console.log("travel-entry watch emitting change", current, this.index);
-			},
-			deep: true
-		}
-	},
-	mounted: function () {
-		// for some reason we need this to establish reactivity,
-		// without it, we don't get reactivity until an emit is triggered
-		this.data = new Decision(this.decision);
-	},
-	template: $("#tmpDataTable").html()
 });
 
 Vue.component('group-detail', {
@@ -302,4 +315,136 @@ Vue.component('entity-detail', {
 
 var vue = new Vue({
 		el: "#vue",
+		data: function () {
+			return {
+				decisions: testDecisions,
+				decisionsColumns: [{
+						data: "name",
+						className: "name",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Name"
+					}, {
+						data: "status",
+						className: "status",
+						render: function (value, renderType, row) {
+							return statuses.get(value);
+						},
+						title: "Status"
+					}, {
+						data: "group",
+						className: "group",
+						render: $.fn.dataTable.render.text(),
+						title: "Group"
+					}, {
+						data: "creationDate",
+						className: "created",
+						render: function (value, renderType, row) {
+							return new Date(value).toLocaleString("en-us", dateTimeOptions);
+						},
+						title: "Created"
+					}, {
+						data: "expirationDate",
+						className: "expiration",
+						render: function (value, renderType, row) {
+							return new Date(value).toLocaleString("en-us", dateTimeOptions);
+						},
+						title: "Expires"
+					}, {
+						data: "attachments",
+						className: "attachments",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Attachments"
+					}
+
+				],
+
+				areDecisionsRendered: false,
+				groups: testGroups,
+				groupsColumns: [{
+						data: "name",
+						className: "name",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Name"
+					}, {
+						data: "parent",
+						className: "parent",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Parent"
+					}, {
+						data: "children",
+						className: "children",
+						render: function (value, renderType, row) {
+							return value.length + " " + row.children ? "Groups" : "Entities";
+						},
+						title: "Children"
+					}, {
+						data: "creationDate",
+						className: "created",
+						render: function (value, renderType, row) {
+							return new Date(value).toLocaleString("en-us", dateTimeOptions);
+						},
+						title: "Created"
+					}, {
+						data: "attachments",
+						className: "attachments",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Attachments"
+					}
+				],
+				areGroupsRendered: false,
+				entities: testEntities,
+				entitiesColumns: [{
+						data: "name",
+						className: "name",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Name"
+					}, {
+						data: "parent",
+						className: "parent",
+						render: function (value, renderType, row) {
+							return "<a href=\"" + row.href + "\">" + value + "</a>";
+						},
+						title: "Parent"
+					}, {
+						data: "creationDate",
+						className: "created",
+						render: function (value, renderType, row) {
+							return new Date(value).toLocaleString("en-us", dateTimeOptions);
+						},
+						title: "Created"
+					}
+
+				],
+				areEntitiesRendered: false,
+			};
+		},
+		methods: {
+			showDecisions: function () {
+				this.areDecisionsRendered = true;
+				this.areGroupsRendered = false;
+				this.areEntitiesRendered = false;
+			},
+			showGroups: function () {
+				this.areDecisionsRendered = false;
+				this.areGroupsRendered = true;
+				this.areEntitiesRendered = false;
+			},
+			showEntities: function () {
+				this.areDecisionsRendered = false;
+				this.areGroupsRendered = false;
+				this.areEntitiesRendered = true;
+			}
+		}
 	});
