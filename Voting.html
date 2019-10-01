@@ -1,24 +1,57 @@
 <html>
 	<head>
 		<title>
-			Decision
+			Decision System
 		</title>
+		<link rel="stylesheet" href="voting.css">
+		<link rel="stylesheet" href="voting.css">
+		<link rel="stylesheet" href="jquery.datatables.min.css">
 		<link rel="stylesheet" href="voting.css">
 		</link>
 	</head>
 	<body>
 		<div id="vue">
-		
-			<nav-bar></nav-bar>
-		
+			<nav-bar
+					@showdecisions="showDecisions"
+					@showgroups="showGroups"
+					@showentities="showEntities"
+					></nav-bar>
+			<div v-if="areDecisionsRendered">
+				<data-table
+						:columns="decisionsColumns"  
+						:data="decisions" 
+						header="Decisions"
+						></data-table>
+			</div>
+			<div v-if="areGroupsRendered">
+				<data-table
+						:columns="groupsColumns"  
+						:data="groups" 
+						header="Groups"
+						></data-table>
+			</div>
+			<div v-if="areEntitiesRendered">
+				<data-table
+						:columns="entitiesColumns"  
+						:data="entities" 
+						header="Entities"
+						></data-table>
+			</div>
 		</div>
-	
+
 		<template id="tmpNavBar">
 			<div class="navbar">
-				<a href="Decisions">Decisions</a>
-				<a href="Groups">Groups</a>
-				<a href="Entities">Entities</a>
+				<span @click="showDecisions">Decisions</span>
+				<span @click="showGroups">Groups</span>
+				<span @click="showEntities">Entities</span>
 			</div>
+		</template>
+		<template id="tmpDataTable">
+			<div>			
+				<h2>{{header}}</h2>
+				<button id="btnCreate">Create</button>
+				<table id="tblList" class="display compact" width="100%"></table>
+			</div>		
 		</template>
 		<template id="tmpDecisionDetail">
 			<h2>Decision</h2>
@@ -66,12 +99,6 @@
 					</entity-list>
 				</div>
 			</div>
-		</template>
-		<template id="tmpDataTable">
-			<h2>{{header}}</h2>
-			<button id="btnCreate">Create</button>
-			<table id="tblList">
-			</table>
 		</template>
 		<template id="tmpGroupDetail">
 			<h2>Group</h2>
