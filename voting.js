@@ -14,6 +14,93 @@ statuses.set(2, "Confirmed");
 statuses.set(3, "Denied");
 statuses.set(4, "Archived");
 
+var dataAccess = {
+	getGroups: function (success, failure) {
+		success(testGroups);
+		// $.ajax({
+		// url: window.location.origin + "/groups",
+		// type: "GET",
+		// success: function (data) {
+		// success(data);
+		// },
+		// failure: function (err) {
+		// failure(err);
+		// }
+		// });
+	},
+	getGroup: function (id, success, failure) {
+		success(testGroups.filter(function (x) {
+				return x.id === id;
+			}));
+		// $.ajax({
+		// url: window.location.origin + "/group/" + id,
+		// type: "GET",
+		// success: function (data) {
+		// success(data);
+		// },
+		// failure: function (err) {
+		// failure(err);
+		// }
+		// });
+	},
+	getDecisions: function (success, failure) {
+		success(testDecisions);
+		// $.ajax({
+		// url: window.location.origin + "/decisions",
+		// type: "GET",
+		// success: function (data) {
+		// success(data);
+		// },
+		// failure: function (err) {
+		// failure(err);
+		// }
+		// });
+	},
+	getDecision: function (id, success, failure) {
+		success(testDecisions.filter(function (x) {
+				return x.id === id;
+			}));
+		// $.ajax({
+		// url: window.location.origin + "/decision/" + id,
+		// type: "GET",
+		// success: function (data) {
+		// success(data);
+		// },
+		// failure: function (err) {
+		// failure(err);
+		// }
+		// });
+	},
+	getEntities: function (success, failure) {
+		success(testEntities);
+		// $.ajax({
+		// url: window.location.origin + "/entities",
+		// type: "GET",
+		// success: function (data) {
+		// success(data);
+		// },
+		// failure: function (err) {
+		// failure(err);
+		// }
+		// });
+	},
+	getEntity: function (id, success, failure) {
+		success(testEntities.filter(function (x) {
+				return x.id === id;
+			}));
+		// $.ajax({
+		// url: window.location.origin + "/entity/" + id,
+		// type: "GET",
+		// success: function (data) {
+		// success(data);
+		// },
+		// failure: function (err) {
+		// failure(err);
+		// }
+		// });
+	}
+};
+
 var Decision = (function () {
 
 	function constructor(data) {
@@ -28,8 +115,6 @@ var Decision = (function () {
 			this.group = data.group;
 			this.status = data.status;
 			this.statusDate = data.statusDate;
-			// Entity[]
-			this.voters = data.voters;
 		} else {
 			this.attachments = null;
 			this.creationDate = null;
@@ -40,7 +125,6 @@ var Decision = (function () {
 			this.group = null;
 			this.status = null;
 			this.statusDate = null;
-			this.voters = [];
 		}
 	}
 
@@ -120,7 +204,7 @@ var testDecisions = (function () {
 			group: Math.floor(Math.random() * 10000),
 			status: Math.floor(Math.random() * 5),
 			statusDate: new Date(Math.floor(Math.random() * 10000000000)),
-			voters: []
+			entities: []
 		};
 	}
 
@@ -163,28 +247,171 @@ var testGroups = (function () {
 
 	function getTestGroup() {
 		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		var id2 = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
 		return {
+			attachments: [],
 			children: [],
 			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
 			description: "group desc",
 			href: id,
 			name: "group " + id,
-			parent: null
+			parent: {
+				id: id2,
+				name: "group " + id2,
+				href: id2
+			}
 
 		};
 	}
 })();
 
+var decisionsColumns = [{
+		data: "name",
+		className: "name",
+		render: function (value, renderType, row) {
+			return "<a href=\"" + row.href + "\">" + value + "</a>";
+		},
+		title: "Name"
+	}, {
+		data: "status",
+		className: "status",
+		render: function (value, renderType, row) {
+			return statuses.get(value);
+		},
+		title: "Status"
+	}, {
+		data: "group",
+		className: "group",
+		render: $.fn.dataTable.render.text(),
+		title: "Group"
+	}, {
+		data: "creationDate",
+		className: "created",
+		render: function (value, renderType, row) {
+			return new Date(value).toLocaleString("en-us", dateTimeOptions);
+		},
+		title: "Created"
+	}, {
+		data: "expirationDate",
+		className: "expiration",
+		render: function (value, renderType, row) {
+			return new Date(value).toLocaleString("en-us", dateTimeOptions);
+		},
+		title: "Expires"
+	}, {
+		data: "attachments",
+		className: "attachments",
+		render: function (value, renderType, row) {
+			return "<a href=\"" + row.href + "\">" + value + "</a>";
+		},
+		title: "Attachments"
+	}
+
+];
+
+var groupsColumns = [{
+		data: "name",
+		className: "name",
+		render: function (value, renderType, row) {
+			return "<a href=\"" + row.href + "\">" + value + "</a>";
+		},
+		title: "Name"
+	}, {
+		data: "parent",
+		className: "parent",
+		render: function (value, renderType, row) {
+			console.log(value);
+			return "<a href=\"" + value.href + "\">" + value.name + "</a>";
+		},
+		title: "Parent"
+	}, {
+		data: "children",
+		className: "children",
+		render: function (value, renderType, row) {
+			return value.length + " " + row.children ? "Groups" : "Entities";
+		},
+		title: "Children"
+	}, {
+		data: "creationDate",
+		className: "created",
+		render: function (value, renderType, row) {
+			return new Date(value).toLocaleString("en-us", dateTimeOptions);
+		},
+		title: "Created"
+	}, {
+		data: "attachments",
+		className: "attachments",
+		render: function (value, renderType, row) {
+			return "<a href=\"" + row.href + "\">" + value + "</a>";
+		},
+		title: "Attachments"
+	}
+];
+
+var entitiesColumns = [{
+		data: "name",
+		className: "name",
+		render: function (value, renderType, row) {
+			return "<a href=\"" + row.href + "\">" + value + "</a>";
+		},
+		title: "Name"
+	}, {
+		data: "parent",
+		className: "parent",
+		render: function (value, renderType, row) {
+			return "<a href=\"" + row.href + "\">" + value + "</a>";
+		},
+		title: "Parent"
+	}, {
+		data: "creationDate",
+		className: "created",
+		render: function (value, renderType, row) {
+			return new Date(value).toLocaleString("en-us", dateTimeOptions);
+		},
+		title: "Created"
+	}
+
+];
+
+var groupsKey = new Date().getTime() + Math.floor(Math.random() * 999).toString();
+var decisionsKey = new Date().getTime() + Math.floor(Math.random() * 999).toString();
+var entitiesKey = new Date().getTime() + Math.floor(Math.random() * 999).toString();
+
+(function () {
+
+	if (!window.localStorage.getItem(groupsKey)) {
+		return dataAccess.getGroups(function (data) {
+			window.localStorage.setItem(groupsKey, data);
+		}, function (err) {
+			console.log("failure", err);
+		});
+	}
+	if (!window.localStorage.getItem(decisionsKey)) {
+		return dataAccess.getDecisions(function (data) {
+			window.localStorage.setItem(decisionsKey, data);
+		}, function (err) {
+			console.log("failure", err);
+		});
+	}
+	if (!window.localStorage.getItem(entitiesKey)) {
+		return dataAccess.getEntities(function (data) {
+			window.localStorage.setItem(entitiesKey, data);
+		}, function (err) {
+			console.log("failure", err);
+		});
+	}
+})();
+
 Vue.component('nav-bar', {
 	methods: {
-		showDecisions: function () {
-			this.$emit("showdecisions");
+		showDecisionList: function () {
+			this.$emit("showdecisionlist");
 		},
-		showGroups: function () {
-			this.$emit("showgroups");
+		showGroupList: function () {
+			this.$emit("showgrouplist");
 		},
-		showEntities: function () {
-			this.$emit("showentities");
+		showEntityList: function () {
+			this.$emit("showentitylist");
 		}
 
 	},
@@ -195,19 +422,19 @@ Vue.component('data-table', {
 	model: {
 		event: "change"
 	},
-	props: ["columns", "data", "header"],
+	props: ["columns", "data", "header", "createHandler"],
 	methods: {
 
 		setupDataTable: function () {
 
-			var selector = "#tblList";
+			var selector = ".data-table";
 
 			if (this.dt) {
 				this.dt.destroy(false);
 				$(selector).empty();
 				// $(selector).html(this.$options.template);
 			}
-			this.dt = $(selector).DataTable({
+			this.dt = $(this.$el).find(selector).DataTable({
 					data: this.data,
 					columns: this.columns
 				});
@@ -232,14 +459,25 @@ Vue.component('decision-detail', {
 	},
 	data: function () {
 		return {
+			decisionsColumns: decisionsColumns,
+			groupsColumns: groupsColumns,
 			data: {}
 		};
 	},
 	props: ["decision", "editable"],
-	methods: {},
-	computed: {},
+	methods: {
+		save: function () {
+			throw ("not implemented");
+		}
+	},
+	computed: {
+		groups: function () {
+			window.localStorage.getItem(groupsKey);
+		}
+
+	},
 	watch: {
-		comment: {
+		data: {
 			handler: function (current, old) {
 				this.$emit("change", current);
 				//console.log("travel-entry watch emitting change", current, this.index);
@@ -265,10 +503,19 @@ Vue.component('group-detail', {
 		};
 	},
 	props: ["group", "editable"],
-	methods: {},
-	computed: {},
+	methods: {
+		save: function () {
+			throw ("not implemented");
+		}
+
+	},
+	computed: {
+		groups: function () {
+			window.localStorage.getItem(groupsKey);
+		}
+	},
 	watch: {
-		comment: {
+		data: {
 			handler: function (current, old) {
 				this.$emit("change", current);
 				//console.log("travel-entry watch emitting change", current, this.index);
@@ -294,10 +541,19 @@ Vue.component('entity-detail', {
 		};
 	},
 	props: ["entity", "editable"],
-	methods: {},
-	computed: {},
+	methods: {
+		save: function () {
+			throw ("not implemented");
+		}
+
+	},
+	computed: {
+		groups: function () {
+			window.localStorage.getItem(groupsKey);
+		}
+	},
 	watch: {
-		comment: {
+		data: {
 			handler: function (current, old) {
 				this.$emit("change", current);
 				//console.log("travel-entry watch emitting change", current, this.index);
@@ -317,134 +573,71 @@ var vue = new Vue({
 		el: "#vue",
 		data: function () {
 			return {
+				currentDecision: new Decision(),
 				decisions: testDecisions,
-				decisionsColumns: [{
-						data: "name",
-						className: "name",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Name"
-					}, {
-						data: "status",
-						className: "status",
-						render: function (value, renderType, row) {
-							return statuses.get(value);
-						},
-						title: "Status"
-					}, {
-						data: "group",
-						className: "group",
-						render: $.fn.dataTable.render.text(),
-						title: "Group"
-					}, {
-						data: "creationDate",
-						className: "created",
-						render: function (value, renderType, row) {
-							return new Date(value).toLocaleString("en-us", dateTimeOptions);
-						},
-						title: "Created"
-					}, {
-						data: "expirationDate",
-						className: "expiration",
-						render: function (value, renderType, row) {
-							return new Date(value).toLocaleString("en-us", dateTimeOptions);
-						},
-						title: "Expires"
-					}, {
-						data: "attachments",
-						className: "attachments",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Attachments"
-					}
-
-				],
-
-				areDecisionsRendered: false,
+				decisionsColumns: decisionsColumns,
+				isDecisionListDisplayed: false,
+				isDecisionDetailDisplayed: false,
+				currentGroup: new Group(),
 				groups: testGroups,
-				groupsColumns: [{
-						data: "name",
-						className: "name",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Name"
-					}, {
-						data: "parent",
-						className: "parent",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Parent"
-					}, {
-						data: "children",
-						className: "children",
-						render: function (value, renderType, row) {
-							return value.length + " " + row.children ? "Groups" : "Entities";
-						},
-						title: "Children"
-					}, {
-						data: "creationDate",
-						className: "created",
-						render: function (value, renderType, row) {
-							return new Date(value).toLocaleString("en-us", dateTimeOptions);
-						},
-						title: "Created"
-					}, {
-						data: "attachments",
-						className: "attachments",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Attachments"
-					}
-				],
-				areGroupsRendered: false,
+				groupsColumns: groupsColumns,
+				isGroupListDisplayed: false,
+				isGroupDetailDisplayed: false,
+				currentEntity: new Entity(),
 				entities: testEntities,
-				entitiesColumns: [{
-						data: "name",
-						className: "name",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Name"
-					}, {
-						data: "parent",
-						className: "parent",
-						render: function (value, renderType, row) {
-							return "<a href=\"" + row.href + "\">" + value + "</a>";
-						},
-						title: "Parent"
-					}, {
-						data: "creationDate",
-						className: "created",
-						render: function (value, renderType, row) {
-							return new Date(value).toLocaleString("en-us", dateTimeOptions);
-						},
-						title: "Created"
-					}
-
-				],
-				areEntitiesRendered: false,
+				entitiesColumns: entitiesColumns,
+				isEntityListDisplayed: false,
+				isEntityDetailDisplayed: false,
 			};
 		},
 		methods: {
-			showDecisions: function () {
-				this.areDecisionsRendered = true;
-				this.areGroupsRendered = false;
-				this.areEntitiesRendered = false;
+			showDecisionList: function () {
+				this.isDecisionListDisplayed = true;
+				this.isDecisionDetailDisplayed = false;
+				this.isGroupListDisplayed = false;
+				this.isGroupDetailDisplayed = false;
+				this.isEntityListDisplayed = false;
+				this.isEntityDetailDisplayed = false;
 			},
-			showGroups: function () {
-				this.areDecisionsRendered = false;
-				this.areGroupsRendered = true;
-				this.areEntitiesRendered = false;
+			showDecisionDetail: function () {
+				this.isDecisionListDisplayed = false;
+				this.isDecisionDetailDisplayed = true;
+				this.isGroupListDisplayed = false;
+				this.isGroupDetailDisplayed = false;
+				this.isEntityListDisplayed = false;
+				this.isEntityDetailDisplayed = false;
 			},
-			showEntities: function () {
-				this.areDecisionsRendered = false;
-				this.areGroupsRendered = false;
-				this.areEntitiesRendered = true;
+			showGroupList: function () {
+				this.isDecisionListDisplayed = false;
+				this.isDecisionDetailDisplayed = false;
+				this.isGroupListDisplayed = true;
+				this.isGroupDetailDisplayed = false;
+				this.isEntityListDisplayed = false;
+				this.isEntityDetailDisplayed = false;
+			},
+			showGroupDetail: function () {
+				this.isDecisionListDisplayed = false;
+				this.isDecisionDetailDisplayed = false;
+				this.isGroupListDisplayed = false;
+				this.isGroupDetailDisplayed = true;
+				this.isEntityListDisplayed = false;
+				this.isEntityDetailDisplayed = false;
+			},
+			showEntityList: function () {
+				this.isDecisionListDisplayed = false;
+				this.isDecisionDetailDisplayed = false;
+				this.isGroupListDisplayed = false;
+				this.isGroupDetailDisplayed = false;
+				this.isEntityListDisplayed = true;
+				this.isEntityDetailDisplayed = false;
+			},
+			showEntityDetail: function () {
+				this.isDecisionListDisplayed = false;
+				this.isDecisionDetailDisplayed = false;
+				this.isGroupListDisplayed = false;
+				this.isGroupDetailDisplayed = false;
+				this.isEntityListDisplayed = false;
+				this.isEntityDetailDisplayed = true;
 			}
 		}
 	});
