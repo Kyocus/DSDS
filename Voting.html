@@ -17,35 +17,35 @@
 					>
 			</nav-bar>
 			<div v-if="isDecisionListDisplayed">
+				<button class="create-button" @click="createDecision">Create</button>
 				<data-table
 						:columns="decisionsColumns"  
 						:data="decisions" 
-						:create-handler="showDecisionDetail"
 						header="Decisions"
 						>
 				</data-table>
 			</div>
 			<div v-if="isGroupListDisplayed">
+				<button class="create-button" @click="createGroup">Create</button>
 				<data-table
 						:columns="groupsColumns"  
 						:data="groups" 
-						:create-handler="showGroupDetail"
 						header="Groups"
 						>
 				</data-table>
 			</div>
 			<div v-if="isEntityListDisplayed">
+				<button class="create-button" @click="createEntity">Create</button>
 				<data-table
 						:columns="entitiesColumns"  
 						:data="entities" 
-						:create-handler="showEntityDetail"
 						header="Entities"
 						>
 				</data-table>
 			</div>
 			<div v-if="isDecisionDetailDisplayed">
 				<decision-detail
-				:decision="currentDecision"
+				:value="currentDecision"
 				editable="true">
 				</decision-detail>
 			</div>
@@ -73,14 +73,13 @@
 		<template id="tmpDataTable">
 			<div>			
 				<h2>{{header}}</h2>
-				<button class="create-button" @click="createHandler">Create</button>
 				<table class="data-table" class="display compact" width="100%"/>
 			</div>		
 		</template>
 		<template id="tmpDecisionDetail">
 			<div>
-				<h2>Decision</h2>
 				<pre>{{decision}}</pre>
+				<h2>Decision</h2>
 				<div v-if="!editable">
 					<div>
 						<label>Name:</label>
@@ -96,7 +95,7 @@
 					</div>
 					<div>
 						<label>Group:</label>
-						<a href="decision.group.href">{{decision.group.name}}</a>
+						<a href="group.href">{{group.name}}</a>
 					</div>
 				</div>
 				<div v-if="editable">
@@ -110,12 +109,18 @@
 					</div>
 					<div>
 						<label>Group:</label>
-						<data-table
+						<a v-if="decision.groupId" :href="group.href">{{group.name}}</a>
+						<button @click="selectGroup">Select Group</button>
+						<div 
+							v-if="isSelectingGroup"
+							class="modal">
+							<data-table
 								:columns="groupsColumns"  
 								:data="groups" 
-								header="Group"
+								header="Select a Group"
 								>
-						</data-table>
+							</data-table>
+						</div>
 					</div>
 					<!-- todo pass in selection event -->
 					<button class="save-button" @click="save">Save</button>

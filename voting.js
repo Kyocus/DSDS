@@ -1,3 +1,6 @@
+const ENTITY_GROUP_TYPE = 0;
+const GROUP_GROUP_TYPE = 1;
+
 var dateTimeOptions = {
 	year: 'numeric',
 	month: 'short',
@@ -106,23 +109,25 @@ var Decision = (function () {
 	function constructor(data) {
 
 		if (data) {
-			this.attachments = data.attachments;
+			this.id = data.id;
+			this.creationDate = data.creationDate;
 			this.creationDate = data.creationDate;
 			this.description = data.description;
 			this.expirationDate = data.expirationDate;
 			this.href = data.href;
 			this.name = data.name;
-			this.group = data.group;
+			this.groupId = data.groupId;
 			this.status = data.status;
 			this.statusDate = data.statusDate;
 		} else {
+			this.id = null;
 			this.attachments = null;
 			this.creationDate = null;
 			this.description = "";
 			this.expirationDate = null;
 			this.href = "";
 			this.name = "";
-			this.group = null;
+			this.groupId = null;
 			this.status = null;
 			this.statusDate = null;
 		}
@@ -137,21 +142,24 @@ var Group = (function () {
 	function constructor(data) {
 
 		if (data) {
-			// Entity or Group
+			this.id = data.id;
+			// Entity[] or Group[]
+			this.type = data.type; // "group" or "entity"
 			this.children = data.children;
 			this.creationDate = data.creationDate;
 			this.description = data.description;
 			this.href = data.href;
 			this.name = data.name;
 			// Group
-			this.parent = data.parent;
+			this.parentId = data.parentId;
 		} else {
+			this.id = null;
 			this.children = [];
 			this.creationDate = null;
 			this.description = "";
 			this.href = "";
 			this.name = "";
-			this.parent = null;
+			this.parentId = null;
 		}
 	}
 
@@ -163,106 +171,24 @@ var Entity = (function () {
 	function constructor(data) {
 
 		if (data) {
+			this.id = data.id;
 			this.creationDate = data.creationDate;
 			this.description = data.description;
 			this.href = data.href;
 			this.name = data.name;
 			// Group
-			this.parent = data.parent;
+			this.groupId = data.groupId;
 		} else {
+			this.id = null;
 			this.creationDate = null;
 			this.description = "";
 			this.href = "";
 			this.name = "";
-			this.parent = null;
+			this.groupId = null;
 		}
 	}
 
 	return constructor;
-})();
-
-var testDecisions = (function () {
-
-	var returnMe = [];
-
-	for (let i = 0; i < Math.random() * 50; i++) {
-
-		returnMe.push(getTestDecision());
-	}
-
-	return returnMe;
-
-	function getTestDecision() {
-		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
-		return {
-			attachments: [],
-			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
-			description: "description",
-			expirationDate: new Date(),
-			href: id,
-			name: "decision " + id,
-			group: Math.floor(Math.random() * 10000),
-			status: Math.floor(Math.random() * 5),
-			statusDate: new Date(Math.floor(Math.random() * 10000000000)),
-			entities: []
-		};
-	}
-
-})();
-
-var testEntities = (function () {
-
-	var returnMe = [];
-
-	for (let i = 0; i < Math.random() * 50; i++) {
-
-		returnMe.push(getTestEntity());
-	}
-
-	return returnMe;
-
-	function getTestEntity() {
-		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
-		return {
-			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
-			description: "description",
-			href: id,
-			name: "entity " + id,
-			parent: null
-		};
-	}
-
-})();
-
-var testGroups = (function () {
-
-	var returnMe = [];
-
-	for (let i = 0; i < Math.random() * 50; i++) {
-
-		returnMe.push(getTestGroup());
-	}
-
-	return returnMe;
-
-	function getTestGroup() {
-		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
-		var id2 = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
-		return {
-			attachments: [],
-			children: [],
-			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
-			description: "group desc",
-			href: id,
-			name: "group " + id,
-			parent: {
-				id: id2,
-				name: "group " + id2,
-				href: id2
-			}
-
-		};
-	}
 })();
 
 var decisionsColumns = [{
@@ -280,9 +206,12 @@ var decisionsColumns = [{
 		},
 		title: "Status"
 	}, {
-		data: "group",
+		data: "groupId",
 		className: "group",
-		render: $.fn.dataTable.render.text(),
+		render: function (value, renderType, row) {
+			var group = getItemById(value, groups);
+			return "<a href=\"" + group.href + "\">" + group.name + "</a>";
+		},
 		title: "Group"
 	}, {
 		data: "creationDate",
@@ -317,11 +246,16 @@ var groupsColumns = [{
 		},
 		title: "Name"
 	}, {
-		data: "parent",
+		data: "parentId",
 		className: "parent",
 		render: function (value, renderType, row) {
-			console.log(value);
-			return "<a href=\"" + value.href + "\">" + value.name + "</a>";
+			var parent = getItemById(value, groups);
+			console.log("parent", parent);
+			if (parent) {
+				return "<a href=\"" + parent.href + "\">" + parent.name + "</a>";
+			} else {
+				return "<a>no parent selected</a>";
+			}
 		},
 		title: "Parent"
 	}, {
@@ -373,33 +307,112 @@ var entitiesColumns = [{
 
 ];
 
-var groupsKey = new Date().getTime() + Math.floor(Math.random() * 999).toString();
-var decisionsKey = new Date().getTime() + Math.floor(Math.random() * 999).toString();
-var entitiesKey = new Date().getTime() + Math.floor(Math.random() * 999).toString();
+var groups = [];
+var decisions = [];
+var entities = [];
 
-(function () {
+(function getTestData() {
+	var testGroups = [];
+	var testDecisions = [];
+	var testEntities = [];
 
-	if (!window.localStorage.getItem(groupsKey)) {
-		return dataAccess.getGroups(function (data) {
-			window.localStorage.setItem(groupsKey, data);
-		}, function (err) {
-			console.log("failure", err);
+	for (let i = 0; i < Math.random() * 50; i++) {
+		testEntities.push(getTestEntity());
+		// returnMe.push(getTestGroup());
+		// returnMe.push(getTestDecision());
+
+	}
+
+	// generate ENTITY groups
+	for (let i = 0; i < 5; i++) {
+		var group = getTestGroup(ENTITY_GROUP_TYPE);
+
+		var max = 3 + Math.floor(Math.random() * 7);
+
+		// put a random number of entities in each group
+		for (let j = 0; j < max; j++) {
+
+			var n = Math.floor(Math.random() * testEntities.length);
+
+			testEntities[n].groupId = group.id;
+			group.children.push(testEntities[n].id);
+		}
+		testGroups.push(group);
+	}
+
+	// generate GROUP groups
+	for (let i = 0; i < 2; i++) {
+		var group = getTestGroup(GROUP_GROUP_TYPE);
+
+		var max = 1 + Math.floor(Math.random() * 1);
+
+		// put a random number of groups in each group
+		for (let j = 0; j < max; j++) {
+
+			var n = Math.floor(Math.random() * testGroups.length);
+
+			testGroups[n].parentId = group.id;
+			group.children.push(testGroups[n].id);
+		}
+		testGroups.push(group);
+	}
+
+	// generate decisions
+	for (let i = 0; i < 10; i++) {
+		var decision = getTestDecision();
+		var n = Math.floor(Math.random() * testGroups.length);
+		decision.groupId = testGroups[n].id;
+		testDecisions.push(decision);
+	}
+
+	groups = testGroups;
+	decisions = testDecisions;
+	entities = testEntities;
+
+	function getTestGroup(type) {
+		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		return new Group({
+			id: id,
+			attachments: [],
+			children: [],
+			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			description: "group desc",
+			href: id,
+			name: "group " + id,
+			parentId: null,
+			type: type
 		});
 	}
-	if (!window.localStorage.getItem(decisionsKey)) {
-		return dataAccess.getDecisions(function (data) {
-			window.localStorage.setItem(decisionsKey, data);
-		}, function (err) {
-			console.log("failure", err);
+
+	function getTestDecision() {
+		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		return new Decision({
+			id: id,
+			attachments: [],
+			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			description: "description",
+			expirationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			href: id,
+			name: "decision " + id,
+			groupId: null,
+			status: Math.floor(Math.random() * 5),
+			statusDate: new Date(Math.floor(Math.random() * 10000000000))
 		});
 	}
-	if (!window.localStorage.getItem(entitiesKey)) {
-		return dataAccess.getEntities(function (data) {
-			window.localStorage.setItem(entitiesKey, data);
-		}, function (err) {
-			console.log("failure", err);
+
+	function getTestEntity() {
+		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		// var parentId = Math.floor(Math.random() * groups.length);
+		return new Entity({
+			id: id,
+			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			description: "description",
+			href: id,
+			name: "entity " + id,
+			groupId: null
 		});
 	}
+
 })();
 
 Vue.component('nav-bar', {
@@ -460,20 +473,48 @@ Vue.component('decision-detail', {
 	data: function () {
 		return {
 			decisionsColumns: decisionsColumns,
-			groupsColumns: groupsColumns,
-			data: {}
+			groupsColumns: this.getGroupsColumns(),
+			isSelectingGroup: false,
+			decision: {}
 		};
 	},
-	props: ["decision", "editable"],
+	props: ["value", "editable"],
 	methods: {
+
+		getGroupsColumns: function () {
+			var returnMe = groupsColumns;
+			returnMe.unshift({
+				data: null,
+				className: "actions",
+				render: function (value, renderType, row) {
+					return "<button @click=\"setGroup(row)\">Select</button>";
+				},
+				title: "Actions"
+			});
+			return returnMe;
+		},
+		setGroup: function (group) {
+			this.data.group = group;
+		},
+		selectGroup: function () {
+			this.isSelectingGroup = true;
+		},
 		save: function () {
 			throw ("not implemented");
 		}
 	},
 	computed: {
 		groups: function () {
-			window.localStorage.getItem(groupsKey);
-		}
+			return groups;
+		},
+		group: function () {
+			try {
+				return getItemById(this.decision.groupId, groups);
+			} catch (e) {
+				console.log(e);
+				return null;
+			}
+		},
 
 	},
 	watch: {
@@ -488,7 +529,7 @@ Vue.component('decision-detail', {
 	mounted: function () {
 		// for some reason we need this to establish reactivity,
 		// without it, we don't get reactivity until an emit is triggered
-		this.data = new Decision(this.decision);
+		this.decision = new Decision(this.value);
 	},
 	template: $("#tmpDecisionDetail").html()
 });
@@ -511,7 +552,7 @@ Vue.component('group-detail', {
 	},
 	computed: {
 		groups: function () {
-			window.localStorage.getItem(groupsKey);
+			return groups;
 		}
 	},
 	watch: {
@@ -549,7 +590,7 @@ Vue.component('entity-detail', {
 	},
 	computed: {
 		groups: function () {
-			window.localStorage.getItem(groupsKey);
+			return groups;
 		}
 	},
 	watch: {
@@ -574,23 +615,35 @@ var vue = new Vue({
 		data: function () {
 			return {
 				currentDecision: new Decision(),
-				decisions: testDecisions,
+				decisions: decisions,
 				decisionsColumns: decisionsColumns,
 				isDecisionListDisplayed: false,
 				isDecisionDetailDisplayed: false,
 				currentGroup: new Group(),
-				groups: testGroups,
+				groups: groups,
 				groupsColumns: groupsColumns,
 				isGroupListDisplayed: false,
 				isGroupDetailDisplayed: false,
 				currentEntity: new Entity(),
-				entities: testEntities,
+				entities: entities,
 				entitiesColumns: entitiesColumns,
 				isEntityListDisplayed: false,
 				isEntityDetailDisplayed: false,
 			};
 		},
 		methods: {
+			createDecision: function () {
+				this.currentDecision = new Decision();
+				this.showDecisionDetail();
+			},
+			createGroup: function () {
+				this.currentGroup = new Group();
+				this.showGroupDetail();
+			},
+			createEntity: function () {
+				this.currentEntity = new Entity();
+				this.showEntityDetail();
+			},
 			showDecisionList: function () {
 				this.isDecisionListDisplayed = true;
 				this.isDecisionDetailDisplayed = false;
@@ -641,3 +694,11 @@ var vue = new Vue({
 			}
 		}
 	});
+
+function getItemById(id, collection) {
+	var item = collection.find(function (x) {
+			return x.id === id;
+		});
+
+	return item ? item : null;
+}
