@@ -435,9 +435,14 @@ Vue.component('data-table', {
 	model: {
 		event: "change"
 	},
-	props: ["columns", "data", "header", "createHandler"],
+	// selectMode === "single" || "multi"
+	props: ["columns", "data", "header", "selectMode"],
 	methods: {
 
+		select: function (row) {
+			console.log("data-table emitting select", row);
+			this.$emit("select", row);
+		},
 		setupDataTable: function () {
 
 			var selector = ".data-table";
@@ -449,12 +454,35 @@ Vue.component('data-table', {
 			}
 			this.dt = $(this.$el).find(selector).DataTable({
 					data: this.data,
-					columns: this.columns
+					columns: this.columnsDisplay
 				});
+
+			$("button.select-single").click(this.select);
+			$("button.select-multi").click(this.select);
+		}
+	},
+	computed: {
+		columnsDisplay: function () {
+
+			var mode = this.selectMode;
+			if (mode === "single" || mode === "multi") {
+
+				var returnMe = this.columns;
+				returnMe.unshift({
+					data: null,
+					className: "actions",
+					render: function (value, renderType, row) {
+						return "<button class=\"select-" + mode + "\">Select</button>";
+					},
+					title: "Actions"
+				});
+				return returnMe;
+			} else {
+				return this.columns;
+			}
 		}
 
 	},
-	computed: {},
 	watch: {
 		data: function (current, old) {
 			this.setupDataTable();
@@ -473,34 +501,32 @@ Vue.component('decision-detail', {
 	data: function () {
 		return {
 			decisionsColumns: decisionsColumns,
-			groupsColumns: this.getGroupsColumns(),
+			groupsColumns: groupsColumns,
 			isSelectingGroup: false,
 			decision: {}
 		};
 	},
 	props: ["value", "editable"],
 	methods: {
+		save: function (event) {},
+		save: function () {
+			decisions.find(function (x) {
+				return x.id === this.data.id;
+			}) = this.data;
 
-		getGroupsColumns: function () {
-			var returnMe = groupsColumns;
-			returnMe.unshift({
-				data: null,
-				className: "actions",
-				render: function (value, renderType, row) {
-					return "<button @click=\"setGroup(row)\">Select</button>";
-				},
-				title: "Actions"
-			});
-			return returnMe;
 		},
 		setGroup: function (group) {
-			this.data.group = group;
+			this.decision.group = group;
 		},
 		selectGroup: function () {
 			this.isSelectingGroup = true;
-		},
-		save: function () {
-			throw ("not implemented");
+			Vue.nextTick(function () {
+				$(".modal").dialog({
+					modal: true,
+					width: "70%"
+				});
+
+			});
 		}
 	},
 	computed: {
@@ -518,7 +544,7 @@ Vue.component('decision-detail', {
 
 	},
 	watch: {
-		data: {
+		decision: {
 			handler: function (current, old) {
 				this.$emit("change", current);
 				//console.log("travel-entry watch emitting change", current, this.index);
@@ -632,6 +658,9 @@ var vue = new Vue({
 			};
 		},
 		methods: {
+			onchange: function (value) {
+				this.data = value;
+			},
 			createDecision: function () {
 				this.currentDecision = new Decision();
 				this.showDecisionDetail();

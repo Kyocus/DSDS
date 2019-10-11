@@ -3,6 +3,12 @@
 		<title>
 			Decision System
 		</title>
+		<link rel="stylesheet" href="jquery-ui.min.css">
+		</link>
+		<link rel="stylesheet" href="jquery-ui.structure.min.css">
+		</link>
+		<link rel="stylesheet" href="jquery-ui.theme.min.css">
+		</link>
 		<link rel="stylesheet" href="jquery.datatables.min.css">
 		</link>
 		<link rel="stylesheet" href="voting.css">
@@ -78,7 +84,7 @@
 		</template>
 		<template id="tmpDecisionDetail">
 			<div>
-				<pre>{{decision}}</pre>
+				<!-- <pre>{{decision}}</pre> -->
 				<h2>Decision</h2>
 				<div v-if="!editable">
 					<div>
@@ -117,7 +123,9 @@
 							<data-table
 								:columns="groupsColumns"  
 								:data="groups" 
+								select-mode="single"
 								header="Select a Group"
+								@select="setGroup"
 								>
 							</data-table>
 						</div>
