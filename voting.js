@@ -439,26 +439,29 @@ Vue.component('data-table', {
 	props: ["columns", "data", "header", "selectMode"],
 	methods: {
 
-		select: function (row) {
-			console.log("data-table emitting select", row);
-			this.$emit("select", row);
+		select: function (data) {
+			console.log("data-table emitting change", data);
+			this.$emit("change", data.id);
 		},
 		setupDataTable: function () {
 
 			var selector = ".data-table";
+			var self = this;
 
-			if (this.dt) {
-				this.dt.destroy(false);
+			if (self.dt) {
+				self.dt.destroy(false);
 				$(selector).empty();
-				// $(selector).html(this.$options.template);
 			}
-			this.dt = $(this.$el).find(selector).DataTable({
-					data: this.data,
-					columns: this.columnsDisplay
+			self.dt = $(self.$el).find(selector).DataTable({
+					data: self.data,
+					columns: self.columnsDisplay
 				});
 
-			$("button.select-single").click(this.select);
-			$("button.select-multi").click(this.select);
+
+			$(self.$el).on('click', 'button.select-single', function () {
+				var data = self.dt.row($(this).closest("tr")).data();
+				self.select(data);
+			});
 		}
 	},
 	computed: {
@@ -508,14 +511,14 @@ Vue.component('decision-detail', {
 	},
 	props: ["value", "editable"],
 	methods: {
-		save: function (event) {},
-		save: function () {
-			decisions.find(function (x) {
-				return x.id === this.data.id;
-			}) = this.data;
+		save: function (data) {
+			decisions[decisions.findIndex(function (x) {
+				return x.id === data.id;
+			})] = data;
 
 		},
 		setGroup: function (group) {
+			console.log("decision-detail setGroup");
 			this.decision.group = group;
 		},
 		selectGroup: function () {
@@ -547,7 +550,7 @@ Vue.component('decision-detail', {
 		decision: {
 			handler: function (current, old) {
 				this.$emit("change", current);
-				//console.log("travel-entry watch emitting change", current, this.index);
+				console.log("decision-detail watch emitting change", current, this.index);
 			},
 			deep: true
 		}
