@@ -18,3 +18,11 @@ h2{
 	text-align: center;
 	background-color: lightsteelblue;
 }
+
+div.linked,
+td.linked {
+	color: blue;
+	text-decoration: underline;
+	cursor: pointer;
+}
+

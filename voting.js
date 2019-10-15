@@ -109,27 +109,25 @@ var Decision = (function () {
 	function constructor(data) {
 
 		if (data) {
-			this.id = data.id;
-			this.creationDate = data.creationDate;
-			this.creationDate = data.creationDate;
-			this.description = data.description;
-			this.expirationDate = data.expirationDate;
-			this.href = data.href;
-			this.name = data.name;
-			this.groupId = data.groupId;
-			this.status = data.status;
-			this.statusDate = data.statusDate;
+			this.id = data.id ? data.id : generateId();
+			this.attachments = data.attachments ? data.attachments : [];
+			this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+			this.description = data.description ? data.description : "";
+			this.expirationDate = data.expirationDate ? data.expirationDate : "";
+			this.name = data.name ? data.name : "";
+			this.groupId = data.groupId ? data.groupId : "";
+			this.status = data.status ? data.status : 0;
+			this.statusDate = data.statusDate ? data.statusDate : "";
 		} else {
-			this.id = null;
-			this.attachments = null;
-			this.creationDate = null;
+			this.id = generateId();
+			this.attachments = [];
+			this.creationDate = new Date().getTime();
 			this.description = "";
-			this.expirationDate = null;
-			this.href = "";
+			this.expirationDate = new Date().getTime();
 			this.name = "";
 			this.groupId = null;
-			this.status = null;
-			this.statusDate = null;
+			this.status = 0;
+			this.statusDate = new Date().getTime();
 		}
 	}
 
@@ -142,22 +140,20 @@ var Group = (function () {
 	function constructor(data) {
 
 		if (data) {
-			this.id = data.id;
+			this.id = data.id ? data.id : generateId();
 			// Entity[] or Group[]
-			this.type = data.type; // "group" or "entity"
-			this.children = data.children;
-			this.creationDate = data.creationDate;
-			this.description = data.description;
-			this.href = data.href;
-			this.name = data.name;
+			this.type = data.type ? data.type : "group"; // "group" or "entity"
+			this.children = data.children ? data.children : [];
+			this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+			this.description = data.description ? data.description : "";
+			this.name = data.name ? data.name : "";
 			// Group
-			this.parentId = data.parentId;
+			this.parentId = data.parentId ? data.parentId : null;
 		} else {
-			this.id = null;
+			this.id = generateId();
 			this.children = [];
-			this.creationDate = null;
+			this.creationDate = new Date().getTime();
 			this.description = "";
-			this.href = "";
 			this.name = "";
 			this.parentId = null;
 		}
@@ -171,18 +167,16 @@ var Entity = (function () {
 	function constructor(data) {
 
 		if (data) {
-			this.id = data.id;
-			this.creationDate = data.creationDate;
-			this.description = data.description;
-			this.href = data.href;
-			this.name = data.name;
+			this.id = data.id ? data.id : generateId();
+			this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+			this.description = data.description ? data.description : "";
+			this.name = data.name ? data.name : "";
 			// Group
-			this.groupId = data.groupId;
+			this.groupId = data.groupId ? data.groupId : null;
 		} else {
-			this.id = null;
-			this.creationDate = null;
+			this.id = generateId();
+			this.creationDate = new Date().getTime();
 			this.description = "";
-			this.href = "";
 			this.name = "";
 			this.groupId = null;
 		}
@@ -191,11 +185,11 @@ var Entity = (function () {
 	return constructor;
 })();
 
-var decisionsColumns = [{
+var decisionColumns = [{
 		data: "name",
-		className: "name",
+		className: "name linked",
 		render: function (value, renderType, row) {
-			return "<a href=\"" + row.href + "\">" + value + "</a>";
+			return "<div>" + value + "</div>"
 		},
 		title: "Name"
 	}, {
@@ -207,10 +201,15 @@ var decisionsColumns = [{
 		title: "Status"
 	}, {
 		data: "groupId",
-		className: "group",
+		className: "group linked",
 		render: function (value, renderType, row) {
-			var group = getItemById(value, groups);
-			return "<a href=\"" + group.href + "\">" + group.name + "</a>";
+			var parent = getItemById(value, groups);
+			// console.log("parent", parent);
+			if (parent) {
+				return "<div>" + value + "</div>"
+			} else {
+				return "<div>no parent selected</div>";
+			}
 		},
 		title: "Group"
 	}, {
@@ -238,21 +237,21 @@ var decisionsColumns = [{
 
 ];
 
-var groupsColumns = [{
+var groupColumns = [{
 		data: "name",
-		className: "name",
+		className: "name linked",
 		render: function (value, renderType, row) {
-			return "<a href=\"" + row.href + "\">" + value + "</a>";
+			return "<div @click=\"showDetail\">" + value + "</div>"
 		},
 		title: "Name"
 	}, {
 		data: "parentId",
-		className: "parent",
+		className: "parent linked",
 		render: function (value, renderType, row) {
 			var parent = getItemById(value, groups);
-			console.log("parent", parent);
+			// console.log("parent", parent);
 			if (parent) {
-				return "<a href=\"" + parent.href + "\">" + parent.name + "</a>";
+				return "<div @click=\"showGroupDetail\">" + value + "</div>"
 			} else {
 				return "<a>no parent selected</a>";
 			}
@@ -282,20 +281,26 @@ var groupsColumns = [{
 	}
 ];
 
-var entitiesColumns = [{
+var entityColumns = [{
 		data: "name",
-		className: "name",
+		className: "name linked",
 		render: function (value, renderType, row) {
-			return "<a href=\"" + row.href + "\">" + value + "</a>";
+			return "<div @click=\"showDetail\">" + value + "</div>"
 		},
 		title: "Name"
 	}, {
-		data: "parent",
-		className: "parent",
+		data: "groupId",
+		className: "parent linked",
 		render: function (value, renderType, row) {
-			return "<a href=\"" + row.href + "\">" + value + "</a>";
+			var parent = getItemById(value, groups);
+			// console.log("parent", parent);
+			if (parent) {
+				return "<div @click=\"showGroupDetail\">" + value + "</div>"
+			} else {
+				return "<div>no parent selected</div>";
+			}
 		},
-		title: "Parent"
+		title: "Group"
 	}, {
 		data: "creationDate",
 		className: "created",
@@ -370,7 +375,7 @@ var entities = [];
 	entities = testEntities;
 
 	function getTestGroup(type) {
-		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		var id = generateId();
 		return new Group({
 			id: id,
 			attachments: [],
@@ -385,7 +390,7 @@ var entities = [];
 	}
 
 	function getTestDecision() {
-		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		var id = generateId();
 		return new Decision({
 			id: id,
 			attachments: [],
@@ -401,7 +406,7 @@ var entities = [];
 	}
 
 	function getTestEntity() {
-		var id = (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
+		var id = generateId();
 		// var parentId = Math.floor(Math.random() * groups.length);
 		return new Entity({
 			id: id,
@@ -438,7 +443,14 @@ Vue.component('data-table', {
 	// selectMode === "single" || "multi"
 	props: ["columns", "data", "header", "selectMode"],
 	methods: {
-
+		showDetail: function (data) {
+			console.log("data-table emitting showDetail");
+			this.$emit("show-detail", data.id);
+		},
+		showGroupDetail: function (data) {
+			console.log("data-table emitting showGroupDetail");
+			this.$emit("show-group-detail", data.id);
+		},
 		select: function (data) {
 			console.log("data-table emitting change", data);
 			this.$emit("change", data.id);
@@ -457,10 +469,17 @@ Vue.component('data-table', {
 					columns: self.columnsDisplay
 				});
 
-
 			$(self.$el).on('click', 'button.select-single', function () {
 				var data = self.dt.row($(this).closest("tr")).data();
 				self.select(data);
+			});
+			$(self.$el).on('click', 'td.name', function () {
+				var data = self.dt.row($(this).closest("tr")).data();
+				self.showDetail(data);
+			});
+			$(self.$el).on('click', 'td.group', function () {
+				var data = self.dt.row($(this).closest("tr")).data();
+				self.showGroupDetail(data);
 			});
 		}
 	},
@@ -503,23 +522,20 @@ Vue.component('decision-detail', {
 	},
 	data: function () {
 		return {
-			decisionsColumns: decisionsColumns,
-			groupsColumns: groupsColumns,
 			isSelectingGroup: false,
 			decision: {}
 		};
 	},
 	props: ["value", "editable"],
 	methods: {
-		save: function (data) {
-			decisions[decisions.findIndex(function (x) {
-				return x.id === data.id;
-			})] = data;
-
+		showGroupDetail: function (data) {
+			console.log("decision-detail emitting showGroupDetail");
+			this.$emit("show-group-detail", data.id);
 		},
 		setGroup: function (group) {
 			console.log("decision-detail setGroup");
 			this.decision.group = group;
+
 		},
 		selectGroup: function () {
 			this.isSelectingGroup = true;
@@ -538,7 +554,7 @@ Vue.component('decision-detail', {
 		},
 		group: function () {
 			try {
-				return getItemById(this.decision.groupId, groups);
+				return getItemById(this.value.groupId, groups);
 			} catch (e) {
 				console.log(e);
 				return null;
@@ -550,7 +566,7 @@ Vue.component('decision-detail', {
 		decision: {
 			handler: function (current, old) {
 				this.$emit("change", current);
-				console.log("decision-detail watch emitting change", current, this.index);
+				console.log("decision-detail watch emitting change", current);
 			},
 			deep: true
 		}
@@ -643,87 +659,173 @@ var vue = new Vue({
 		el: "#vue",
 		data: function () {
 			return {
+
+				currentColumns: "",
+				currentData: "",
+				currentHeader: "",
+				currentComponent: "",
 				currentDecision: new Decision(),
 				decisions: decisions,
-				decisionsColumns: decisionsColumns,
-				isDecisionListDisplayed: false,
-				isDecisionDetailDisplayed: false,
 				currentGroup: new Group(),
 				groups: groups,
-				groupsColumns: groupsColumns,
-				isGroupListDisplayed: false,
-				isGroupDetailDisplayed: false,
 				currentEntity: new Entity(),
 				entities: entities,
-				entitiesColumns: entitiesColumns,
-				isEntityListDisplayed: false,
-				isEntityDetailDisplayed: false,
 			};
 		},
 		methods: {
+
+			create_onclick: function (event) {
+
+				if (this.currentData === "decisions") {
+					this.createDecision();
+				}
+				if (this.currentData === "groups") {
+					this.createGroup();
+				}
+				if (this.currentData === "entities") {
+					this.createEntity();
+				}
+			},
+			saveDecision: function (data) {
+				decisions[decisions.findIndex(function (x) {
+						return x.id === data.id;
+					})] = data;
+
+			},
 			onchange: function (value) {
 				this.data = value;
 			},
 			createDecision: function () {
 				this.currentDecision = new Decision();
+				decisions.push(this.currentDecision);
 				this.showDecisionDetail();
 			},
 			createGroup: function () {
 				this.currentGroup = new Group();
+				groups.push(this.currentGroup);
 				this.showGroupDetail();
 			},
 			createEntity: function () {
 				this.currentEntity = new Entity();
+				entities.push(this.currentEntity);
 				this.showEntityDetail();
 			},
 			showDecisionList: function () {
-				this.isDecisionListDisplayed = true;
-				this.isDecisionDetailDisplayed = false;
-				this.isGroupListDisplayed = false;
-				this.isGroupDetailDisplayed = false;
-				this.isEntityListDisplayed = false;
-				this.isEntityDetailDisplayed = false;
+				this.currentColumns = decisionColumns;
+				this.currentData = decisions;
+				this.currentHeader = "Decisions";
+				this.currentComponent = "data-table";
 			},
-			showDecisionDetail: function () {
-				this.isDecisionListDisplayed = false;
-				this.isDecisionDetailDisplayed = true;
-				this.isGroupListDisplayed = false;
-				this.isGroupDetailDisplayed = false;
-				this.isEntityListDisplayed = false;
-				this.isEntityDetailDisplayed = false;
+			showDecisionDetail: function (id) {
+				if (id) {
+					this.currentDecision = decisions.find(function (x) {
+							return x.id === id;
+						});
+				} else {
+					this.currentDecision = new Decision();
+				}
+
+				this.currentColumns = "";
+				this.currentData = this.currentDecision;
+				this.currentHeader = "";
+				this.currentComponent = "decision-detail";
 			},
 			showGroupList: function () {
-				this.isDecisionListDisplayed = false;
-				this.isDecisionDetailDisplayed = false;
-				this.isGroupListDisplayed = true;
-				this.isGroupDetailDisplayed = false;
-				this.isEntityListDisplayed = false;
-				this.isEntityDetailDisplayed = false;
+				this.currentColumns = groupColumns;
+				this.currentData = groups;
+				this.currentHeader = "Groups";
+				this.currentComponent = "data-table";
 			},
-			showGroupDetail: function () {
-				this.isDecisionListDisplayed = false;
-				this.isDecisionDetailDisplayed = false;
-				this.isGroupListDisplayed = false;
-				this.isGroupDetailDisplayed = true;
-				this.isEntityListDisplayed = false;
-				this.isEntityDetailDisplayed = false;
+			showGroupDetail: function (id) {
+				if (id) {
+					this.currentGroup = decisions.find(function (x) {
+							return x.id === id;
+						});
+				} else {
+					this.currentGroup = new Decision();
+				}
+
+				this.currentColumns = "";
+				this.currentData = this.currentGroup;
+				this.currentHeader = "";
+				this.currentComponent = "group-detail";
 			},
 			showEntityList: function () {
-				this.isDecisionListDisplayed = false;
-				this.isDecisionDetailDisplayed = false;
-				this.isGroupListDisplayed = false;
-				this.isGroupDetailDisplayed = false;
-				this.isEntityListDisplayed = true;
-				this.isEntityDetailDisplayed = false;
+				this.currentColumns = entityColumns;
+				this.currentData = entities;
+				this.currentHeader = "Entities";
+				this.currentComponent = "data-table";
 			},
-			showEntityDetail: function () {
-				this.isDecisionListDisplayed = false;
-				this.isDecisionDetailDisplayed = false;
-				this.isGroupListDisplayed = false;
-				this.isGroupDetailDisplayed = false;
-				this.isEntityListDisplayed = false;
-				this.isEntityDetailDisplayed = true;
+			showEntityDetail: function (id) {
+				if (id) {
+					this.currentEntity = decisions.find(function (x) {
+							return x.id === id;
+						});
+				} else {
+					this.currentEntity = new Decision();
+				}
+
+				this.currentColumns = "";
+				this.currentData = this.currentEntity;
+				this.currentHeader = "";
+				this.currentComponent = "entity-detail";
 			}
+		},
+		computed: {
+
+			currentEvents: function () {
+				return this.currentComponent === "decision-detail"
+				 ? {
+					"save": this.saveDecision,
+
+				}
+				 : this.currentComponent === "group-detail"
+				 ? {
+					"save": this.saveGroup,
+				}
+				 : this.currentComponent === "entity-detail"
+				 ? {
+					"save": this.saveEntity,
+				}
+				 : this.currentComponent === "data-table"
+				 ? {
+					"show-detail": this.showEntityDetail,
+					"show-group-detail": this.showGroupDetail,
+				}
+				 : {};
+
+			},
+			currentProperties: function () {
+				return this.currentComponent === "decision-detail"
+				 ? {
+					"v-model": this.currentDecision,
+					"editable": "true"
+
+				}
+				 : this.currentComponent === "group-detail"
+				 ? {
+					"group": this.currentGroup,
+					"editable": "true"
+
+				}
+				 : this.currentComponent === "entity-detail"
+				 ? {
+					"entity": this.currentEntity,
+					"editable": "true"
+
+				}
+				 : this.currentComponent === "data-table"
+				 ? {
+					"columns": this.currentColumns, 
+					"data": this.currentData, 
+					"header": this.currentHeader, 
+					"select-mode": "", 
+
+				}
+				 : {};
+
+			}
+
 		}
 	});
 
@@ -733,4 +835,8 @@ function getItemById(id, collection) {
 		});
 
 	return item ? item : null;
+}
+
+function generateId() {
+	return (new Date().getTime() * 1000) + Math.floor(Math.random() * 999);
 }
