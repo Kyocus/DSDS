@@ -140,22 +140,21 @@ var Group = (function () {
 	function constructor(data) {
 
 		if (data) {
-			this.id = data.id ? data.id : generateId();
-			// Entity[] or Group[]
-			this.type = data.type ? data.type : "group"; // "group" or "entity"
-			this.children = data.children ? data.children : [];
+			this.children = data.children ? data.children : []; // Entity[] or Group[]
 			this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
 			this.description = data.description ? data.description : "";
+			this.id = data.id ? data.id : generateId();
 			this.name = data.name ? data.name : "";
-			// Group
-			this.parentId = data.parentId ? data.parentId : null;
+			this.parentId = data.parentId ? data.parentId : null; // Group
+			this.type = data.type ? data.type : "group"; // "group" or "entity"
 		} else {
-			this.id = generateId();
 			this.children = [];
 			this.creationDate = new Date().getTime();
 			this.description = "";
+			this.id = generateId();
 			this.name = "";
 			this.parentId = null;
+			this.type = "group"; // "group" or "entity"
 		}
 	}
 
@@ -452,8 +451,8 @@ Vue.component('data-table', {
 			this.$emit("show-group-detail", data.id);
 		},
 		select: function (data) {
-			console.log("data-table emitting change", data);
-			this.$emit("change", data.id);
+			console.log("data-table emitting select", data);
+			this.$emit("select", data.id);
 		},
 		setupDataTable: function () {
 
@@ -489,7 +488,7 @@ Vue.component('data-table', {
 			var mode = this.selectMode;
 			if (mode === "single" || mode === "multi") {
 
-				var returnMe = this.columns;
+				var returnMe = this.columns.slice();
 				returnMe.unshift({
 					data: null,
 					className: "actions",
@@ -528,6 +527,9 @@ Vue.component('decision-detail', {
 	},
 	props: ["value", "editable"],
 	methods: {
+		// save: function () {
+		// throw ("not implemented");
+		// },
 		showGroupDetail: function (data) {
 			console.log("decision-detail emitting showGroupDetail");
 			this.$emit("show-group-detail", data.id);
@@ -538,9 +540,10 @@ Vue.component('decision-detail', {
 
 		},
 		selectGroup: function () {
+			var self = this;
 			this.isSelectingGroup = true;
 			Vue.nextTick(function () {
-				$(".modal").dialog({
+				$(self.$el).find(".modal.group").dialog({
 					modal: true,
 					width: "70%"
 				});
@@ -553,14 +556,11 @@ Vue.component('decision-detail', {
 			return groups;
 		},
 		group: function () {
-			try {
-				return getItemById(this.value.groupId, groups);
-			} catch (e) {
-				console.log(e);
-				return null;
-			}
+			return getGroupById(this.value.groupId);
 		},
-
+		groupColumns: function () {
+			return groupColumns;
+		}
 	},
 	watch: {
 		decision: {
@@ -585,23 +585,71 @@ Vue.component('group-detail', {
 	},
 	data: function () {
 		return {
-			data: {}
+			isAddingChild: false,
+			isSelectingGroup: false,
+			group: {}
 		};
 	},
-	props: ["group", "editable"],
+	props: ["value", "editable"],
 	methods: {
-		save: function () {
+		showGroupDetail: function (data) {
+			console.log("group-detail emitting showGroupDetail");
+			this.$emit("show-group-detail", data.id);
+		},
+		setGroup: function (id) {
+			console.log("decision-detail setGroup");
+			this.group.parentId = id;
+
+		},
+		selectGroup: function () {
+			var self = this;
+			this.isSelectingGroup = true;
+			Vue.nextTick(function () {
+				$(self.$el).find(".modal.parent").dialog({
+					modal: true,
+					width: "70%"
+				});
+
+			});
+		},
+		showAddChild: function () {
+			var self = this;
+			this.isAddingChild = true;
+			Vue.nextTick(function () {
+				$(self.$el).find(".modal.children").dialog({
+					modal: true,
+					width: "70%"
+				});
+
+			});
+		},
+		removeChild: function () {
+			throw ("not implemented");
+		},
+		addChild: function () {
 			throw ("not implemented");
 		}
 
 	},
 	computed: {
+		parent: function () {
+			return getGroupById(this.group.parentId);
+		},
 		groups: function () {
 			return groups;
-		}
+		},
+		groupColumns: function () {
+			return groupColumns;
+		},
+		columns: function () {
+			return this.group.type === "group" ? groupColumns : entityColumns;
+		},
+		header: function () {
+			return this.group.type === "group" ? "Groups" : "Entities";
+		},
 	},
 	watch: {
-		data: {
+		group: {
 			handler: function (current, old) {
 				this.$emit("change", current);
 				//console.log("travel-entry watch emitting change", current, this.index);
@@ -612,7 +660,7 @@ Vue.component('group-detail', {
 	mounted: function () {
 		// for some reason we need this to establish reactivity,
 		// without it, we don't get reactivity until an emit is triggered
-		this.data = new Group(this.group);
+		this.group = new Group(this.value);
 	},
 	template: $("#tmpGroupDetail").html()
 });
@@ -623,6 +671,7 @@ Vue.component('entity-detail', {
 	},
 	data: function () {
 		return {
+			isSelectingGroup: false,
 			data: {}
 		};
 	},
@@ -630,11 +679,28 @@ Vue.component('entity-detail', {
 	methods: {
 		save: function () {
 			throw ("not implemented");
-		}
+		},
+		showGroupDetail: function (data) {
+			console.log("entity-detail emitting showGroupDetail");
+			this.$emit("show-group-detail", data.id);
+		},
+		selectGroup: function () {
+			var self = this;
+			this.isSelectingGroup = true;
+			Vue.nextTick(function () {
+				$(self.$el).find(".modal.group").dialog({
+					modal: true,
+					width: "70%"
+				});
 
+			});
+		},
 	},
 	computed: {
-		groups: function () {
+		groupColumns: function () {
+			return groupColumns;
+		}
+		,groups: function () {
 			return groups;
 		}
 	},
@@ -661,33 +727,45 @@ var vue = new Vue({
 			return {
 
 				currentColumns: "",
-				currentData: "",
-				currentHeader: "",
 				currentComponent: "",
+				currentData: "",
 				currentDecision: new Decision(),
-				decisions: decisions,
-				currentGroup: new Group(),
-				groups: groups,
 				currentEntity: new Entity(),
+				currentGroup: new Group(),
+				currentHeader: "",
+				decisions: decisions,
 				entities: entities,
+				groups: groups,
 			};
 		},
 		methods: {
 
 			create_onclick: function (event) {
 
-				if (this.currentData === "decisions") {
+				if (this.currentHeader === "Decisions") {
 					this.createDecision();
 				}
-				if (this.currentData === "groups") {
+				if (this.currentHeader === "Groups") {
 					this.createGroup();
 				}
-				if (this.currentData === "entities") {
+				if (this.currentHeader === "Entities") {
 					this.createEntity();
 				}
 			},
 			saveDecision: function (data) {
 				decisions[decisions.findIndex(function (x) {
+						return x.id === data.id;
+					})] = data;
+
+			},
+			saveGroup: function (data) {
+				groups[group.findIndex(function (x) {
+						return x.id === data.id;
+					})] = data;
+
+			},
+			saveEntity: function (data) {
+				entities[entities.findIndex(function (x) {
 						return x.id === data.id;
 					})] = data;
 
@@ -726,7 +804,7 @@ var vue = new Vue({
 				}
 
 				this.currentColumns = "";
-				this.currentData = this.currentDecision;
+				// this.currentData = this.currentDecision;
 				this.currentHeader = "";
 				this.currentComponent = "decision-detail";
 			},
@@ -816,10 +894,10 @@ var vue = new Vue({
 				}
 				 : this.currentComponent === "data-table"
 				 ? {
-					"columns": this.currentColumns, 
-					"data": this.currentData, 
-					"header": this.currentHeader, 
-					"select-mode": "", 
+					"columns": this.currentColumns,
+					"data": this.currentData,
+					"header": this.currentHeader,
+					"select-mode": "",
 
 				}
 				 : {};
@@ -828,6 +906,17 @@ var vue = new Vue({
 
 		}
 	});
+
+
+		function getGroupById(id) {
+			try {
+				return getItemById(id, groups);
+			} catch (e) {
+				console.log(e);
+				return null;
+			}
+		}
+
 
 function getItemById(id, collection) {
 	var item = collection.find(function (x) {

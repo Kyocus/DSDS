@@ -23,7 +23,7 @@
 					>
 			</nav-bar>
 
-			<div>
+			<div v-if="currentComponent.length > 0">
 				<button class="create-button" @click="create_onclick">Create</button>
 				<component :is="currentComponent" v-bind="currentProperties" v-on="currentEvents"/>
 			</div>
@@ -44,7 +44,7 @@
 		</template>
 		<template id="tmpDecisionDetail">
 			<div>
-				<!-- <pre>{{decision}}</pre> -->
+				<!-- <pre>decision:{{decision}}</pre> -->
 				<h2>Decision</h2>
 				<div v-if="!editable">
 					<div>
@@ -56,12 +56,8 @@
 						<div>{{decision.description}}</div>
 					</div>
 					<div>
-						<label>Href:</label>
-						<a href="decision.href">{{decision.href}}</a>
-					</div>
-					<div>
 						<label>Group:</label>
-						<a href="group.href">{{group.name}}</a>
+						<a @click="showGroupDetail" v-if="decision.groupId">{{group.name}}</a>
 					</div>
 				</div>
 				<div v-if="editable">
@@ -74,14 +70,16 @@
 						<textarea v-model="decision.description"/>
 					</div>
 					<div>
-						<label>Group:</label>
-						<div v-if="decision.groupId" class="linked" @click="showGroupDetail">{{group.name}}</div>
-						<button @click="selectGroup">Select Group</button>
+						<div>
+							<label>Group:</label>
+							<span v-if="decision.groupId" class="linked" @click="showGroupDetail">{{group.name}}</span>
+							<button @click="selectGroup">Select Group</button>
+						</div>
 						<div 
 							v-if="isSelectingGroup"
-							class="modal">
+							class="modal group">
 							<data-table
-								:columns="groupsColumns"  
+								:columns="groupColumns"  
 								:data="groups" 
 								select-mode="single"
 								header="Select a Group"
@@ -91,14 +89,13 @@
 							</data-table>
 						</div>
 					</div>
-					<!-- todo pass in selection event -->
-					<!-- <button class="save-button" @click="save">Save</button> -->
 				</div>
 			</div>
 		</template>
 		<template id="tmpGroupDetail">
 			<div>
 				<h2>Group</h2>
+				<!-- <pre>{{group}}</pre> -->
 				<div v-if="!editable">
 					<div>
 						<label>Name:</label>
@@ -109,12 +106,8 @@
 						<div>{{group.description}}</div>
 					</div>
 					<div>
-						<label>Href:</label>
-						<a href="href">{{group.href}}</a>
-					</div>
-					<div>
 						<label>Parent:</label>
-						<a href="parent.href">{{group.parent.name}}</a>
+						<a @click="showGroupDetail">{{group.parent.name}}</a>
 					</div>
 					<div>
 						<data-table
@@ -127,6 +120,17 @@
 				</div>
 				<div v-if="editable">
 					<div>
+						<label>Type:</label>
+						<div>
+							<input type="radio" name="type" value="group" />
+							<label>Group</label>
+						</div>
+						<div>
+							<input type="radio" name="type" value="entity" />
+							<label>Entity</label>
+						</div>
+					</div>
+					<div>
 						<label>Name:</label>
 						<input type="text">{{group.name}}</input>
 					</div>
@@ -134,26 +138,47 @@
 						<label>Description:</label>
 						<textarea>{{group.description}}</textarea>
 					</div>
-					<!-- todo pass in selection event -->
 					<div>
-						<label>Parent:</label>
-						<data-table
-								:columns="groupsColumns"  
+						<div>						
+							<label>Parent:</label>
+							<span v-if="group.parentId" class="linked" @click="showGroupDetail">{{parent.name}}</span>
+							<button @click="selectGroup">Select Parent</button>
+						</div>
+						<div v-if="isSelectingGroup"
+							class="modal parent">
+							<data-table
+								:columns="groupColumns"  
 								:data="groups" 
-								header="Groups"
-								>
-						</data-table>
+								select-mode="single"
+								header="Select a Group"
+								@select="setGroup">
+							</data-table>
+						</div>
 					</div>
 					<div>
-						<label>Children:</label>
+						<div>
+							<label>Children:</label>
+							<button @click="showAddChild">Add</button>
+						</div>
+						<div v-if="isAddingChild"
+							class="modal children">
+							<data-table
+								:columns="columns"  
+								:data="groups" 
+								select-mode="single"
+								:header="header"
+								@select="addChild">
+							</data-table>
+						</div>
+
 						<data-table
-								:columns="entitiesColumns"  
+								:columns="columns"  
 								:data="group.children" 
-								header="Entities"
-								>
+								:header="header"
+								select-mode="multi"
+								@select="removeChild">
 						</data-table>
 					</div>
-					<button class="save-button" @click="saveGroup">Save</button>
 				</div>
 			</div>
 		</template>
@@ -170,12 +195,8 @@
 						<div>{{entity.description}}</div>
 					</div>
 					<div>
-						<label>Href:</label>
-						<a href="href">{{entity.href}}</a>
-					</div>
-					<div>
 						<label>Parent:</label>
-						<a href="href">{{entity.parent.href}}</a>
+						<a @click="showGroupDetail">{{entity.parent.href}}</a>
 					</div>
 				</div>
 				<div v-if="editable">
@@ -189,16 +210,22 @@
 					</div>
 					<!-- todo pass in selection event -->
 					<div>
-						<label>Parent:</label>
+						<div>						
+							<label>Parent:</label>
+							<span v-if="entity.groupId" class="linked" @click="showGroupDetail">{{group.name}}</span>
+							<button @click="selectGroup">Select Parent</button>
+						</div>
+						<div v-if="isSelectingGroup"
+							class="modal group">
 						<data-table
-								:columns="groupsColumns"  
+								:columns="groupColumns"  
 								:data="groups" 
-								:selected-value="parent.id"
+								:selected-value="entity.groupId"
 								header="Parent"
 								>
 						</data-table>
+						</div>
 					</div>
-					<button class="save-button" @click="saveEntity">Save</button>
 				</div>
 			</div>
 		</template>
