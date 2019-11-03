@@ -146,7 +146,7 @@ var Group = (function () {
 			this.id = data.id ? data.id : generateId();
 			this.name = data.name ? data.name : "";
 			this.parentId = data.parentId ? data.parentId : null; // Group
-			this.type = data.type ? data.type : "group"; // "group" or "entity"
+			this.type = data.type ? data.type : ENTITY_GROUP_TYPE; // group or entity
 		} else {
 			this.children = [];
 			this.creationDate = new Date().getTime();
@@ -154,7 +154,7 @@ var Group = (function () {
 			this.id = generateId();
 			this.name = "";
 			this.parentId = null;
-			this.type = "group"; // "group" or "entity"
+			this.type = ENTITY_GROUP_TYPE; // group or entity
 		}
 	}
 
@@ -245,12 +245,12 @@ var groupColumns = [{
 		title: "Name"
 	}, {
 		data: "parentId",
-		className: "parent linked",
+		className: "group linked",
 		render: function (value, renderType, row) {
 			var parent = getItemById(value, groups);
 			// console.log("parent", parent);
 			if (parent) {
-				return "<div @click=\"showGroupDetail\">" + value + "</div>"
+				return "<div>" + value + "</div>"
 			} else {
 				return "<a>no parent selected</a>";
 			}
@@ -289,7 +289,7 @@ var entityColumns = [{
 		title: "Name"
 	}, {
 		data: "groupId",
-		className: "parent linked",
+		className: "group linked",
 		render: function (value, renderType, row) {
 			var parent = getItemById(value, groups);
 			// console.log("parent", parent);
@@ -444,11 +444,11 @@ Vue.component('data-table', {
 	methods: {
 		showDetail: function (data) {
 			console.log("data-table emitting showDetail");
-			this.$emit("show-detail", data.id);
+			this.$emit("show-detail", data, this.header);
 		},
 		showGroupDetail: function (data) {
 			console.log("data-table emitting showGroupDetail");
-			this.$emit("show-group-detail", data.id);
+			this.$emit("show-detail", data, "Groups");
 		},
 		select: function (data) {
 			console.log("data-table emitting select", data);
@@ -474,11 +474,11 @@ Vue.component('data-table', {
 			});
 			$(self.$el).on('click', 'td.name', function () {
 				var data = self.dt.row($(this).closest("tr")).data();
-				self.showDetail(data);
+				self.showDetail(data.id, this.header);
 			});
 			$(self.$el).on('click', 'td.group', function () {
-				var data = self.dt.row($(this).closest("tr")).data();
-				self.showGroupDetail(data);
+				// var data = self.dt.row($(this).closest("tr")).data();
+				self.showGroupDetail(parseInt($(this).text()));
 			});
 		}
 	},
@@ -594,7 +594,11 @@ Vue.component('group-detail', {
 	methods: {
 		showGroupDetail: function (data) {
 			console.log("group-detail emitting showGroupDetail");
-			this.$emit("show-group-detail", data.id);
+			this.$emit("show-group-detail", data);
+		},
+		showDetail: function (data, header) {
+			console.log("group-detail emitting showDetail");
+			this.$emit("show-detail", data, header);
 		},
 		setGroup: function (id) {
 			console.log("decision-detail setGroup");
@@ -642,14 +646,22 @@ Vue.component('group-detail', {
 			return groupColumns;
 		},
 		columns: function () {
-			return this.group.type === "group" ? groupColumns : entityColumns;
+			return this.group.type === GROUP_GROUP_TYPE ? groupColumns : entityColumns;
 		},
 		header: function () {
-			return this.group.type === "group" ? "Groups" : "Entities";
+			return this.group.type === GROUP_GROUP_TYPE ? "Groups" : "Entities";
 		},
-	childrenDisplay: function(){
-		return this.group.children.map(function(c){return getItemById(c.id, groups);});
-	}
+		childrenDisplay: function () {
+			return this.group.type === GROUP_GROUP_TYPE
+			 ? this.group.children.map(function (c) {
+				return getItemById(c, groups);
+			})
+			 : this.group.type === ENTITY_GROUP_TYPE
+			 ? this.group.children.map(function (c) {
+				return getItemById(c, entities);
+			})
+			 : null;
+		}
 	},
 	watch: {
 		group: {
@@ -686,6 +698,10 @@ Vue.component('entity-detail', {
 		showGroupDetail: function (data) {
 			console.log("entity-detail emitting showGroupDetail");
 			this.$emit("show-group-detail", data.id);
+		},
+		showDetail: function (data) {
+			console.log("entity-detail emitting showDetail");
+			this.$emit("show-detail", data.id);
 		},
 		setupParentSelect: function () {
 			var self = this;
@@ -799,17 +815,23 @@ var vue = new Vue({
 				entities.push(this.currentEntity);
 				this.showEntityDetail();
 			},
-			
+
 			showDecisionList: function () {
 				this.currentColumns = decisionColumns;
 				this.currentData = decisions;
 				this.currentHeader = "Decisions";
 				this.currentComponent = "data-table";
 			},
-			showDetail: function(id){
-				if(this.currentHeader === "Groups"){this.showGroupDetail(id);}
-				if(this.currentHeader === "Decisions"){this.showDecisionDetail(id);}
-				if(this.currentHeader === "Entities"){this.showEntityDetail(id);}
+			showDetail: function (id, header) {
+				if (header === "Groups") {
+					this.showGroupDetail(id);
+				}
+				if (header === "Decisions") {
+					this.showDecisionDetail(id);
+				}
+				if (header === "Entities") {
+					this.showEntityDetail(id);
+				}
 			},
 			showDecisionDetail: function (id) {
 				if (id) {
@@ -879,7 +901,7 @@ var vue = new Vue({
 				 ? {
 					"save": this.saveGroup,
 					"show-group-detail": this.showGroupDetail,
-					"show-detail": this.showGroupDetail,
+					"show-detail": this.showDetail,
 				}
 				 : this.currentComponent === "entity-detail"
 				 ? {
@@ -909,7 +931,7 @@ var vue = new Vue({
 				}
 				 : this.currentComponent === "entity-detail"
 				 ? {
-					"v-model": this.currentEntity,
+					"value": this.currentEntity,
 					"editable": "true"
 
 				}

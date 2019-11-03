@@ -19,7 +19,11 @@ h2{
 	background-color: lightsteelblue;
 }
 
-.linked {
+td.linked 
+,a.linked 
+,div.linked 
+,span.linked 
+{
 	color: blue;
 	text-decoration: underline;
 	cursor: pointer;
