@@ -164,8 +164,9 @@
 							class="modal children">
 							<data-table
 								:columns="columns"  
-								:data="groups" 
+								:data="childSelectionList" 
 								select-mode="single"
+								class="child-selector"
 								:header="header"
 								@select="addChild">
 							</data-table>
@@ -175,6 +176,7 @@
 								:columns="columns"  
 								:data="childrenDisplay" 
 								:header="header"
+								class="children"
 								select-mode="multi"
 								@select="removeChild"
 								@show-detail="showDetail"

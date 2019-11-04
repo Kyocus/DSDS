@@ -619,19 +619,26 @@ Vue.component('group-detail', {
 		showAddChild: function () {
 			var self = this;
 			this.isAddingChild = true;
+			
+			if(self._modal){
+				self._modal.show();
+			}else{
+				
+			
 			Vue.nextTick(function () {
-				$(self.$el).find(".modal.children").dialog({
+				self._modal = $(self.$el).find(".modal.children").dialog({
 					modal: true,
 					width: "70%"
 				});
 
 			});
+			}
 		},
-		removeChild: function () {
-			throw ("not implemented");
+		removeChild: function (index) {
+			this.group.children.splice(index, 1);
 		},
-		addChild: function () {
-			throw ("not implemented");
+		addChild: function (data) {
+			this.group.children.push(data);
 		}
 
 	},
@@ -661,13 +668,16 @@ Vue.component('group-detail', {
 				return getItemById(c, entities);
 			})
 			 : null;
+		},
+		childSelectionList: function () {
+			return this.group.type === 0 ? entities : groups;
 		}
 	},
 	watch: {
 		group: {
 			handler: function (current, old) {
 				this.$emit("change", current);
-				//console.log("travel-entry watch emitting change", current, this.index);
+				console.log("group-detail watch emitting change", current);
 			},
 			deep: true
 		}
@@ -785,7 +795,7 @@ var vue = new Vue({
 
 			},
 			saveGroup: function (data) {
-				groups[group.findIndex(function (x) {
+				groups[groups.findIndex(function (x) {
 						return x.id === data.id;
 					})] = data;
 
@@ -893,13 +903,13 @@ var vue = new Vue({
 			currentEvents: function () {
 				return this.currentComponent === "decision-detail"
 				 ? {
-					"save": this.saveDecision,
+					"change": this.saveDecision,
 					"show-group-detail": this.showGroupDetail,
 
 				}
 				 : this.currentComponent === "group-detail"
 				 ? {
-					"save": this.saveGroup,
+					"change": this.saveGroup,
 					"show-group-detail": this.showGroupDetail,
 					"show-detail": this.showDetail,
 				}
