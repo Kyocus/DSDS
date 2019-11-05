@@ -83,9 +83,7 @@
 								:data="groups" 
 								select-mode="single"
 								header="Select a Group"
-								@select="setGroup"
-								v-model="decision.groupId"
-								>
+								@select="setGroup">
 							</data-table>
 						</div>
 					</div>
@@ -95,7 +93,7 @@
 		<template id="tmpGroupDetail">
 			<div>
 				<h2>Group</h2>
-				<!-- <pre>{{group}}</pre> -->
+				<pre>{{group}}</pre>
 				<div v-if="!editable">
 					<div>
 						<label>Name:</label>
