@@ -115,7 +115,7 @@ var Decision = (function () {
 			this.description = data.description ? data.description : "";
 			this.expirationDate = data.expirationDate ? data.expirationDate : "";
 			this.name = data.name ? data.name : "";
-			this.groupId = data.groupId ? data.groupId : "";
+			// this.groupId = data.groupId ? data.groupId : "";
 			this.status = data.status ? data.status : 0;
 			this.statusDate = data.statusDate ? data.statusDate : "";
 		} else {
@@ -125,7 +125,7 @@ var Decision = (function () {
 			this.description = "";
 			this.expirationDate = new Date().getTime();
 			this.name = "";
-			this.groupId = null;
+			// this.groupId = null;
 			this.status = 0;
 			this.statusDate = new Date().getTime();
 		}
@@ -140,6 +140,7 @@ var Group = (function () {
 	function constructor(data) {
 
 		if (data) {
+			this.decisions = data.decisions ? data.decisions : []; // Entity[] or Group[]
 			this.children = data.children ? data.children : []; // Entity[] or Group[]
 			this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
 			this.description = data.description ? data.description : "";
@@ -365,7 +366,7 @@ var entities = [];
 	for (let i = 0; i < 10; i++) {
 		var decision = getTestDecision();
 		var n = Math.floor(Math.random() * testGroups.length);
-		decision.groupId = testGroups[n].id;
+		testGroups[n].decisions.push(decision.id);
 		testDecisions.push(decision);
 	}
 
@@ -379,6 +380,7 @@ var entities = [];
 			id: id,
 			attachments: [],
 			children: [],
+			decisions: [],
 			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
 			description: "group desc",
 			href: id,
@@ -529,12 +531,15 @@ Vue.component('decision-detail', {
 	},
 	props: ["value", "editable"],
 	methods: {
-		// save: function () {
-		// throw ("not implemented");
-		// },
-		showGroupDetail: function (data) {
-			console.log("decision-detail emitting showGroupDetail");
-			this.$emit("show-group-detail", data.id);
+		addComment: function () {
+			throw ("not implemented");
+		},
+		uploadAttachment: function () {
+			throw ("not implemented");
+		},
+		showDetail: function (data, header) {
+			console.log("decision-detail emitting showDetail");
+			this.$emit("show-detail", data, header);
 		},
 		setGroup: function (id) {
 			console.log("decision-detail setGroup");
@@ -601,13 +606,15 @@ Vue.component('group-detail', {
 	},
 	props: ["value", "editable"],
 	methods: {
-		showGroupDetail: function (data) {
-			console.log("group-detail emitting showGroupDetail");
-			this.$emit("show-group-detail", data);
+		makeDecision: function () {
+			var d = new Decision();
+			decisions.push(d);
+			this.group.decisions.push(d);
+			this.showDetail(d.id, "Decisions");
 		},
 		showDetail: function (data, header) {
 			console.log("group-detail emitting showDetail");
-			this.$emit("show-detail", data, header);
+			this.$emit("show-detail", data, header ? header : "Groups");
 		},
 		setGroup: function (id) {
 			console.log("group-detail setGroup");
@@ -660,6 +667,9 @@ Vue.component('group-detail', {
 		groupColumns: function () {
 			return groupColumns;
 		},
+		decisionsColumns: function () {
+			return decisionColumns;
+		},
 		columns: function () {
 			return this.group.type === GROUP_GROUP_TYPE ? groupColumns : entityColumns;
 		},
@@ -676,6 +686,12 @@ Vue.component('group-detail', {
 				return getItemById(c, entities);
 			})
 			 : null;
+		},
+		decisionsDisplay: function () {
+
+			return this.group.decisions ? this.group.decisions.map(function (c) {
+				return getItemById(c, decisions);
+			}) : [];
 		},
 		childSelectionList: function () {
 			var self = this;
@@ -722,13 +738,9 @@ Vue.component('entity-detail', {
 		save: function () {
 			throw ("not implemented");
 		},
-		showGroupDetail: function (data) {
-			console.log("entity-detail emitting showGroupDetail");
-			this.$emit("show-group-detail", data.id);
-		},
-		showDetail: function (data) {
+		showDetail: function (id, header) {
 			console.log("entity-detail emitting showDetail");
-			this.$emit("show-detail", data.id);
+			this.$emit("show-detail", id, header);
 		},
 		setupParentSelect: function () {
 			var self = this;
@@ -867,6 +879,8 @@ var vue = new Vue({
 				}
 			},
 			showDecisionDetail: function (id) {
+				this.currentDecision = null;
+
 				if (id) {
 					this.currentDecision = decisions.find(function (x) {
 							return x.id === id;
@@ -909,6 +923,7 @@ var vue = new Vue({
 				this.currentComponent = "data-table";
 			},
 			showEntityDetail: function (id) {
+				this.currentEntity = null;
 				if (id) {
 					this.currentEntity = entities.find(function (x) {
 							return x.id === id;

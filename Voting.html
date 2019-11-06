@@ -55,10 +55,6 @@
 						<label>Description:</label>
 						<div>{{decision.description}}</div>
 					</div>
-					<div>
-						<label>Group:</label>
-						<a @click="showGroupDetail" v-if="decision.groupId">{{group.name}}</a>
-					</div>
 				</div>
 				<div v-if="editable">
 					<div>
@@ -71,22 +67,28 @@
 					</div>
 					<div>
 						<div>
-							<label>Group:</label>
-							<span v-if="decision.groupId" class="linked" @click="showGroupDetail">{{group.name}}</span>
-							<button @click="selectGroup">Select Group</button>
+							<label>Attachments:</label>
+							<input type="file"/>
+							<button @click="uploadAttachment" class="add-attachment-button">Upload</button>
 						</div>
-						<div 
-							v-if="isSelectingGroup"
-							class="modal group">
-							<data-table
-								:columns="groupColumns"  
-								:data="groups" 
-								select-mode="single"
-								header="Select a Group"
-								@select="setGroup">
-							</data-table>
+
+						<div v-for="item in attachments"> 
+							<a :href="item.href">{{item.name}}</a>
+							<button class="delete-button">X</button>
 						</div>
 					</div>
+				</div>
+				<div> 
+					<h2>Discussion</h2>
+					<div v-for="item in comments"> 
+						<div>
+							<span>{{item.entityName}}</span>
+							<span>{{item.time}}</span>
+						</div>
+						<div>{{item.narrative}}</div>
+					</div>
+					<textarea> </textarea>
+					<button @click="addComment">Comment</button>
 				</div>
 			</div>
 		</template>
@@ -105,13 +107,21 @@
 					</div>
 					<div>
 						<label>Parent:</label>
-						<a @click="showGroupDetail">{{group.parent.name}}</a>
+						<span v-if="group.parentId" class="linked" @click="showDetail(group.parentId, 'Groups')">{{parent.name}}</span>
 					</div>
 					<div>
 						<data-table
 								:columns="entitiesColumns"  
 								:data="group.children" 
 								header="Children"
+								>
+						</data-table>
+					</div>
+					<div>
+						<data-table
+								:columns="decisionsColumns"  
+								:data="group.decisions" 
+								header="Decisions"
 								>
 						</data-table>
 					</div>
@@ -139,24 +149,23 @@
 					<div>
 						<div>						
 							<label>Parent:</label>
-							<span v-if="group.parentId" class="linked" @click="showGroupDetail">{{parent.name}}</span>
-							<button @click="selectGroup">Select Parent</button>
+							<span v-if="group.parentId" class="linked" @click="showDetail(group.parentId, 'Groups')">{{parent.name}}</span>
+							<!-- <button @click="selectGroup">Select Parent</button> -->
 						</div>
-						<div v-if="isSelectingGroup"
-							class="modal parent">
-							<data-table
-								:columns="groupColumns"  
-								:data="groups" 
-								select-mode="single"
-								header="Select a Group"
-								@select="setGroup">
-							</data-table>
-						</div>
+						<!-- <div v-if="isSelectingGroup" -->
+						<!-- class="modal parent"> -->
+						<!-- <data-table -->
+						<!-- :columns="groupColumns"   -->
+						<!-- :data="groups"  -->
+						<!-- select-mode="single" -->
+						<!-- header="Select a Group" -->
+						<!-- @select="setGroup"> -->
+						<!-- </data-table> -->
+						<!-- </div> -->
 					</div>
 					<div>
 						<div>
-							<label>Children:</label>
-							<button @click="showAddChild">Add</button>
+							<button @click="showAddChild">Add Child</button>
 						</div>
 						<div v-if="isAddingChild"
 							class="modal children">
@@ -178,7 +187,17 @@
 								select-mode="multi"
 								@select="removeChild"
 								@show-detail="showDetail"
-								@show-group-detail="showGroupDetail">
+								>
+						</data-table>
+					</div>
+
+					<div>
+						<button @click="makeDecision">Make a Decision</button>
+						<data-table
+								:columns="decisionsColumns"  
+								:data="decisionsDisplay" 
+								header="Decisions"
+								>
 						</data-table>
 					</div>
 				</div>
@@ -247,6 +266,8 @@
 		<script src="jquery.datetimepicker.full.min.js">
 		</script>
 		<script src="jquery.datatables.min.js">
+		</script>
+		<script src="jquery.fileupload.js">
 		</script>
 		<script src="jstree.js">
 		</script>
