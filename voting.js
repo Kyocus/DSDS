@@ -104,12 +104,42 @@ var dataAccess = {
 	}
 };
 
+var Vote = (function () {
+
+	function constructor(data) {
+		this.id = data.id ? data.id : generateId();
+		this.entityId = data.entityId ? data.entityId : null;
+		this.selectedIndex = data.selectedIndex ? data.selectedIndex : 0;
+	}
+
+	return constructor;
+
+})();
+
+var Comment = (function () {
+
+	function constructor(data) {
+		this.id = data.id ? data.id : generateId();
+		this.entityId = data.entityId ? data.entityId : null;
+		this.time = data.time ? data.time : new Date();
+		this.upvotes = data.upvotes ? data.upvotes : 0;
+		this.downvotes = data.downvotes ? data.downvotes : 0;
+		this.narrative = data.narrative ? data.narrative : "";
+	}
+
+	return constructor;
+
+})();
+
 var Decision = (function () {
 
 	function constructor(data) {
 
 		if (data) {
 			this.id = data.id ? data.id : generateId();
+			this.votes = data.votes ? data.votes : [];
+			this.options = data.options ? data.options : [];
+			this.comments = data.comments ? data.comments : [];
 			this.attachments = data.attachments ? data.attachments : [];
 			this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
 			this.description = data.description ? data.description : "";
@@ -120,6 +150,9 @@ var Decision = (function () {
 			this.statusDate = data.statusDate ? data.statusDate : "";
 		} else {
 			this.id = generateId();
+			this.votes = [];
+			this.options = [];
+			this.comments = [];
 			this.attachments = [];
 			this.creationDate = new Date().getTime();
 			this.description = "";
@@ -365,7 +398,14 @@ var entities = [];
 	// generate decisions
 	for (let i = 0; i < 10; i++) {
 		var decision = getTestDecision();
+		var date = decision.creationDate.getTime();
 		var n = Math.floor(Math.random() * testGroups.length);
+
+		for (let i = 0; i < 10; i++) {
+			date += Math.floor(Math.random() * 1000000000);
+			decision.comments.push(getTestComment(date));
+		}
+
 		testGroups[n].decisions.push(decision.id);
 		testDecisions.push(decision);
 	}
@@ -373,6 +413,17 @@ var entities = [];
 	groups = testGroups;
 	decisions = testDecisions;
 	entities = testEntities;
+
+	function getTestComment(date) {
+		return {
+			entityId: testEntities[Math.floor(Math.random() * testEntities.length)].id,
+			time: date,
+			upvotes: Math.floor(Math.random() * 1000),
+			downvotes: Math.floor(Math.random() * 1000),
+			narrative: "lorem ipsum dolor sit amet adipising"
+		};
+
+	}
 
 	function getTestGroup(type) {
 		var id = generateId();
@@ -392,10 +443,12 @@ var entities = [];
 
 	function getTestDecision() {
 		var id = generateId();
+		var creationTime = Math.floor(Math.random() * 10000000000);
 		return new Decision({
 			id: id,
 			attachments: [],
-			creationDate: new Date(Math.floor(Math.random() * 10000000000)),
+			comments: [],
+			creationDate: new Date(creationTime),
 			description: "description",
 			expirationDate: new Date(Math.floor(Math.random() * 10000000000)),
 			href: id,
@@ -525,12 +578,29 @@ Vue.component('decision-detail', {
 	},
 	data: function () {
 		return {
+			currentSorting: 'none',
 			isSelectingGroup: false,
 			decision: {}
 		};
 	},
 	props: ["value", "editable"],
 	methods: {
+		sortComments: function (key) {
+			this.currentSorting = key;
+			this.comments.sort(function (a, b) {
+				return a[key] < b[key]
+				 ? -1
+				 : a[key] > b[key]
+				 ? 1
+				 : 0;
+			});
+		},
+		voteYes: function () {
+			throw ("not implemented");
+		},
+		voteNo: function () {
+			throw ("not implemented");
+		},
 		addComment: function () {
 			throw ("not implemented");
 		},
@@ -557,8 +627,14 @@ Vue.component('decision-detail', {
 
 			});
 		}
+		,getISODate: function (date) {
+			return new Date(date).toISOString();
+		}
 	},
 	computed: {
+		votable: function () {
+			return this.decision.status === 1;
+		},
 		groups: function () {
 			return groups;
 		},
