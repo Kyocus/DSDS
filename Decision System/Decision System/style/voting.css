@@ -1,0 +1,31 @@
+*{
+	box-sizing: border-box;
+}
+
+
+div.navbar{
+	background-color: lightgray;
+	font-size: x-large;
+	font-weight: bold;
+}
+div.navbar > span{
+	margin-right: 1em;
+	color: royalblue;
+	cursor: pointer;
+}
+
+h2{
+	text-align: center;
+	background-color: lightsteelblue;
+}
+
+td.linked 
+,a.linked 
+,div.linked 
+,span.linked 
+{
+	color: blue;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
