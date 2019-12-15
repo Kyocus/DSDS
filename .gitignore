@@ -1,6 +1,9 @@
-
-Decision System/.vs/DecisionSystem/v16/.suo
 *.lock
-Decision System/.vs/DecisionSystem/v16/Server/sqlite3/storage.ide
-Decision System/.vs/DecisionSystem/v16/Server/sqlite3/storage.ide-shm
-Decision System/.vs/DecisionSystem/v16/Server/sqlite3/storage.ide-wal
+Decision System/.vs
+Decision System/Core/bin
+Decision System/Core/obj
+Decision System/Data/bin
+Decision System/Data/obj
+*.dll
+Decision System/Web/bin
+Decision System/Web/obj
