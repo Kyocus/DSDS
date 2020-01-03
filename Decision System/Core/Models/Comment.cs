@@ -6,20 +6,23 @@ namespace Core.Models
 {
     public class Comment : Votable, IAggregateRoot
     {
-
-        private int id;
+        private int entityId;
         private Voter entity;
         private long time;
 
-        public int Id { get => id; set => id = value; }
-        public Voter Entity { get => entity; set => entity = value; }
+        public virtual Voter Entity { get => entity; set => entity = value; }
         public long Time { get => time; set => time = value; }
+        public int EntityId { get => entityId; set => entityId = value; }
 
-        public Comment(int id, Voter entity, long time)
+        public Comment()
         {
-            Id = id;
-            Entity = entity ?? throw new ArgumentNullException(nameof(entity));
+
+        }
+
+        public Comment(long time, int entityId)
+        {
             Time = time;
+            EntityId = entityId;
         }
     }
 }

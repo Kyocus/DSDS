@@ -8,7 +8,6 @@ namespace Core.Models
 {
     public class Group : BaseModel, IAggregateRoot
     {
-        private int id;
         private string name;
         private string description;
         private int parentGroupId;
@@ -17,12 +16,15 @@ namespace Core.Models
         public virtual Group ParentGroup { get; set; }
         public virtual List<Decision> Decisions { get; set; }
         //Groups or Entities
-        public virtual List<object> Children { get; set; }
-        public int Id { get => id; set => id = value; }
         public string Name { get => name; set => name = value; }
         public string Description { get => description; set => description = value; }
         public int ParentGroupId { get => parentGroupId; set => parentGroupId = value; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
+
+        public Group()
+        {
+
+        }
 
         public Group(int id, string name, string description, int parentGroupId, long creationDate)
         {

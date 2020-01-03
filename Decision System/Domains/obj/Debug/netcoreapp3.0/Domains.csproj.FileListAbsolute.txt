@@ -1,0 +1,13 @@
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Domains.deps.json
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Domains.dll
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Domains.pdb
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Core.dll
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Data.dll
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Core.pdb
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\bin\Debug\netcoreapp3.0\Data.pdb
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\obj\Debug\netcoreapp3.0\Domains.csprojAssemblyReference.cache
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\obj\Debug\netcoreapp3.0\Domains.AssemblyInfoInputs.cache
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\obj\Debug\netcoreapp3.0\Domains.AssemblyInfo.cs
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\obj\Debug\netcoreapp3.0\Domains.csproj.CopyComplete
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\obj\Debug\netcoreapp3.0\Domains.dll
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Domains\obj\Debug\netcoreapp3.0\Domains.pdb

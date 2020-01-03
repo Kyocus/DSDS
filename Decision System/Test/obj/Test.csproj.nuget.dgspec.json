@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\DecisionSystemTest\\Test.csproj": {}
+    "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\Test\\Test.csproj": {}
   },
   "projects": {
-    "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\DecisionSystemTest\\Test.csproj": {
+    "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\Test\\Test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\DecisionSystemTest\\Test.csproj",
+        "projectUniqueName": "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\Test\\Test.csproj",
         "projectName": "Test",
-        "projectPath": "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\DecisionSystemTest\\Test.csproj",
+        "projectPath": "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\Test\\Test.csproj",
         "packagesPath": "C:\\Users\\arcon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\DecisionSystemTest\\obj\\",
+        "outputPath": "C:\\Users\\arcon\\Documents\\GitHub\\DSDS\\Decision System\\Test\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\",

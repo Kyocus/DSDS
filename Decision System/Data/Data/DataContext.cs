@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Core.Models;
+using System.Reflection;
 
 namespace DecisionSystem.Data
 {
@@ -12,6 +13,7 @@ namespace DecisionSystem.Data
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
+
         }
 
         public DbSet<Attachment> Attachments { get; set; }
@@ -21,5 +23,15 @@ namespace DecisionSystem.Data
         public DbSet<Group> Groups { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<Vote> Votes { get; set; }
+
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
     }
 }

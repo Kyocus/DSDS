@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Core.Domains
 {
-    class AttachmentDomain
+    public interface IDomain<T>
     {
+        T Get(int id);
+        IEnumerable<T> GetAll();
     }
 }
