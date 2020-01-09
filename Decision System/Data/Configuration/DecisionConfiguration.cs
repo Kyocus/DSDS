@@ -29,7 +29,7 @@ namespace DecisionSystem.Configuration
                 Description = "description",
                 ExpirationDate = DateTime.UtcNow.Ticks,
                 Name = "name",
-                Status = 1,
+                StatusId = 1,
                 StatusDate = DateTime.UtcNow.Ticks
             });
 

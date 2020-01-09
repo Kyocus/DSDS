@@ -20,6 +20,8 @@ namespace DecisionSystem.Configuration
             {
                 Id = 1,
                 EntityId = 1,
+                Upvotes = 0,
+                Downvotes = 0,
                 Time = DateTime.UtcNow.Ticks
             });
 

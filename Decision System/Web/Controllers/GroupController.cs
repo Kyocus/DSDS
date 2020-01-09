@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DecisionSystem.Repository;
 using Core.Interfaces;
+using Core.Domains;
 
 namespace DecisionSystem.Controllers
 {
@@ -15,7 +16,7 @@ namespace DecisionSystem.Controllers
     [Route("[controller]")]
     public class GroupController : BaseController<Group>
     {
-        public GroupController(ILogger<GroupController> logger, GroupRepository repository) : base(logger, repository)
+        public GroupController(ILogger<GroupController> logger, IRepository<Group> repository, IDomain<Group> domain) : base(logger, repository, domain)
         {
         }
 

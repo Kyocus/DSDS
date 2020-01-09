@@ -7,6 +7,7 @@ using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Core.Interfaces;
+using Core.Domains;
 
 namespace DecisionSystem.Controllers
 {
@@ -18,17 +19,34 @@ namespace DecisionSystem.Controllers
 
         protected IRepository<T> _repository;
 
-        public BaseController(ILogger<BaseController<T>> logger, IRepository<T> repo)
+        protected IDomain<T> _domain;
+
+        public BaseController(ILogger<BaseController<T>> logger, IRepository<T> repo, IDomain<T> domain)
         {
             _logger = logger;
             _repository = repo;
+            _domain = domain;
         }
 
         [HttpGet]
         public IEnumerable<T> GetAll()
         {
-            List<T> entities = new List<T>();
-            return _repository.FindAll();
+            //List<T> entities = new List<T>();
+            //return _repository.FindAll();
+            return _domain.GetAll();
+        }
+
+        [HttpPost]
+        public void Post(T entity) {
+            _domain.Create(entity);
+        }
+        [HttpPut]
+        public void Put(T entity) {
+            _domain.Update(entity);
+        }
+        [HttpDelete]
+        public void Delete(int id) {
+            _domain.Delete(id);
         }
     }
 }

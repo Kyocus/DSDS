@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DecisionSystem.Repository;
 using Core.Interfaces;
+using Core.Domains;
 
 namespace DecisionSystem.Controllers
 {
@@ -15,7 +16,7 @@ namespace DecisionSystem.Controllers
     [Route("[controller]")]
     public class StatusController : BaseController<Status>
     {
-        public StatusController(ILogger<StatusController> logger, StatusRepository repository) : base(logger, repository)
+        public StatusController(ILogger<StatusController> logger, IRepository<Status> repository, IDomain<Status> domain) : base(logger, repository, domain)
         {
         }
 

@@ -62,13 +62,13 @@ namespace DecisionSystem
             services.AddScoped<Vote>();
             services.AddScoped<Voter>();
 
-            services.AddScoped<AttachmentDomain>();
-            services.AddScoped<CommentDomain>();
-            services.AddScoped<DecisionDomain>();
-            services.AddScoped<GroupDomain>();
-            services.AddScoped<StatusDomain>();
-            services.AddScoped<VoteDomain>();
-            services.AddScoped<VoterDomain>();
+            services.AddScoped<IDomain<Attachment>, AttachmentDomain>();
+            services.AddScoped<IDomain<Comment>, CommentDomain>();
+            services.AddScoped<IDomain<Decision>, DecisionDomain>();
+            services.AddScoped<IDomain<Group>, GroupDomain>();
+            services.AddScoped<IDomain<Status>, StatusDomain>();
+            services.AddScoped<IDomain<Vote>, VoteDomain>();
+            services.AddScoped<IDomain<Voter>, VoterDomain>();
 
 
             services.AddDbContext<DataContext>(opt =>

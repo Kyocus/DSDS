@@ -8,6 +8,7 @@ namespace Core.Models
         private string name;
         private string path;
         private int uploaderId;
+        private int optionId;
         private Voter uploader;
         private long uploadDate;
 
@@ -16,18 +17,21 @@ namespace Core.Models
         public virtual Voter Uploader { get => uploader; set => uploader = value; }
         public long UploadDate { get => uploadDate; set => uploadDate = value; }
         public int UploaderId { get => uploaderId; set => uploaderId = value; }
+        public int OptionId { get => optionId; set => optionId = value; }
 
         public Attachment()
         {
 
         }
 
-        public Attachment(string name, string path, long uploadDate, int uploaderId)
+        public Attachment(string name, string path, Voter uploader, long uploadDate, int uploaderId, int optionId)
         {
             Name = name;
             Path = path;
+            Uploader = uploader;
             UploadDate = uploadDate;
             UploaderId = uploaderId;
+            OptionId = optionId;
         }
     }
 }

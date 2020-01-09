@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DecisionSystem.Repository;
 using Core.Interfaces;
+using Core.Domains;
 
 namespace DecisionSystem.Controllers
 {
@@ -16,7 +17,7 @@ namespace DecisionSystem.Controllers
     public class CommentController : BaseController<Comment>
     {
 
-        public CommentController(ILogger<CommentController> logger, IRepository<Comment> repository) : base(logger, repository)
+        public CommentController(ILogger<CommentController> logger, IRepository<Comment> repository, IDomain<Comment> domain) : base(logger, repository, domain)
         {
         }
 

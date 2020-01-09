@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DecisionSystem.Repository;
 using Core.Interfaces;
+using Core.Domains;
 
 namespace DecisionSystem.Controllers
 {
@@ -15,7 +16,7 @@ namespace DecisionSystem.Controllers
     [Route("[controller]")]
     public class AttachmentController : BaseController<Attachment>
     {
-        public AttachmentController(ILogger<AttachmentController> logger, IRepository<Attachment> repository) : base(logger, repository)
+        public AttachmentController(ILogger<AttachmentController> logger, IRepository<Attachment> repository, IDomain<Attachment> domain) : base(logger, repository, domain)
         {
         }
 

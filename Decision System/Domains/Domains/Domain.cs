@@ -7,7 +7,7 @@ namespace Core.Domains
 {
     public class Domain<T> : IDomain<T> where T : IAggregateRoot
     {
-        IRepository<T> repository;
+        protected readonly IRepository<T> repository;
 
         public Domain(IRepository<T> repo)
         {
@@ -20,6 +20,19 @@ namespace Core.Domains
 
         public IEnumerable<T> GetAll() {
             return repository.FindAll();
+        }
+
+        public void Create(T entity) {
+            repository.Create(entity);
+        }
+
+        public void Update(T entity) {
+            repository.Update(entity);
+        }
+
+        public void Delete(int id)
+        {
+            repository.Delete(id);
         }
     }
 }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DecisionSystem.Configuration
 {
-    public class GroupConfiguration : IEntityTypeConfiguration<Group>
+    public class OptionConfiguration : IEntityTypeConfiguration<Option>
     {
-        public void Configure(EntityTypeBuilder<Group> builder)
+        public void Configure(EntityTypeBuilder<Option> builder)
         {
             builder.HasKey(o => o.Id);
             builder.Property(t => t.Name)
@@ -19,10 +19,8 @@ namespace DecisionSystem.Configuration
             builder.HasData(new
             {
                 Id = 1,
-                Name = "name 1",
-                Description = "description 1",
-                ParentGroupId = 1,
-                CreationDate = DateTime.UtcNow.Ticks
+                Name = "Option1",
+                Description = "Option1"
             });
 
         }

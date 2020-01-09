@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DecisionSystem.Repository;
 using Core.Interfaces;
+using Core.Domains;
 
 namespace DecisionSystem.Controllers
 {
@@ -16,7 +17,7 @@ namespace DecisionSystem.Controllers
     public class VoterController : BaseController<Voter>
     {
 
-        public VoterController(ILogger<VoterController> logger, VoterRepository repository) : base(logger, repository)
+        public VoterController(ILogger<VoterController> logger, IRepository<Voter> repository, IDomain<Voter> domain) : base(logger, repository, domain)
         {
         }
 

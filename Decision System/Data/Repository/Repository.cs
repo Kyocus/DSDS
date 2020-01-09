@@ -42,7 +42,9 @@ namespace DecisionSystem.Repository
         {
             this.context.Set<T>().Remove(entity);
         }
-
+        public void Delete(int id) {
+            context.Set<T>().Remove(context.Set<T>().Find(id));
+        }
 
         public T FindById(long id)
         {

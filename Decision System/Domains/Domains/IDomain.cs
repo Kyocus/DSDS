@@ -8,5 +8,8 @@ namespace Core.Domains
     {
         T Get(int id);
         IEnumerable<T> GetAll();
+        void Create(T entity);
+        void Update(T entity);
+        void Delete(int id);
     }
 }
