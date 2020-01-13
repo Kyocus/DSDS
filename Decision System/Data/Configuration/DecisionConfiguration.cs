@@ -30,6 +30,7 @@ namespace DecisionSystem.Configuration
                 ExpirationDate = DateTime.UtcNow.Ticks,
                 Name = "name",
                 StatusId = 1,
+                statusId = 1,
                 StatusDate = DateTime.UtcNow.Ticks
             });
 

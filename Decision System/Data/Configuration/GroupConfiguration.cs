@@ -22,6 +22,7 @@ namespace DecisionSystem.Configuration
                 Name = "name 1",
                 Description = "description 1",
                 ParentGroupId = 1,
+                parentGroupId = 1,
                 CreationDate = DateTime.UtcNow.Ticks
             });
 

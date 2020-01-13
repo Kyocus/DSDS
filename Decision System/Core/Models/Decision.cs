@@ -1,6 +1,7 @@
 ﻿using Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,12 +23,16 @@ namespace Core.Models
         public virtual List<Option> Options { get; set; }
         public virtual List<Comment> Comments { get; set; }
         public virtual List<Attachment> Attachments { get; set; }
+        
+        [ForeignKey("statusId")]
         public virtual Status Status { get => status; set => status = value; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
         public string Description { get => description; set => description = value; }
         public long ExpirationDate { get => expirationDate; set => expirationDate = value; }
         public string Name { get => name; set => name = value; }
         public long StatusDate { get => statusDate; set => statusDate = value; }
+
+        [Required]
         public int StatusId { get => statusId; set => statusId = value; }
 
         public Decision()

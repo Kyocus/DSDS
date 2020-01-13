@@ -21,9 +21,59 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\images\loading.gif" />
+    <None Include="wwwroot\images\progressbar.gif" />
+    <None Include="wwwroot\Index.html" />
+    <None Include="wwwroot\README.md" />
+    <None Include="wwwroot\script\jquery-3.4.1.js" />
+    <None Include="wwwroot\script\jquery-ui.js" />
+    <None Include="wwwroot\script\jquery.datatables.min.js" />
+    <None Include="wwwroot\script\jquery.datetimepicker.full.min.js" />
+    <None Include="wwwroot\script\jquery.datetimepicker.js" />
+    <None Include="wwwroot\script\jquery.fileupload-audio.js" />
+    <None Include="wwwroot\script\jquery.fileupload-image.js" />
+    <None Include="wwwroot\script\jquery.fileupload-process.js" />
+    <None Include="wwwroot\script\jquery.fileupload-ui.js" />
+    <None Include="wwwroot\script\jquery.fileupload-validate.js" />
+    <None Include="wwwroot\script\jquery.fileupload-video.js" />
+    <None Include="wwwroot\script\jquery.fileupload.js" />
+    <None Include="wwwroot\script\jquery.iframe-transport.js" />
+    <None Include="wwwroot\script\jquery.multifile.js" />
+    <None Include="wwwroot\script\jquery.postmessage-transport.js" />
+    <None Include="wwwroot\script\jquery.ui.widget.js" />
+    <None Include="wwwroot\script\jquery.xdr-transport.js" />
+    <None Include="wwwroot\script\jstree.js" />
+    <None Include="wwwroot\script\jstree.min.js" />
+    <None Include="wwwroot\script\voting.js" />
+    <None Include="wwwroot\script\vue.js" />
+    <None Include="wwwroot\script\vue.min.js" />
+    <None Include="wwwroot\script\webcomponents-loader.js" />
+    <None Include="wwwroot\style\jquery-ui.css" />
+    <None Include="wwwroot\style\jquery-ui.min.css" />
+    <None Include="wwwroot\style\jquery-ui.structure.css" />
+    <None Include="wwwroot\style\jquery-ui.structure.min.css" />
+    <None Include="wwwroot\style\jquery-ui.theme.css" />
+    <None Include="wwwroot\style\jquery-ui.theme.min.css" />
+    <None Include="wwwroot\style\jquery.datatables.min.css" />
+    <None Include="wwwroot\style\jquery.datetimepicker.css" />
+    <None Include="wwwroot\style\jquery.fileupload-noscript.css" />
+    <None Include="wwwroot\style\jquery.fileupload-ui-noscript.css" />
+    <None Include="wwwroot\style\jquery.fileupload-ui.css" />
+    <None Include="wwwroot\style\jquery.fileupload.css" />
+    <None Include="wwwroot\style\voting.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
     <PackageReference Include="Microsoft.OpenApi" Version="1.1.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0-rc5" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.0.0-rc5" />

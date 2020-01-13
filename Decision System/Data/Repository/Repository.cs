@@ -30,20 +30,19 @@ namespace DecisionSystem.Repository
 
         public void Create(T entity)
         {
-            this.context.Set<T>().Add(entity);
+            this.context.Set<T>().Add(stripVirtualProps(entity));
+            context.SaveChanges();
         }
 
         public void Update(T entity)
         {
-            this.context.Set<T>().Update(entity);
+            this.context.Set<T>().Update(stripVirtualProps(entity));
+            context.SaveChanges();
         }
 
-        public void Delete(T entity)
-        {
-            this.context.Set<T>().Remove(entity);
-        }
         public void Delete(int id) {
             context.Set<T>().Remove(context.Set<T>().Find(id));
+            context.SaveChanges();
         }
 
         public T FindById(long id)
@@ -67,6 +66,18 @@ namespace DecisionSystem.Repository
             return secondaryResult
                             .Where(spec.Criteria)
                             .AsEnumerable();
+        }
+
+
+        private T stripVirtualProps(T entity) {
+            foreach (var prop in typeof(T).GetProperties())
+            {
+                if (prop.GetGetMethod().IsVirtual)
+                {
+                    prop.SetValue(entity, null);
+                }
+            }
+            return entity;
         }
     }
 }

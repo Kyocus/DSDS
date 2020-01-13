@@ -74,6 +74,13 @@ namespace DecisionSystem
             services.AddDbContext<DataContext>(opt =>
             opt.UseInMemoryDatabase("EntityList"));
 
+            services.AddMvc();
+            services.AddRazorPages()
+                .AddRazorPagesOptions(options =>
+                {
+                    options.Conventions.AddPageRoute("/App", "App");
+                });
+
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
@@ -110,6 +117,17 @@ namespace DecisionSystem
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
+            //DefaultFilesOptions DefaultFile = new DefaultFilesOptions();
+            //DefaultFile.DefaultFileNames.Clear();
+            //DefaultFile.DefaultFileNames.Add("/Pages/Index.html");
+            //app.UseDefaultFiles(DefaultFile);
+            app.UseStaticFiles();
+
+            app.UseDefaultFiles(new DefaultFilesOptions
+            {
+                DefaultFileNames = new List<string> { "index.html" }
             });
 
             app.UseRouting();

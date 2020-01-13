@@ -1,5 +1,7 @@
 ﻿using Core.Interfaces;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
 {
@@ -9,15 +11,24 @@ namespace Core.Models
         private string path;
         private int uploaderId;
         private int optionId;
-        private Voter uploader;
         private long uploadDate;
 
         public string Name { get => name; set => name = value; }
         public string Path { get => path; set => path = value; }
-        public virtual Voter Uploader { get => uploader; set => uploader = value; }
+        
         public long UploadDate { get => uploadDate; set => uploadDate = value; }
+        
+        [Required]
         public int UploaderId { get => uploaderId; set => uploaderId = value; }
+        
+        [Required]
         public int OptionId { get => optionId; set => optionId = value; }
+
+        [ForeignKey("uploaderId")]
+        public virtual Voter Uploader { get; set; }
+
+        [ForeignKey("optionId")]
+        public virtual Option Option { get; set; }
 
         public Attachment()
         {

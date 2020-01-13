@@ -12,15 +12,21 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Option> builder)
         {
+            List<int> attachmentIds = new List<int>();
+            attachmentIds.Add(1);
+
+
             builder.HasKey(o => o.Id);
             builder.Property(t => t.Name)
                     .IsRequired();
+
+
 
             builder.HasData(new
             {
                 Id = 1,
                 Name = "Option1",
-                Description = "Option1"
+                Description = "Option1",
             });
 
         }

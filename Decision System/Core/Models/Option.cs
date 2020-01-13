@@ -9,11 +9,9 @@ namespace Core.Models
     {
         private string name;
         private string description;
-        private List<int> attachmentIds;
 
         public string Name { get => name; set => name = value; }
         public string Description { get => description; set => description = value; }
-        //public List<int> AttachmentIds { get => attachmentIds; set => attachmentIds = value; }
         public virtual List<Attachment> Attachments { get; }
 
         public Option()

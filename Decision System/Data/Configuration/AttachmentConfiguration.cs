@@ -22,7 +22,9 @@ namespace DecisionSystem.Configuration
                 Name = "filename",
                 Path = "attachments/filename.jpg",
                 UploaderId = 1,
+                uploaderId = 1,
                 OptionId = 1,
+                optionId = 1,
                 UploadDate = DateTime.UtcNow.Ticks
             });
 

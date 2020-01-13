@@ -1,4 +1,6 @@
 ﻿using Core.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
 {
@@ -8,8 +10,11 @@ namespace Core.Models
         private int entityId;
         private int selectedOption;
 
+        [ForeignKey("EntityId")]
         public virtual Voter Entity { get; set; }
         public long Time { get => time; set => time = value; }
+        
+        [Required]
         public int EntityId { get => entityId; set => entityId = value; }
         public int SelectedOption { get => selectedOption; set => selectedOption = value; }
 
