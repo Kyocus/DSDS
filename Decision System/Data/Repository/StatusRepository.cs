@@ -2,6 +2,7 @@
 using Core.Models;
 using DecisionSystem.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace DecisionSystem.Repository
 {
     public class StatusRepository : Repository<Status>, IStatusRepository
     {
-        public StatusRepository(DbContext context) : base(context)
+        public StatusRepository(DbContext context, ILogger<Status> logger) : base(context, logger)
         {
                 
         }

@@ -2,6 +2,7 @@
 using Core.Models;
 using DecisionSystem.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace DecisionSystem.Repository
 {
     public class GroupRepository : Repository<Group>, IGroupRepository
     {
-        public GroupRepository(DbContext context) : base(context)
+        public GroupRepository(DbContext context, ILogger<Group> logger) : base(context, logger)
         {
 
         }

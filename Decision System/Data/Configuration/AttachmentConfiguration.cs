@@ -18,13 +18,13 @@ namespace DecisionSystem.Configuration
 
             builder.HasData(new
             {
-                Id = 1,
+                Id = 1l,
                 Name = "filename",
                 Path = "attachments/filename.jpg",
-                UploaderId = 1,
-                uploaderId = 1,
-                OptionId = 1,
-                optionId = 1,
+                UploaderId = 1l,
+                uploaderId = 1l,
+                OptionId = 1l,
+                optionId = 1l,
                 UploadDate = DateTime.UtcNow.Ticks
             });
 

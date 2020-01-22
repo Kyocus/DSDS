@@ -16,10 +16,10 @@ namespace DecisionSystem.Configuration
             builder.Property(t => t.Name)
                     .IsRequired();
 
-            builder.HasData(new { Id = 1, Name = "status 1"});
-            builder.HasData(new { Id = 2, Name = "status 2"});
-            builder.HasData(new { Id = 3, Name = "status 3"});
-            builder.HasData(new { Id = 4, Name = "status 4"});
+            builder.HasData(new { Id = 1l, Name = "status 1"});
+            builder.HasData(new { Id = 2l, Name = "status 2"});
+            builder.HasData(new { Id = 3l, Name = "status 3"});
+            builder.HasData(new { Id = 4l, Name = "status 4"});
 
         }
     }

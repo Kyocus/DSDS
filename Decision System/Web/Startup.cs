@@ -70,6 +70,7 @@ namespace DecisionSystem
             services.AddScoped<IDomain<Vote>, VoteDomain>();
             services.AddScoped<IDomain<Voter>, VoterDomain>();
 
+            services.AddCors();
 
             services.AddDbContext<DataContext>(opt =>
             opt.UseInMemoryDatabase("EntityList"));

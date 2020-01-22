@@ -13,6 +13,7 @@ namespace DecisionSystem.Configuration
         public void Configure(EntityTypeBuilder<Decision> builder)
         {
             builder.HasKey(o => o.Id);
+            builder.Property(o => o.Id).ValueGeneratedOnAdd();
             builder.Property(t => t.Name).IsRequired();
             builder.Property(t => t.ExpirationDate).IsRequired();
             builder.Property(t => t.CreationDate).IsRequired();
@@ -24,13 +25,13 @@ namespace DecisionSystem.Configuration
 
             builder.HasData(new
             {
-                Id = 4,
+                Id = 4l,
                 CreationDate = DateTime.UtcNow.Ticks,
                 Description = "description",
                 ExpirationDate = DateTime.UtcNow.Ticks,
                 Name = "name",
-                StatusId = 1,
-                statusId = 1,
+                StatusId = 1l,
+                statusId = 1l,
                 StatusDate = DateTime.UtcNow.Ticks
             });
 

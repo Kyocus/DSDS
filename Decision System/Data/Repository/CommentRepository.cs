@@ -2,6 +2,7 @@
 using Core.Models;
 using DecisionSystem.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace DecisionSystem.Repository
 {
     public class CommentRepository : Repository<Comment> , ICommentRepository
     {
-        public CommentRepository(DbContext context) : base(context)
+        public CommentRepository(DbContext context, ILogger<Comment> logger) : base(context, logger)
         {
 
         }

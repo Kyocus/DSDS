@@ -15,7 +15,7 @@ namespace Core.Models
         private string description;
         private long expirationDate;
         private string name;
-        private int statusId;
+        private long statusId;
         private Status status;
         private long statusDate;
 
@@ -33,7 +33,7 @@ namespace Core.Models
         public long StatusDate { get => statusDate; set => statusDate = value; }
 
         [Required]
-        public int StatusId { get => statusId; set => statusId = value; }
+        public long StatusId { get => statusId; set => statusId = value; }
 
         public Decision()
         {}

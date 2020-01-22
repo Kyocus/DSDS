@@ -18,9 +18,9 @@ namespace DecisionSystem.Configuration
 
             builder.HasData(new
             {
-                Id = 1,
-                EntityId = 1,
-                entityId = 1,
+                Id = 1l,
+                EntityId = 1l,
+                entityId = 1l,
                 Upvotes = 0,
                 Downvotes = 0,
                 Time = DateTime.UtcNow.Ticks

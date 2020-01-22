@@ -24,7 +24,7 @@ namespace DecisionSystem.Configuration
 
             builder.HasData(new
             {
-                Id = 1,
+                Id = 1l,
                 Name = "Option1",
                 Description = "Option1",
             });

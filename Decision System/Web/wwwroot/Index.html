@@ -11,6 +11,8 @@
 </head>
 <body>
     <div id="vue">
+        <pre><!--decision:{{currentDecision}}--></pre>
+
         <nav-bar @showdecisionlist="showDecisionList"
                  @showgrouplist="showGroupList"
                  @showentitylist="showEntityList">
@@ -26,7 +28,7 @@
         <div class="navbar">
             <span @click="showDecisionList">Decisions</span>
             <span @click="showGroupList">Groups</span>
-            <span @click="showEntityList">Entities</span>
+            <span @click="showEntityList">Voters</span>
         </div>
     </template>
     <template id="tmpDataTable">
@@ -37,8 +39,12 @@
     </template>
     <template id="tmpDecisionDetail">
         <div>
-            <!-- <pre>decision:{{decision}}</pre> -->
+          <!--   <pre>decision:{{decision}}</pre>--> 
             <h2>Decision</h2>
+            <div v-if="editable">
+                <button @click="save_onclick">Save</button>
+                <button @click="delete_onclick">Delete</button>
+            </div>
             <div v-if="votable">
                 <button v-for="(item, index) in options" @click="vote(index)" class="vote-button">{{item}}</button>
             </div>
@@ -74,13 +80,13 @@
                     </div>
                 </div>
             </div>
-            <div>
+            <div v-if="showVotes">
                 <data-table :columns="votesColumns"
                             :data="votesDisplay"
                             header="Votes">
                 </data-table>
             </div>
-            <div>
+            <div v-if="showDiscussion">
                 <h2>Discussion</h2>
                 <div class="sort-options">
                     <span :class="currentSorting === 'time' ? 'selected' : ''" @click="sortComments('time')">Newest</span>
@@ -138,7 +144,7 @@
                     </div>
                     <div>
                         <input type="radio" name="type" value="0" v-model="group.type" :checked="group.type === 0" />
-                        <label>Entity</label>
+                        <label>Voter</label>
                     </div>
                 </div>
                 <div>
@@ -203,43 +209,43 @@
     </template>
     <template id="tmpEntityDetail">
         <div>
-            <!-- <pre>{{entity}}</pre> -->
-            <h2>Entity</h2>
+            <!-- <pre>{{voter}}</pre> -->
+            <h2>Voter</h2>
             <div v-if="!editable">
                 <div>
                     <label>Name:</label>
-                    <span>{{entity.name}}</span>
+                    <span>{{voter.name}}</span>
                 </div>
                 <div>
                     <label>Description:</label>
-                    <div>{{entity.description}}</div>
+                    <div>{{voter.description}}</div>
                 </div>
                 <div>
                     <label>Parent:</label>
-                    <a @click="showGroupDetail">{{entity.parent.href}}</a>
+                    <a @click="showGroupDetail">{{voter.parent.href}}</a>
                 </div>
             </div>
             <div v-if="editable">
                 <div>
                     <label>Name:</label>
-                    <input type="text" v-model="entity.name" />
+                    <input type="text" v-model="voter.name" />
                 </div>
                 <div>
                     <label>Description:</label>
-                    <textarea v-model="entity.description"> </textarea>
+                    <textarea v-model="voter.description"> </textarea>
                 </div>
                 <!-- todo pass in selection event -->
                 <div>
                     <div>
                         <label>Parent:</label>
-                        <span v-if="entity.groupId" class="linked" @click="showDetail(entity.groupId, 'Groups')">{{group.name}}</span>
+                        <span v-if="voter.groupId" class="linked" @click="showDetail(voter.groupId, 'Groups')">{{group.name}}</span>
                         <button @click="setupParentSelect">Select Parent</button>
                     </div>
                     <div v-if="isSelectingGroup"
                          class="modal group">
                         <data-table :columns="groupColumns"
                                     :data="groups"
-                                    :selected-value="entity.groupId"
+                                    :selected-value="voter.groupId"
                                     select-mode="single"
                                     header="Parent"
                                     @select="selectParent">

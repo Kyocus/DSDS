@@ -22,12 +22,12 @@ namespace Core.Domains
             return repository.FindAll();
         }
 
-        public void Create(T entity) {
-            repository.Create(entity);
+        public T Create(T entity) {
+            return repository.Create(entity);
         }
 
-        public void Update(T entity) {
-            repository.Update(entity);
+        public T Update(T entity) {
+            return repository.Update(entity);
         }
 
         public void Delete(int id)

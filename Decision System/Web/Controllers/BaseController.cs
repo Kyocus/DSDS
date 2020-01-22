@@ -37,12 +37,12 @@ namespace DecisionSystem.Controllers
         }
 
         [HttpPost]
-        public void Post(T entity) {
-            _domain.Create(entity);
+        public T Post(T entity) {
+            return _domain.Create(entity);
         }
         [HttpPut]
-        public void Put(T entity) {
-            _domain.Update(entity);
+        public T Put(T entity) {
+            return _domain.Update(entity);
         }
         [HttpDelete]
         public void Delete(int id) {

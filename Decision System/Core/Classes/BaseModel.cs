@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Core.Models
 {
     public class BaseModel
     {
-        private int id;
+        private long id;
 
-        public int Id { get => id; set => id = value; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get => id; set => id = value; }
     }
 }

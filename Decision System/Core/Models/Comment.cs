@@ -8,7 +8,7 @@ namespace Core.Models
 {
     public class Comment : Votable, IAggregateRoot
     {
-        private int entityId;
+        private long entityId;
         private long time;
 
         [ForeignKey("entityId")]
@@ -16,7 +16,7 @@ namespace Core.Models
         public long Time { get => time; set => time = value; }
 
         [Required]
-        public int EntityId { get => entityId; set => entityId = value; }
+        public long EntityId { get => entityId; set => entityId = value; }
 
         public Comment()
         {

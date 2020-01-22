@@ -8,10 +8,10 @@ namespace Core.Models
 {
     public class GroupOfVoters : Group
     {
-        private List<int> VoterIds;
+        private List<long> voterIds;
 
         public virtual List<Voter> Voters { get; set; }
-        public List<int> VoterIds1 { get => VoterIds; set => VoterIds = value; }
+        public List<long> VoterIds { get => voterIds; set => voterIds = value; }
 
         public GroupOfVoters()
         {

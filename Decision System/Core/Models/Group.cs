@@ -12,7 +12,7 @@ namespace Core.Models
     {
         private string name;
         private string description;
-        private int parentGroupId;
+        private long parentGroupId;
         private long creationDate;
 
         [ForeignKey("parentGroupId")]
@@ -23,7 +23,7 @@ namespace Core.Models
         public string Description { get => description; set => description = value; }
 
         [Required]
-        public int ParentGroupId { get => parentGroupId; set => parentGroupId = value; }
+        public long ParentGroupId { get => parentGroupId; set => parentGroupId = value; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
 
         public Group()

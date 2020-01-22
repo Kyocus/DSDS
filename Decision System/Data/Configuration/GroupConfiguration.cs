@@ -18,11 +18,11 @@ namespace DecisionSystem.Configuration
 
             builder.HasData(new
             {
-                Id = 1,
+                Id = 1l,
                 Name = "name 1",
                 Description = "description 1",
-                ParentGroupId = 1,
-                parentGroupId = 1,
+                ParentGroupId = 1l,
+                parentGroupId = 1l,
                 CreationDate = DateTime.UtcNow.Ticks
             });
 

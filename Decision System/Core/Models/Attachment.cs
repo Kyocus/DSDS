@@ -9,8 +9,8 @@ namespace Core.Models
     {
         private string name;
         private string path;
-        private int uploaderId;
-        private int optionId;
+        private long uploaderId;
+        private long optionId;
         private long uploadDate;
 
         public string Name { get => name; set => name = value; }
@@ -19,10 +19,10 @@ namespace Core.Models
         public long UploadDate { get => uploadDate; set => uploadDate = value; }
         
         [Required]
-        public int UploaderId { get => uploaderId; set => uploaderId = value; }
+        public long UploaderId { get => uploaderId; set => uploaderId = value; }
         
         [Required]
-        public int OptionId { get => optionId; set => optionId = value; }
+        public long OptionId { get => optionId; set => optionId = value; }
 
         [ForeignKey("uploaderId")]
         public virtual Voter Uploader { get; set; }

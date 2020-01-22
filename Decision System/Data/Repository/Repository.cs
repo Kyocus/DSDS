@@ -6,16 +6,20 @@ using System.Threading.Tasks;
 using Core.Interfaces;
 using Core.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
 
 namespace DecisionSystem.Repository
 {
     public abstract class Repository<T> : IRepository<T> where T : BaseModel, IAggregateRoot
     {
         protected DbContext context;
+        private readonly ILogger _logger;
 
-        public Repository(DbContext repositoryContext)
+        public Repository(DbContext repositoryContext, ILogger<T> logger)
         {
             this.context = repositoryContext;
+            _logger = logger;
         }
 
         public IQueryable<T> FindAll()
@@ -28,16 +32,34 @@ namespace DecisionSystem.Repository
             return this.context.Set<T>().Where(expression).AsNoTracking();
         }
 
-        public void Create(T entity)
+        public T Create(T entity)
         {
-            this.context.Set<T>().Add(stripVirtualProps(entity));
-            context.SaveChanges();
+            try
+            {
+                EntityEntry<T> returnMe = this.context.Set<T>().Add(stripVirtualProps(entity));
+                context.SaveChanges();
+                return returnMe.Entity;
+            }
+            catch (Exception e) {
+                _logger.LogError("could not insert Decision");
+            }
+
+            return null;
         }
 
-        public void Update(T entity)
+        public T Update(T entity)
         {
-            this.context.Set<T>().Update(stripVirtualProps(entity));
-            context.SaveChanges();
+            try
+            {
+                EntityEntry<T> returnMe = this.context.Set<T>().Update(stripVirtualProps(entity));
+                context.SaveChanges();
+                return returnMe.Entity;
+            }
+            catch (Exception e) { 
+                _logger.LogError("could not update Decision");
+            }
+
+            return null;
         }
 
         public void Delete(int id) {
