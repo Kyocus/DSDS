@@ -15,7 +15,7 @@
 
         <nav-bar @showdecisionlist="showDecisionList"
                  @showgrouplist="showGroupList"
-                 @showentitylist="showEntityList">
+                 @showvoterlist="showVoterList">
         </nav-bar>
 
         <div v-if="currentComponent.length > 0">
@@ -28,7 +28,7 @@
         <div class="navbar">
             <span @click="showDecisionList">Decisions</span>
             <span @click="showGroupList">Groups</span>
-            <span @click="showEntityList">Voters</span>
+            <span @click="showVoterList">Voters</span>
         </div>
     </template>
     <template id="tmpDataTable">
@@ -95,7 +95,7 @@
                 </div>
                 <div v-for="item in decision.comments" class="outline">
                     <div>
-                        <span>{{item.entityName}}</span>
+                        <span>{{item.voterName}}</span>
                         <span>{{getDate(item.time)}}</span>
                     </div>
                     <div>{{item.narrative}}</div>
@@ -136,6 +136,10 @@
                 </div>
             </div>
             <div v-if="editable">
+                <div v-if="editable">
+                    <button @click="save_onclick">Save</button>
+                    <button @click="delete_onclick">Delete</button>
+                </div>
                 <div>
                     <label>Type:</label>
                     <div>
@@ -207,7 +211,7 @@
             </div>
         </div>
     </template>
-    <template id="tmpEntityDetail">
+    <template id="tmpVoterDetail">
         <div>
             <!-- <pre>{{voter}}</pre> -->
             <h2>Voter</h2>
@@ -226,6 +230,10 @@
                 </div>
             </div>
             <div v-if="editable">
+                <div v-if="editable">
+                    <button @click="save_onclick">Save</button>
+                    <button @click="delete_onclick">Delete</button>
+                </div>
                 <div>
                     <label>Name:</label>
                     <input type="text" v-model="voter.name" />
@@ -239,7 +247,7 @@
                     <div>
                         <label>Parent:</label>
                         <span v-if="voter.groupId" class="linked" @click="showDetail(voter.groupId, 'Groups')">{{group.name}}</span>
-                        <button @click="setupParentSelect">Select Parent</button>
+                        <!--<button @click="setupParentSelect">Select Parent</button>-->
                     </div>
                     <div v-if="isSelectingGroup"
                          class="modal group">

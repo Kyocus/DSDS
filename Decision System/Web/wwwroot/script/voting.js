@@ -18,63 +18,55 @@ statuses.set(3, "Denied");
 statuses.set(4, "Archived");
 
 var dataAccess = {
-    getGroups: function (success, failure) {
+    getGroups: function () {
         //success(testGroups);
         return $.ajax({
             url: window.location.origin + "/Group",
-            type: "GET",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            type: "GET"
         });
     },
-    getGroup: function (id, success, failure) {
+    getGroup: function (id) {
         //success(testGroups.filter(function (x) {
         //    return x.id === id;
         //}));
         return $.ajax({
             url: window.location.origin + "/group/" + id,
-            type: "GET",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            type: "GET"
         });
     },
-    getDecisions: function (success, failure) {
+    getDecisions: function () {
         //success(testDecisions);
         return $.ajax({
             url: window.location.origin + "/Decision",
-            type: "GET",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            type: "GET"
         });
     },
-    getDecision: function (id, success, failure) {
+    getDecision: function (id) {
         //success(testDecisions.filter(function (x) {
         //    return x.id === id;
         //}));
         return $.ajax({
             url: window.location.origin + "/decision/" + id,
-            type: "GET",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            type: "GET"
         });
     },
-    postDecision: function (decision, success, failure) {
+    postVoter: function (voter) {
+        return $.ajax({
+            url: window.location.origin + "/voter",
+            type: "POST",
+            data: JSON.stringify(new PersistVoter(voter)),
+            contentType: "application/json"
+        });
+    },
+    postGroup: function (group) {
+        return $.ajax({
+            url: window.location.origin + "/group",
+            type: "POST",
+            data: JSON.stringify(new PersistGroup(group)),
+            contentType: "application/json"
+        });
+    },
+    postDecision: function (decision) {
         //success(testDecisions.filter(function (x) {
         //    return x.id === id;
         //}));
@@ -82,16 +74,28 @@ var dataAccess = {
             url: window.location.origin + "/decision",
             type: "POST",
             data: JSON.stringify(new PersistDecision(decision)),
-            contentType: "application/json",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            contentType: "application/json"
         });
     },
-    putDecision: function (id, decision, success, failure) {
+    putGroup: function (group) {
+        return $.ajax({
+            url: window.location.origin + "/group",
+            type: "PUT",
+            data: JSON.stringify(new PersistGroup(group)),
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    putVoter: function (voter) {
+        return $.ajax({
+            url: window.location.origin + "/voter",
+            type: "PUT",
+            data: JSON.stringify(new PersistVoter(voter)),
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    putDecision: function (decision) {
         //success(testDecisions.filter(function (x) {
         //    return x.id === id;
         //}));
@@ -100,16 +104,10 @@ var dataAccess = {
             type: "PUT",
             data: JSON.stringify(new PersistDecision(decision)),
             datatype: "json",
-            contentType: "application/json",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            contentType: "application/json"
         });
     },
-    deleteDecision: function (id, success, failure) {
+    deleteDecision: function (id) {
         //success(testDecisions.filter(function (x) {
         //    return x.id === id;
         //}));
@@ -117,41 +115,45 @@ var dataAccess = {
             url: window.location.origin + "/decision/" + id,
             type: "DELETE",
             datatype: "json",
-            contentType: "application/json",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            contentType: "application/json"
         });
     },
-    getVoters: function (success, failure) {
+    deleteGroup: function (id) {
+        //success(testDecisions.filter(function (x) {
+        //    return x.id === id;
+        //}));
+        return $.ajax({
+            url: window.location.origin + "/group/" + id,
+            type: "DELETE",
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    deleteVoter: function (id) {
+        //success(testDecisions.filter(function (x) {
+        //    return x.id === id;
+        //}));
+        return $.ajax({
+            url: window.location.origin + "/voter/" + id,
+            type: "DELETE",
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    getVoters: function () {
         //success(testEntities);
         return $.ajax({
             url: window.location.origin + "/Voter",
-            type: "GET",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            type: "GET"
         });
     },
-    getVoter: function (id, success, failure) {
+    getVoter: function (id) {
         //success(testEntities.filter(function (x) {
         //    return x.id === id;
         //}));
         return $.ajax({
             url: window.location.origin + "/Voter/" + id,
-            type: "GET",
-            success: function (data) {
-                success(data);
-            },
-            failure: function (err) {
-                failure(err);
-            }
+            type: "GET"
         });
     }
 };
@@ -160,7 +162,7 @@ var Vote = (function () {
 
     function constructor(data) {
         this.id = data.id ? data.id : generateId();
-        this.entityId = data.entityId ? data.entityId : null;
+        this.voterId = data.voterId ? data.voterId : null;
         this.selectedIndex = data.selectedIndex ? data.selectedIndex : 0;
         this.time = data.time ? data.time : 0;
     }
@@ -173,7 +175,7 @@ var Comment = (function () {
 
     function constructor(data) {
         this.id = data.id ? data.id : generateId();
-        this.entityId = data.entityId ? data.entityId : null;
+        this.voterId = data.voterId ? data.voterId : null;
         this.time = data.time ? data.time : new Date();
         this.upvotes = data.upvotes ? data.upvotes : 0;
         this.downvotes = data.downvotes ? data.downvotes : 0;
@@ -268,6 +270,28 @@ var Group = (function () {
     return constructor;
 })();
 
+var PersistGroup = (function () {
+
+    function constructor(data) {
+
+        if (data) {
+            this.description = data.description ? data.description : "";
+            this.id = data.id ? data.id : 0;
+            this.name = data.name ? data.name : "";
+            this.parentId = data.parentId ? data.parentId : null; // Group
+            this.type = data.type ? data.type : ENTITY_GROUP_TYPE; // group or voter
+        } else {
+            this.description = "";
+            this.id = 0;
+            this.name = "";
+            this.parentId = null;
+            this.type = ENTITY_GROUP_TYPE; // group or voter
+        }
+    }
+
+    return constructor;
+})();
+
 var Voter = (function () {
 
     function constructor(data) {
@@ -282,6 +306,28 @@ var Voter = (function () {
         } else {
             this.id = 0;
             this.creationDate = new Date().getTime();
+            this.description = "";
+            this.name = "";
+            this.groupId = null;
+        }
+    }
+
+    return constructor;
+})();
+
+var PersistVoter = (function () {
+
+    function constructor(data) {
+
+        if (data) {
+            this.id = data.id ? data.id : 0;
+            this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+            this.description = data.description ? data.description : "";
+            this.name = data.name ? data.name : "";
+            // Group
+            this.groupId = data.groupId ? data.groupId : null;
+        } else {
+            this.id = 0;
             this.description = "";
             this.name = "";
             this.groupId = null;
@@ -383,7 +429,7 @@ var groupColumns = [{
 }
 ];
 
-var entityColumns = [{
+var voterColumns = [{
     data: "name",
     className: "name linked",
     render: function (value, renderType, row) {
@@ -446,8 +492,8 @@ Vue.component('nav-bar', {
         showGroupList: function () {
             this.$emit("showgrouplist");
         },
-        showEntityList: function () {
-            this.$emit("showentitylist");
+        showVoterList: function () {
+            this.$emit("showvoterlist");
         }
 
     },
@@ -609,11 +655,8 @@ Vue.component('decision-detail', {
         votable: function () {
             return this.decision.status === 1;
         },
-        groups: function () {
-            return groups;
-        },
         group: function () {
-            return getGroupById(this.value.groupId);
+            return getItemById(this.value.groupId, this.groups);
         },
         groupColumns: function () {
             return groupColumns;
@@ -625,8 +668,8 @@ Vue.component('decision-detail', {
             if (this.decision) {
                 return this.decision.votes.map(function (x) {
                     return {
-                        name: getItemById(x.entityId, voters)
-                        , id: x.entityId
+                        name: getItemById(x.voterId, voters)
+                        , id: x.voterId
                         , choice: this.choices[x.selectedIndex]
                         , time: x.time
                     };
@@ -720,11 +763,19 @@ Vue.component('group-detail', {
         addChild: function (data) {
             this.group.children.push(data);
         }
+        , save_onclick: function () {
+            this.$emit("change", this.group);
+            console.log("group-detail save_onclick emitting change", this.group.id);
+        }
+        , delete_onclick: function () {
+            this.$emit("delete", this.group);
+            console.log("group-detail delete_onclick emitting change", this.group);
+        }
 
     },
     computed: {
         parent: function () {
-            return getGroupById(this.group.parentId);
+            return getItemById(this.group.parentId, this.groups);
         },
         groupColumns: function () {
             return groupColumns;
@@ -733,7 +784,7 @@ Vue.component('group-detail', {
             return decisionColumns;
         },
         columns: function () {
-            return this.group.type === GROUP_GROUP_TYPE ? groupColumns : entityColumns;
+            return this.group.type === GROUP_GROUP_TYPE ? groupColumns : voterColumns;
         },
         header: function () {
             return this.group.type === GROUP_GROUP_TYPE ? "Groups" : "Voters";
@@ -745,7 +796,7 @@ Vue.component('group-detail', {
                 })
                 : this.group.type === ENTITY_GROUP_TYPE
                     ? this.group.children.map(function (c) {
-                        return getItemById(c, voters);
+                        return getItemById(c, this.voters);
                     })
                     : null;
         },
@@ -766,13 +817,13 @@ Vue.component('group-detail', {
         }
     },
     watch: {
-        group: {
-            handler: function (current, old) {
-                this.$emit("change", current);
-                console.log("group-detail watch emitting change", current);
-            },
-            deep: true
-        },
+        //group: {
+        //    handler: function (current, old) {
+        //        this.$emit("change", current);
+        //        console.log("group-detail watch emitting change", current);
+        //    },
+        //    deep: true
+        //},
         // value: function (current, old) {
         // this.group = new Group(current);
         // }
@@ -795,7 +846,7 @@ Vue.component('voter-detail', {
             voter: {}
         };
     },
-    props: ["value", "editable"],
+    props: ["value", "editable", "groups"],
     methods: {
         save: function () {
             throw ("not implemented");
@@ -818,33 +869,38 @@ Vue.component('voter-detail', {
         selectParent: function (id) {
             this.voter.groupId = id;
         }
+        , save_onclick: function () {
+            this.$emit("change", this.voter);
+            console.log("group-detail save_onclick emitting change", this.voter.id);
+        }
+        , delete_onclick: function () {
+            this.$emit("delete", this.voter);
+            console.log("group-detail delete_onclick emitting change", this.voter);
+        }
     },
     computed: {
         groupColumns: function () {
             return groupColumns;
         },
-        groups: function () {
-            return groups;
-        },
         group: function () {
-            return getGroupById(this.voter.groupId);
+            return getItemById(this.voter.groupId, this.groups);
         },
     },
     watch: {
-        voter: {
-            handler: function (current, old) {
-                this.$emit("change", current);
-                console.log("voter-detail emitting change", current, this.index);
-            },
-            deep: true
-        }
+        //voter: {
+        //    handler: function (current, old) {
+        //        this.$emit("change", current);
+        //        console.log("voter-detail emitting change", current, this.index);
+        //    },
+        //    deep: true
+        //}
     },
     mounted: function () {
         // for some reason we need this to establish reactivity,
         // without it, we don't get reactivity until an emit is triggered
         this.voter = new Voter(this.value);
     },
-    template: $("#tmpEntityDetail").html()
+    template: $("#tmpVoterDetail").html()
 });
 
 var vue = new Vue({
@@ -875,7 +931,7 @@ var vue = new Vue({
                 this.createGroup();
             }
             if (this.currentHeader === "Voters") {
-                this.createEntity();
+                this.createVoter();
             }
         },
         deleteDecision: function (id) {
@@ -893,7 +949,7 @@ var vue = new Vue({
                 this.saveDecision(data);
             }
             else {
-                this.updateDecision(data.id, data);
+                this.updateDecision(data);
             }
         },
         persistGroup: function (data) {
@@ -901,7 +957,7 @@ var vue = new Vue({
                 this.saveGroup(data);
             }
             else {
-                this.updateGroup(data.id, data);
+                this.updateGroup(data);
             }
         },
         persistVoter: function (data) {
@@ -909,27 +965,29 @@ var vue = new Vue({
                 this.saveVoter(data);
             }
             else {
-                this.updateVoter(data.id, data);
+                this.updateVoter(data);
             }
         },
         saveDecision: function (data) {
             var self = this;
             console.log("saveDecision", data.id);
             this.currentDecision = data;
-            dataAccess.postDecision(data, function (result) {
-                self.decisions.push(new Decision(result));
-                self.currentDecision = new Decision(result);
-                console.log("result", result.id);
-            }, function () {
-                console.log("error during insert");
-            });
+            dataAccess.postDecision(data)
+                .then(function (result) {
+                    var d = new Decision(result);
+                    self.decisions.push(d);
+                    self.currentDecision = d;
+                    console.log("result", d.id);
+                }).catch(function (err) {
+                    console.log("error during insert");
+                });
         },
         updateDecision: function (id, data) {
             var self = this;
             console.log("updateDecision", data);
             this.currentDecision = data;
             dataAccess.putDecision(id, data, function (result) {
-                self.decisions[self.decisions.findIndex(x => x.id === id)] = new Decision(result);
+                self.decisions[self.decisions.findIndex(x => x.id === result.id)] = new Decision(result);
                 self.currentDecision = new Decision(result);
             }, function () {
                 console.log("error during update");
@@ -950,7 +1008,7 @@ var vue = new Vue({
             var self = this;
             console.log("deleteVoter", id);
             this.currentVoter = null;
-            dataAccess.deleteGroup(id, function (result) {
+            dataAccess.deleteVoter(id, function (result) {
                 self.voters.splice(self.voters.findIndex(x => x.id === id), 1);
             }, function () {
                 console.log("error during delete");
@@ -962,18 +1020,61 @@ var vue = new Vue({
             console.log("saveGroup", data);
             var self = this;
             this.currentGroup = data;
-            self.groups[self.groups.findIndex(function (x) {
-                return x.id === data.id;
-            })] = data;
+
+            dataAccess.postGroup(data)
+                .then(function (result) {
+                    var g = new Group(result);
+                    self.groups.push(g);
+                    self.currentGroup = g;
+                    console.log("result", g.id);
+                }).catch(function (err) {
+                    console.log("error during insert");
+                });
 
         },
-        saveVoter: function (data) {
-            console.log("saveEntity", data);
-            this.currentVoter = data;
-            self.voters[self.voters.findIndex(function (x) {
-                return x.id === data.id;
-            })] = result;
+        updateGroup: function (data) {
+            console.log("updateGroup", data);
+            var self = this;
+            this.currentGroup = data;
 
+            dataAccess.putGroup(data)
+                .then(function (result) {
+                    self.currentGroup = new Group(result);
+                    self.groups[self.groups.findIndex(x => x.id === result.id)] = self.currentGroup;
+                    //getItemById(result.id, self.groups) = result;
+                }).catch(function (err) {
+                    console.log("error during insert");
+                });
+        },
+        saveVoter: function (data) {
+            console.log("saveVoter", data);
+            var self = this;
+            this.currentVoter = data;
+
+            dataAccess.postVoter(data)
+                .then(function (result) {
+                    var v = new Voter(result);
+                    self.voters.push(v);
+                    self.currentVoter = v;
+                    console.log("result", v.id);
+                }).catch(function (err) {
+                    console.log("error during insert");
+                });
+
+        },
+        updateVoter: function (data) {
+            console.log("updateVoter", data);
+            var self = this;
+            this.currentVoter = data;
+
+            dataAccess.putVoter(data)
+                .then(function (result) {
+                    self.currentVoter = new Voter(result);
+                    self.voters[self.voters.findIndex(x => x.id === result.id)] = self.currentVoter;
+                    //getItemById(result.id, self.voters) = result;
+                }).catch(function (err) {
+                    console.log("error during insert");
+                });
         },
         onchange: function (value) {
             this.data = value;
@@ -989,10 +1090,10 @@ var vue = new Vue({
             //this.groups.push(this.currentGroup);
             this.showGroupDetail(null, false, false);
         },
-        createEntity: function () {
+        createVoter: function () {
             this.currentVoter = new Voter();
-            this.voters.push(this.currentVoter);
-            this.showEntityDetail(null, false, false);
+            //this.voters.push(this.currentVoter);
+            this.showVoterDetail(null, false, false);
         },
 
         showDecisionList: function () {
@@ -1009,7 +1110,7 @@ var vue = new Vue({
                 this.showDecisionDetail(id);
             }
             if (header === "Voters") {
-                this.showEntityDetail(id);
+                this.showVoterDetail(id);
             }
         },
         showDecisionDetail: function (id, showVotes, showDiscussion) {
@@ -1039,7 +1140,7 @@ var vue = new Vue({
         showGroupDetail: function (id) {
             this.currentGroup = null;
             if (id) {
-                this.currentGroup = groups.find(function (x) {
+                this.currentGroup = this.groups.find(function (x) {
                     return x.id === id;
                 });
             } else {
@@ -1052,16 +1153,16 @@ var vue = new Vue({
             this.currentComponent = "";
             this.currentComponent = "group-detail";
         },
-        showEntityList: function () {
-            this.currentColumns = entityColumns;
+        showVoterList: function () {
+            this.currentColumns = voterColumns;
             this.currentData = this.voters;
             this.currentHeader = "Voters";
             this.currentComponent = "data-table";
         },
-        showEntityDetail: function (id) {
+        showVoterDetail: function (id) {
             this.currentVoter = null;
             if (id) {
-                this.currentVoter = voters.find(function (x) {
+                this.currentVoter = this.voters.find(function (x) {
                     return x.id === id;
                 });
             } else {
@@ -1107,7 +1208,6 @@ var vue = new Vue({
                 ? {
                     "value": this.currentDecision,
                     "editable": "true"
-
                 }
                 : this.currentComponent === "group-detail"
                     ? {
@@ -1115,13 +1215,12 @@ var vue = new Vue({
                         "groups": this.groups,
                         "voters": this.voters,
                         "editable": "true"
-
                     }
                     : this.currentComponent === "voter-detail"
                         ? {
                             "value": this.currentVoter,
+                            "groups": this.groups,
                             "editable": "true"
-
                         }
                         : this.currentComponent === "data-table"
                             ? {
@@ -1129,7 +1228,6 @@ var vue = new Vue({
                                 "data": this.currentData,
                                 "header": this.currentHeader,
                                 "select-mode": "",
-
                             }
                             : {};
 
@@ -1157,15 +1255,6 @@ var vue = new Vue({
             });
     }
 });
-
-function getGroupById(id) {
-    try {
-        return getItemById(id, groups);
-    } catch (e) {
-        console.log(e);
-        return null;
-    }
-}
 
 function getItemById(id, collection) {
     var item = collection.find(function (x) {
