@@ -248,22 +248,24 @@ var Group = (function () {
     function constructor(data) {
 
         if (data) {
-            this.decisions = data.decisions ? data.decisions : []; // Voter[] or Group[]
-            this.children = data.children ? data.children : []; // Voter[] or Group[]
+            this.decisions = data.decisions ? data.decisions : [];
+            this.groups = data.groups ? data.groups : [];
+            this.voters = data.voters ? data.voters : [];
             this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
             this.description = data.description ? data.description : "";
             this.id = data.id ? data.id : 0;
             this.name = data.name ? data.name : "";
-            this.parentId = data.parentId ? data.parentId : null; // Group
-            this.type = data.type ? data.type : ENTITY_GROUP_TYPE; // group or voter
+            this.parentId = data.parentId ? data.parentId : null;
+            this.type = data.type ? data.type : ENTITY_GROUP_TYPE;
         } else {
-            this.children = [];
+            this.groups = [];
+            this.voters = [];
             this.creationDate = new Date().getTime();
             this.description = "";
             this.id = 0;
             this.name = "";
             this.parentId = null;
-            this.type = ENTITY_GROUP_TYPE; // group or voter
+            this.type = ENTITY_GROUP_TYPE;
         }
     }
 
@@ -338,147 +340,95 @@ var PersistVoter = (function () {
 })();
 
 var decisionColumns = [{
-    data: "name",
-    className: "name linked",
-    render: function (value, renderType, row) {
-        return "<div>" + value + "</div>"
-    },
-    title: "Name"
+    value: "name",
+    text: "Name"
 }, {
-    data: "statusId",
-    className: "status",
-    render: function (value, renderType, row) {
-        return statuses.get(value);
-    },
-    title: "Status"
+    value: "statusId",
+    text: "Status"
 }, {
-    data: "groupId",
-    className: "group linked",
-    render: function (value, renderType, row) {
-        if (parent) {
-            return "<div>" + value + "</div>"
-        } else {
-            return "<div>no parent selected</div>";
-        }
-    },
-    title: "Group"
+    value: "groupId",
+    text: "Group"
 }, {
-    data: "creationDate",
-    className: "created",
-    render: function (value, renderType, row) {
-        return new Date(value).toLocaleString("en-us", dateTimeOptions);
-    },
-    title: "Created"
+    value: "creationDate",
+    text: "Created"
 }, {
-    data: "expirationDate",
-    className: "expiration",
-    render: function (value, renderType, row) {
-        return new Date(value).toLocaleString("en-us", dateTimeOptions);
-    },
-    title: "Expires"
+    value: "expirationDate",
+    text: "Expires"
 }, {
-    data: "attachments",
-    className: "attachments",
-    render: function (value, renderType, row) {
-        return "<a href=\"" + row.href + "\">" + value + "</a>";
-    },
-    title: "Attachments"
+    value: "attachments",
+    text: "Attachments"
 }
 
 ];
 
 var groupColumns = [{
-    data: "name",
-    className: "name linked",
-    render: function (value, renderType, row) {
-        return "<div @click=\"showDetail\">" + value + "</div>"
-    },
-    title: "Name"
+    value: "name",
+    text: "Name"
 }, {
-    data: "parentId",
-    className: "group linked",
-    render: function (value, renderType, row) {
-        if (parent) {
-            return "<div>" + value + "</div>"
-        } else {
-            return "<a>no parent selected</a>";
-        }
-    },
-    title: "Parent"
+    value: "parentId",
+    text: "Parent"
 }, {
-    data: "type",
-    className: "children",
-    render: function (value, renderType, row) {
-        return value === 1 ? "Groups" : "Voters";
-    },
-    title: "Type"
+    value: "type",
+    text: "Type"
 }, {
-    data: "creationDate",
-    className: "created",
-    render: function (value, renderType, row) {
-        return new Date(value).toLocaleString("en-us", dateTimeOptions);
-    },
-    title: "Created"
+    value: "creationDate",
+    text: "Created"
 }, {
     data: "attachments",
-    className: "attachments",
-    render: function (value, renderType, row) {
-        return "<a href=\"" + row.href + "\">" + value + "</a>";
-    },
-    title: "Attachments"
+    text: "Attachments"
 }
 ];
 
 var voterColumns = [{
-    data: "name",
-    className: "name linked",
-    render: function (value, renderType, row) {
-        return "<div @click=\"showDetail\">" + value + "</div>"
-    },
-    title: "Name"
+    value: "name",
+    //className: "name linked",
+    //render: function (value, renderType, row) {
+    //    return "<div @click=\"showDetail\">" + value + "</div>"
+    //},
+    text: "Name"
 }, {
     data: "groupId",
-    className: "group linked",
-    render: function (value, renderType, row) {
-        if (parent) {
-            return "<div @click=\"showGroupDetail\">" + value + "</div>"
-        } else {
-            return "<div>no parent selected</div>";
-        }
-    },
-    title: "Group"
+    //className: "group linked",
+    //render: function (value, renderType, row) {
+    //    if (parent) {
+    //        return "<div @click=\"showGroupDetail\">" + value + "</div>"
+    //    } else {
+    //        return "<div>no parent selected</div>";
+    //    }
+    //},
+    text: "Group"
 }, {
     data: "creationDate",
-    className: "created",
-    render: function (value, renderType, row) {
-        return new Date(value).toLocaleString("en-us", dateTimeOptions);
-    },
-    title: "Created"
+    //className: "created",
+    //render: function (value, renderType, row) {
+    //    return new Date(value).toLocaleString("en-us", dateTimeOptions);
+    //},
+    text: "Created"
 }
 
 ];
 
 var votesColumns = [{
     data: "name",
-    className: "name linked",
-    render: function (value, renderType, row) {
-        return "<div @click=\"showDetail(row.id, 'Voters')\">" + value + "</div>"
-    },
-    title: "Name"
+    //className: "name linked",
+    //render: function (value, renderType, row) {
+    //    return "<div @click=\"showDetail(row.id, 'Voters')\">" + value + "</div>"
+    //},
+    text: "Name"
 }, {
     data: "choice",
-    className: "choice",
-    render: function (value, renderType, row) {
-        return value;
-    },
-    title: "Group"
+    //className: "choice",
+    //render: function (value, renderType, row) {
+    //    return value;
+    //},
+    text: "Group"
 }, {
     data: "time",
-    className: "created",
-    render: function (value, renderType, row) {
-        return new Date(value).toLocaleString("en-us", dateTimeOptions);
-    },
-    title: "Created"
+    //className: "created",
+    //render: function (value, renderType, row) {
+    //    return new Date(value).toLocaleString("en-us", dateTimeOptions);
+    //},
+    text: "Created"
 }
 
 ];
@@ -504,7 +454,26 @@ Vue.component('data-table', {
     model: {
         event: "change"
     },
-    // selectMode === "single" || "multi"
+    data: function () {
+        return {
+            search: ""
+
+            , slots: [
+                'body',
+                'body.append',
+                'body.prepend',
+                'footer',
+                'header.data-table-select',
+                'header',
+                'progress',
+                'item.data-table-select',
+                'item.<name>',
+                'no-data',
+                'no-results',
+                'top',
+            ]
+        };
+    },
     props: ["columns", "data", "header", "selectMode"],
     methods: {
         showDetail: function (data) {
@@ -519,65 +488,45 @@ Vue.component('data-table', {
             console.log("data-table emitting select", data);
             this.$emit("select", data.id);
         },
-        setupDataTable: function () {
-
-            var selector = ".data-table";
-            var self = this;
-
-            if (self.dt) {
-                self.dt.destroy(false);
-                $(this.$el).find(selector).empty();
-            }
-            self.dt = $(self.$el).find(selector).DataTable({
-                data: self.data,
-                columns: self.columnsDisplay
-            });
-
-            $(self.$el).off();
-
-            $(self.$el).on('click', 'button.select-single', function () {
-                var data = self.dt.row($(this).closest("tr")).data();
-                self.select(data);
-            });
-            $(self.$el).on('click', 'td.name', function () {
-                var data = self.dt.row($(this).closest("tr")).data();
-                self.showDetail(data.id, this.header);
-            });
-            $(self.$el).on('click', 'td.group', function () {
-                // var data = self.dt.row($(this).closest("tr")).data();
-                self.showGroupDetail(parseInt($(this).text()));
-            });
+        dateDisplay: function (value) {
+            return new Date(value).toLocaleString("en-us", dateTimeOptions);
         }
     },
     computed: {
-        columnsDisplay: function () {
-
-            var mode = this.selectMode;
-            if (mode === "single" || mode === "multi") {
-
-                var returnMe = this.columns.slice();
-                returnMe.unshift({
-                    data: null,
-                    className: "actions",
-                    render: function (value, renderType, row) {
-                        return "<button class=\"select-" + mode + "\">Select</button>";
-                    },
-                    title: "Actions"
-                });
-                return returnMe;
-            } else {
-                return this.columns;
-            }
+        statusDisplay: function () {
+            return statuses.get(value);
+        }
+        , headers: function () {
+            return this.header === "Voters"
+                ? [
+                    { text: 'Name', value: 'name' },
+                    { text: 'Group', value: 'groupId' },
+                    { text: 'Created', value: 'creationDate' }
+                ]
+                : this.header === "Decisions"
+                    ? [
+                        { text: 'Name', value: 'name' },
+                        { text: 'Status', value: 'statusId' },
+                        { text: 'Group', value: 'groupId' },
+                        { text: 'Created', value: 'creationDate' },
+                        { text: 'Expires', value: 'expirationDate' },
+                        { text: 'Attachments', value: 'attachments' }
+                    ]
+                    : this.header === "Groups"
+                        ? [
+                            { text: 'Name', value: 'name' },
+                            { text: 'Group', value: 'parentId' },
+                            { text: 'Type', value: 'type' },
+                            { text: 'Created', value: 'creationDate' },
+                            { text: 'Attachments', value: 'attachments' }
+                        ]
+                        : [];
         }
 
     },
     watch: {
-        data: function (current, old) {
-            this.setupDataTable();
-        }
     },
     mounted: function () {
-        this.setupDataTable();
     },
     template: $("#tmpDataTable").html()
 });
@@ -588,6 +537,7 @@ Vue.component('decision-detail', {
     },
     data: function () {
         return {
+            search: "",
             currentSorting: 'none',
             isSelectingGroup: false,
             showDiscussion: false,
@@ -757,11 +707,28 @@ Vue.component('group-detail', {
                 });
             }
         },
+        removeGroup: function (index) {
+            this.group.groups.splice(index, 1);
+        },
+        addGroup: function (data) {
+            this.group.groups.push(data);
+        },
+        removeVoter: function (index) {
+            this.group.voters.splice(index, 1);
+        },
+        addVoter: function (data) {
+            this.group.voters.push(data);
+        },
         removeChild: function (index) {
-            this.group.children.splice(index, 1);
+            return self.group.type === GROUP_GROUP_TYPE
+                ? self.removeGroup(index)
+                : self.removeVoter(index);
         },
         addChild: function (data) {
-            this.group.children.push(data);
+            return self.group.type === GROUP_GROUP_TYPE
+                ? self.addGroup(data)
+                : self.addVoter(data);
+            //this.group.voters.push(data);
         }
         , save_onclick: function () {
             this.$emit("change", this.group);
@@ -789,17 +756,29 @@ Vue.component('group-detail', {
         header: function () {
             return this.group.type === GROUP_GROUP_TYPE ? "Groups" : "Voters";
         },
-        childrenDisplay: function () {
-            return this.group.type === GROUP_GROUP_TYPE
-                ? this.group.children.map(function (c) {
-                    return getItemById(c, groups);
-                })
-                : this.group.type === ENTITY_GROUP_TYPE
-                    ? this.group.children.map(function (c) {
-                        return getItemById(c, this.voters);
-                    })
-                    : null;
+        groupsDisplay: function () {
+            var self = this;
+            return self.group.groups.map(function (c) {
+                return getItemById(c, self.groups);
+            });
         },
+        votersDisplay: function () {
+            var self = this;
+            if (self.group.voters) {
+                return self.group.voters.map(function (c) {
+                    return getItemById(c, self.voters);
+                });
+            } else {
+                return [];
+            }
+        },
+        childrenDisplay: function () {
+            var self = this;
+            return self.group.type === GROUP_GROUP_TYPE
+                ? self.groupsDisplay
+                : self.votersDisplay;
+        },
+
         decisionsDisplay: function () {
 
             return this.group.decisions ? this.group.decisions.map(function (c) {
@@ -810,9 +789,13 @@ Vue.component('group-detail', {
             var self = this;
             var list = this.group.type === 0 ? self.voters : self.groups;
             return list.filter(function (x) {
-                return self.group.children.findIndex(function (y) {
-                    return y === x.id;
-                }) === -1;
+                if (self.group.children) {
+                    return self.group.children.findIndex(function (y) {
+                        return y === x.id;
+                    }) === -1;
+                } else {
+                    return true;
+                }
             });
         }
     },
@@ -905,6 +888,7 @@ Vue.component('voter-detail', {
 
 var vue = new Vue({
     el: "#vue",
+    vuetify: new Vuetify(),
     data: function () {
         return {
 
@@ -977,7 +961,6 @@ var vue = new Vue({
                     var d = new Decision(result);
                     self.decisions.push(d);
                     self.currentDecision = d;
-                    console.log("result", d.id);
                 }).catch(function (err) {
                     console.log("error during insert");
                 });
@@ -1026,7 +1009,7 @@ var vue = new Vue({
                     var g = new Group(result);
                     self.groups.push(g);
                     self.currentGroup = g;
-                    console.log("result", g.id);
+                    //console.log("result", g.id);
                 }).catch(function (err) {
                     console.log("error during insert");
                 });
@@ -1056,7 +1039,7 @@ var vue = new Vue({
                     var v = new Voter(result);
                     self.voters.push(v);
                     self.currentVoter = v;
-                    console.log("result", v.id);
+                    //console.log("result", v.id);
                 }).catch(function (err) {
                     console.log("error during insert");
                 });
@@ -1081,17 +1064,17 @@ var vue = new Vue({
             console.log("this probably isn't working");
         },
         createDecision: function () {
-            this.currentDecision = new Decision();
+            //this.currentDecision = new Decision();
             //this.decisions.push(this.currentDecision);
             this.showDecisionDetail(null, false, false);
         },
         createGroup: function () {
-            this.currentGroup = new Group();
+            //this.currentGroup = new Group();
             //this.groups.push(this.currentGroup);
             this.showGroupDetail(null, false, false);
         },
         createVoter: function () {
-            this.currentVoter = new Voter();
+            //this.currentVoter = new Voter();
             //this.voters.push(this.currentVoter);
             this.showVoterDetail(null, false, false);
         },
@@ -1114,9 +1097,6 @@ var vue = new Vue({
             }
         },
         showDecisionDetail: function (id, showVotes, showDiscussion) {
-            //todo find out why this is here
-            //this.currentDecision = null;
-
             if (id) {
                 this.currentDecision = this.decisions.find(function (x) {
                     return x.id === id;
@@ -1160,7 +1140,6 @@ var vue = new Vue({
             this.currentComponent = "data-table";
         },
         showVoterDetail: function (id) {
-            this.currentVoter = null;
             if (id) {
                 this.currentVoter = this.voters.find(function (x) {
                     return x.id === id;
@@ -1170,8 +1149,9 @@ var vue = new Vue({
             }
 
             this.currentColumns = "";
-            this.currentData = this.currentVoter;
-            this.currentHeader = "";
+            //this.currentData = this.currentVoter;
+            this.currentHeader = "Voters";
+            this.currentComponent = "";
             this.currentComponent = "voter-detail";
         }
     },

@@ -3,16 +3,16 @@
 }
 
 
-div.navbar{
+/*.nav{
 	background-color: lightgray;
 	font-size: x-large;
 	font-weight: bold;
 }
-div.navbar > span{
+.nav .nav-item{
 	margin-right: 1em;
 	color: royalblue;
 	cursor: pointer;
-}
+}*/
 
 h2{
 	text-align: center;
@@ -27,5 +27,26 @@ td.linked
 	color: blue;
 	text-decoration: underline;
 	cursor: pointer;
+}
+
+.group-description 
+,.voter-description 
+,.decision-description 
+{
+	width: 30em;
+	height: auto;
+	outline: solid thin lightgray;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+label {
+	vertical-align: top;
+}
+
+input {
+	width: 30em;
 }
 

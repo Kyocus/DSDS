@@ -56,8 +56,8 @@ namespace DecisionSystem
             services.AddScoped<Comment>();
             services.AddScoped<Decision>();
             services.AddScoped<Group>();
-            services.AddScoped<GroupOfGroups>();
-            services.AddScoped<GroupOfVoters>();
+            services.AddScoped<GroupGroup>();
+            services.AddScoped<GroupVoter>();
             services.AddScoped<Status>();
             services.AddScoped<Vote>();
             services.AddScoped<Voter>();

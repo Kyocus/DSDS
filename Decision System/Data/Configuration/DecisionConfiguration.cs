@@ -12,7 +12,6 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Decision> builder)
         {
-            builder.HasKey(o => o.Id);
             builder.Property(o => o.Id).ValueGeneratedOnAdd();
             builder.Property(t => t.Name).IsRequired();
             builder.Property(t => t.ExpirationDate).IsRequired();

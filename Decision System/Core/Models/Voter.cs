@@ -17,6 +17,7 @@ namespace Core.Models
         public string Name { get => name; set => name = value; }
         public string Description { get => description; set => description = value; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
+        public List<GroupVoter> GroupVoters { get; set; }
 
         public Voter()
         {

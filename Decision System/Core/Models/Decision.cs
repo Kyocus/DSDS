@@ -19,7 +19,7 @@ namespace Core.Models
         private Status status;
         private long statusDate;
 
-        public virtual List<Decision> Decisions { get; set; }
+        public virtual List<GroupDecision> GroupDecisions { get; set; }
         public virtual List<Vote> Votes { get; set; }
         public virtual List<Option> Options { get; set; }
         public virtual List<Comment> Comments { get; set; }

@@ -12,7 +12,6 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Attachment> builder)
         {
-            builder.HasKey(o => o.Id);
             builder.Property(t => t.Name)
                     .IsRequired();
 

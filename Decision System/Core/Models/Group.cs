@@ -12,32 +12,20 @@ namespace Core.Models
     {
         private string name;
         private string description;
-        private long parentGroupId;
         private long creationDate;
 
-        [ForeignKey("parentGroupId")]
-        public virtual Group ParentGroup { get; set; }
-        public virtual List<Decision> Decisions { get; set; }
-        //Groups or Entities
+        public virtual List<GroupDecision> Decisions { get; set; }
         public string Name { get => name; set => name = value; }
         public string Description { get => description; set => description = value; }
 
-        [Required]
-        public long ParentGroupId { get => parentGroupId; set => parentGroupId = value; }
+        public List<GroupGroup> ParentGroups { get; set; }
+        public List<GroupGroup> ChildGroups { get; set; }
+        public List<GroupVoter> GroupVoters { get; set; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
 
         public Group()
         {
 
-        }
-
-        public Group(int id, string name, string description, int parentGroupId, long creationDate)
-        {
-            Id = id;
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description ?? throw new ArgumentNullException(nameof(description));
-            ParentGroupId = parentGroupId;
-            CreationDate = creationDate;
         }
     }
 }

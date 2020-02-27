@@ -12,7 +12,6 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Comment> builder)
         {
-            builder.HasKey(o => o.Id);
             builder.Property(t => t.Time)
                     .IsRequired();
 

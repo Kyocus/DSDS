@@ -36,7 +36,7 @@ namespace DecisionSystem.Repository
         {
             try
             {
-                EntityEntry<T> returnMe = this.context.Set<T>().Add(stripVirtualProps(entity));
+                EntityEntry<T> returnMe = this.context.Set<T>().Add(entity);
                 context.SaveChanges();
                 return returnMe.Entity;
             }
@@ -51,7 +51,7 @@ namespace DecisionSystem.Repository
         {
             try
             {
-                EntityEntry<T> returnMe = this.context.Set<T>().Update(stripVirtualProps(entity));
+                EntityEntry<T> returnMe = this.context.Set<T>().Update(entity);
                 context.SaveChanges();
                 return returnMe.Entity;
             }
