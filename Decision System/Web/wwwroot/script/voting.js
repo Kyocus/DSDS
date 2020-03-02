@@ -297,20 +297,20 @@ var PersistGroup = (function () {
 var Voter = (function () {
 
     function constructor(data) {
-
+        var self = this;
         if (data) {
-            this.id = data.id ? data.id : 0;
-            this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
-            this.description = data.description ? data.description : "";
-            this.name = data.name ? data.name : "";
+            self.id = data.id ? data.id : 0;
+            self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+            self.description = data.description ? data.description : "";
+            self.name = data.name ? data.name : "";
             // Group
-            this.groupId = data.groupId ? data.groupId : null;
+            self.groupId = data.groupId ? data.groupId : null;
         } else {
-            this.id = 0;
-            this.creationDate = new Date().getTime();
-            this.description = "";
-            this.name = "";
-            this.groupId = null;
+            self.id = 0;
+            self.creationDate = new Date().getTime();
+            self.description = "";
+            self.name = "";
+            self.groupId = null;
         }
     }
 
@@ -320,19 +320,19 @@ var Voter = (function () {
 var PersistVoter = (function () {
 
     function constructor(data) {
-
+        var self = this;
         if (data) {
-            this.id = data.id ? data.id : 0;
-            this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
-            this.description = data.description ? data.description : "";
-            this.name = data.name ? data.name : "";
+            self.id = data.id ? data.id : 0;
+            self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+            self.description = data.description ? data.description : "";
+            self.name = data.name ? data.name : "";
             // Group
-            this.groupId = data.groupId ? data.groupId : null;
+            self.groupId = data.groupId ? data.groupId : null;
         } else {
-            this.id = 0;
-            this.description = "";
-            this.name = "";
-            this.groupId = null;
+            self.id = 0;
+            self.description = "";
+            self.name = "";
+            self.groupId = null;
         }
     }
 
@@ -476,17 +476,17 @@ Vue.component('data-table', {
     },
     props: ["columns", "data", "header", "selectMode"],
     methods: {
-        showDetail: function (data) {
+        showDetail: function (id) {
             console.log("data-table emitting showDetail");
-            this.$emit("show-detail", data, this.header);
+            this.$emit("show-detail", id, this.header);
         },
-        showGroupDetail: function (data) {
+        showGroupDetail: function (id) {
             console.log("data-table emitting showGroupDetail");
-            this.$emit("show-detail", data, "Groups");
+            this.$emit("show-detail", id, "Groups");
         },
-        select: function (data) {
-            console.log("data-table emitting select", data);
-            this.$emit("select", data.id);
+        select: function (id) {
+            console.log("data-table emitting select", id);
+            this.$emit("select", id);
         },
         dateDisplay: function (value) {
             return new Date(value).toLocaleString("en-us", dateTimeOptions);
@@ -497,30 +497,36 @@ Vue.component('data-table', {
             return statuses.get(value);
         }
         , headers: function () {
-            return this.header === "Voters"
-                ? [
-                    { text: 'Name', value: 'name' },
-                    { text: 'Group', value: 'groupId' },
-                    { text: 'Created', value: 'creationDate' }
-                ]
-                : this.header === "Decisions"
-                    ? [
+
+            switch (this.header) {
+                case "Voters":
+                    return [
+                        { text: 'Name', value: 'name' },
+                        { text: 'Group', value: 'groupId' },
+                        { text: 'Created', value: 'creationDate' }
+                    ];
+
+                case "Decisions":
+                    return [
                         { text: 'Name', value: 'name' },
                         { text: 'Status', value: 'statusId' },
                         { text: 'Group', value: 'groupId' },
                         { text: 'Created', value: 'creationDate' },
                         { text: 'Expires', value: 'expirationDate' },
                         { text: 'Attachments', value: 'attachments' }
-                    ]
-                    : this.header === "Groups"
-                        ? [
-                            { text: 'Name', value: 'name' },
-                            { text: 'Group', value: 'parentId' },
-                            { text: 'Type', value: 'type' },
-                            { text: 'Created', value: 'creationDate' },
-                            { text: 'Attachments', value: 'attachments' }
-                        ]
-                        : [];
+                    ];
+
+                case "Groups":
+                    return [
+                        { text: 'Name', value: 'name' },
+                        { text: 'Group', value: 'parentId' },
+                        { text: 'Type', value: 'type' },
+                        { text: 'Created', value: 'creationDate' },
+                        { text: 'Attachments', value: 'attachments' }
+                    ];
+                default:
+                    return [];
+            }
         }
 
     },
@@ -658,8 +664,7 @@ Vue.component('group-detail', {
     data: function () {
         return {
             isAddingChild: false,
-            isSelectingGroup: false,
-            group: {}
+            isSelectingGroup: false
         };
     },
     props: ["value", "editable", "voters", "groups"],
@@ -667,7 +672,7 @@ Vue.component('group-detail', {
         makeDecision: function () {
             var d = new Decision();
             decisions.push(d);
-            this.group.decisions.push(d);
+            this.value.decisions.push(d);
             this.showDetail(d.id, "Decisions");
         },
         showDetail: function (data, header) {
@@ -676,7 +681,7 @@ Vue.component('group-detail', {
         },
         setGroup: function (id) {
             console.log("group-detail setGroup");
-            this.group.parentId = id;
+            this.value.parentId = id;
 
         },
         selectGroup: function () {
@@ -708,35 +713,41 @@ Vue.component('group-detail', {
             }
         },
         removeGroup: function (index) {
-            this.group.groups.splice(index, 1);
+            this.$emit("removeGroup", index);
+            //this.group.groups.splice(index, 1);
         },
         addGroup: function (data) {
-            this.group.groups.push(data);
+            this.$emit("addGroup", data);
+            //this.group.groups.push(data);
         },
         removeVoter: function (index) {
-            this.group.voters.splice(index, 1);
+            this.$emit("removeVoter", index);
+            //this.group.voters.splice(index, 1);
         },
         addVoter: function (data) {
-            this.group.voters.push(data);
+            this.$emit("addVoter", data);
+            //this.group.voters.push(data);
         },
         removeChild: function (index) {
-            return self.group.type === GROUP_GROUP_TYPE
+            var self = this;
+            return self.value.type === GROUP_GROUP_TYPE
                 ? self.removeGroup(index)
                 : self.removeVoter(index);
         },
         addChild: function (data) {
-            return self.group.type === GROUP_GROUP_TYPE
+            var self = this;
+            return self.value.type === GROUP_GROUP_TYPE
                 ? self.addGroup(data)
                 : self.addVoter(data);
             //this.group.voters.push(data);
         }
         , save_onclick: function () {
-            this.$emit("change", this.group);
-            console.log("group-detail save_onclick emitting change", this.group.id);
+            this.$emit("change", this.value);
+            console.log("group-detail save_onclick emitting change", this.value.id);
         }
         , delete_onclick: function () {
-            this.$emit("delete", this.group);
-            console.log("group-detail delete_onclick emitting change", this.group);
+            this.$emit("delete", this.value);
+            console.log("group-detail delete_onclick emitting change", this.value);
         }
 
     },
@@ -751,21 +762,21 @@ Vue.component('group-detail', {
             return decisionColumns;
         },
         columns: function () {
-            return this.group.type === GROUP_GROUP_TYPE ? groupColumns : voterColumns;
+            return this.value.type === GROUP_GROUP_TYPE ? groupColumns : voterColumns;
         },
         header: function () {
-            return this.group.type === GROUP_GROUP_TYPE ? "Groups" : "Voters";
+            return this.value.type === GROUP_GROUP_TYPE ? "Groups" : "Voters";
         },
         groupsDisplay: function () {
             var self = this;
-            return self.group.groups.map(function (c) {
+            return self.value.groups.map(function (c) {
                 return getItemById(c, self.groups);
             });
         },
         votersDisplay: function () {
             var self = this;
-            if (self.group.voters) {
-                return self.group.voters.map(function (c) {
+            if (self.value.voters) {
+                return self.value.voters.map(function (c) {
                     return getItemById(c, self.voters);
                 });
             } else {
@@ -774,23 +785,23 @@ Vue.component('group-detail', {
         },
         childrenDisplay: function () {
             var self = this;
-            return self.group.type === GROUP_GROUP_TYPE
+            return self.value.type === GROUP_GROUP_TYPE
                 ? self.groupsDisplay
                 : self.votersDisplay;
         },
 
         decisionsDisplay: function () {
 
-            return this.group.decisions ? this.group.decisions.map(function (c) {
+            return this.value.decisions ? this.value.decisions.map(function (c) {
                 return getItemById(c, decisions);
             }) : [];
         },
         childSelectionList: function () {
             var self = this;
-            var list = this.group.type === 0 ? self.voters : self.groups;
+            var list = self.value.type === 0 ? self.voters : self.groups;
             return list.filter(function (x) {
-                if (self.group.children) {
-                    return self.group.children.findIndex(function (y) {
+                if (self.value.children) {
+                    return self.value.children.findIndex(function (y) {
                         return y === x.id;
                     }) === -1;
                 } else {
@@ -814,9 +825,9 @@ Vue.component('group-detail', {
     mounted: function () {
         // for some reason we need this to establish reactivity,
         // without it, we don't get reactivity until an emit is triggered
-        this.group = new Group(this.value);
+        //this.group = new Group(this.value);
     },
-    template: $("#tmpGroupDetail").html()
+    template: "#tmpGroupDetail"
 });
 
 Vue.component('voter-detail', {
@@ -1153,6 +1164,21 @@ var vue = new Vue({
             this.currentHeader = "Voters";
             this.currentComponent = "";
             this.currentComponent = "voter-detail";
+        },
+        removeGroupFromGroup: function (index) {
+            this.currentGroup.groups.splice(index, 1);
+        },
+        addGroupToGroup: function (data) {
+            this.currentGroup.groups.push(data);
+        },
+        removeVoterFromGroup: function (index) {
+            this.currentGroup.voter.splice(index, 1);
+        },
+        addVoterToGroup: function (data) {
+            this.currentGroup.voters.push(data);
+        },
+        rowSelect: function (id) {
+            showDetail(id, header);
         }
     },
     computed: {
@@ -1169,6 +1195,10 @@ var vue = new Vue({
                         "change": this.persistGroup,
                         "delete": this.deleteGroup,
                         "show-detail": this.showDetail,
+                        "removeGroup": this.removeGroupFromGroup,
+                        "addGroup": this.addGroupToGroup,
+                        "removeVoter": this.removeVoterFromGroup,
+                        "addVoter": this.addVoterToGroup
                     }
                     : this.currentComponent === "voter-detail"
                         ? {
