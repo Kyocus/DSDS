@@ -20,7 +20,7 @@ namespace Core.Models
 
         public List<GroupGroup> ParentGroups { get; set; }
         public List<GroupGroup> ChildGroups { get; set; }
-        public List<GroupVoter> GroupVoters { get; set; }
+        public List<GroupVoter> Voters { get; set; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
 
         public Group()

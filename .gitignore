@@ -1,9 +1,12 @@
+*.cache
 *.lock
+*.dll
 Decision System/.vs
 Decision System/Core/bin
 Decision System/Core/obj
 Decision System/Data/bin
 Decision System/Data/obj
-*.dll
 Decision System/Web/bin
 Decision System/Web/obj
+Decision System/Domains/bin
+Decision System/Domains/obj

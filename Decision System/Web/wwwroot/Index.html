@@ -24,9 +24,6 @@
     <div id="vue">
         <v-app>
             <v-content class="container-fluid">
-
-
-
                 <nav-bar @showdecisionlist="showDecisionList"
                          @showgrouplist="showGroupList"
                          @showvoterlist="showVoterList">
@@ -71,17 +68,17 @@
     </div>
 
     <template id="tmpNavBar">
-        <nav class="navbar">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
             <ul class="navbar nav">
-                <li class="nav-item decisions" @click="showDecisionList">
-                    <a class="nav-link" href="#">Decisions</a>
+                <li class="nav-item active decisions" @click="showDecisionList">
+                    <a class="nav-link text-light" href="#">Decisions</a>
                 </li>
-                <li class="nav-item groups" @click="showGroupList">
-                    <a class="nav-link" href="#">Groups</a>
+                <li class="nav-item active groups" @click="showGroupList">
+                    <a class="nav-link text-light" href="#">Groups</a>
                 </li>
-                <li class="nav-item voters" @click="showVoterList">
-                    <a class="nav-link" href="#">Voters</a>
+                <li class="nav-item active voters" @click="showVoterList">
+                    <a class="nav-link text-light" href="#">Voters</a>
                 </li>
             </ul>
         </nav>
@@ -105,37 +102,43 @@
 
                 <template v-slot:body="{ items }">
                     <tbody v-if="header === 'Voters'">
-                        <tr v-for="item in items" @click="showDetail(item.id)" :key="item.id" key="item.id">
-                            <td class="linked name" @click="showDetail">{{item.name}}</td>
-                            <td class="linked group" @click="showGroupDetail">{{item.groupId}}</td>
+                        <tr v-for="item in items" @click="row_onclick(item.id)" :key="item.id" :row-id="item.id">
+                            <td class="linked name" >{{item.name}}</td>
+                            <td class="linked group" >{{item.groupId}}</td>
                             <td class="created"> {{dateDisplay(item.creationDate)}}</td>
                         </tr>
                     </tbody>
 
                     <tbody v-else-if="header === 'Decisions'">
-                        <tr v-for="item in items" @click="showDetail(item.id)" :key="item.id">
+                        <tr v-for="item in items" @click="row_onclick(item.id)" :key="item.id" :row-id="item.id">
                             <td class="linked name">{{item.name}}</td>
-                            <td class="linked status">{{item.statusId}}</td>
+                            <td class="status">{{item.statusId}}</td>
                             <td class="linked group">{{item.groupId}}</td>
-                            <td class="linked created">{{item.creationDate}}</td>
-                            <td class="linked expiration">{{item.expirationDate}}</td>
-                            <td class="linked attachments">{{item.attachments}}</td>
+                            <td class="created">{{item.creationDate}}</td>
+                            <td class="expiration">{{item.expirationDate}}</td>
+                            <td class="attachments">{{item.attachments}}</td>
                         </tr>
                     </tbody>
 
                     <tbody v-else="header === 'Groups'">
-                        <tr v-for="item in items" @click="showDetail(item.id)" :key="item.id">
+                        <tr v-for="item in items" @click="row_onclick(item.id)" :key="item.id" :row-id="item.id">
                             <td class="linked name">{{item.name}}</td>
                             <td class="linked group">{{item.parentId}}</td>
                             <td class="linked children">{{item.type}}</td>
-                            <td class="linked created">{{item.creationDate}}</td>
-                            <td class="linked attachments">{{item.attachments}}</td>
+                            <td class="created">{{item.creationDate}}</td>
+                            <td class="attachments">{{item.attachments}}</td>
                         </tr>
                     </tbody>
                 </template>
 
+                <template v-if="showActions" v-slot:item.action="{ item }">
+<!--                    <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>-->
+                    <v-icon small @click="deleteItem(item.id)">mdi-delete</v-icon>
+                </template>
+
             </v-data-table>
             <pre>{{data}}</pre>
+            <pre>{{showActions}}</pre>
 
         </div>
     </template>
@@ -220,17 +223,19 @@
                 </div>
                 <div>
                     <label>Parent:</label>
-                    <span v-if="value.parentId" class="linked parent-group" @click="showDetail(value.parentId, 'Groups')">{{parent.name}}</span>
+                    <span v-if="value.parentId" class="linked parent-group" @click="showGroupDetail(value.parentId, 'Groups')">{{parent.name}}</span>
                 </div>
                 <div>
-                    <data-table :columns="entitiesColumns"
-                                :data="value.children"
-                                header="Children">
+                    <data-table :columns="columns"
+                                :data="childrenDisplay"
+                                @row_onclick="showChildDetail"
+                                :header="header">
                     </data-table>
                 </div>
                 <div>
                     <data-table :columns="decisionsColumns"
-                                :data="value.decisions"
+                                :data="decisionsDisplay"
+                                @row_onclick="showDecisionDetail"
                                 header="Decisions">
                     </data-table>
                 </div>
@@ -243,38 +248,27 @@
                 <div>
                     <label>Type:</label>
                     <div class="inline-block">
-                        <input class="group-type-radio" type="radio" name="type" value="1" v-model="value.type" :checked="value.type === 1" />
+                        <input class="group-type-radio" type="radio" name="type" value="1" v-model="group.type" :checked="group.type === 1" />
                         <label>Group</label>
                     </div>
                     <div class="inline-block">
-                        <input class="group-type-radio" type="radio" name="type" value="0" v-model="value.type" :checked="value.type === 0" />
+                        <input class="group-type-radio" type="radio" name="type" value="0" v-model="group.type" :checked="group.type === 0" />
                         <label>Voter</label>
                     </div>
                 </div>
                 <div>
                     <label>Name:</label>
-                    <input class="group-name" type="text" v-model="value.name" />
+                    <input class="group-name" type="text" v-model="group.name" />
                 </div>
                 <div>
                     <label>Description:</label>
-                    <textarea class="group-description" v-model="value.description">{{value.description}}</textarea>
+                    <textarea class="group-description" v-model="group.description">{{group.description}}</textarea>
                 </div>
                 <div>
                     <div>
                         <label>Parent:</label>
-                        <span v-if="value.parentId" class="linked parent-group" @click="showDetail(value.parentId, 'Groups')">{{parent.name}}</span>
-                        <!-- <button @click="selectGroup">Select Parent</button> -->
+                        <span v-if="group.parentId" class="linked parent-group" @click="showGroupDetail(group.parentId, 'Groups')">{{parent.name}}</span>
                     </div>
-                    <!-- <div v-if="isSelectingGroup" -->
-                    <!-- class="modal parent"> -->
-                    <!-- <data-table -->
-                    <!-- :columns="groupColumns"   -->
-                    <!-- :data="groups"  -->
-                    <!-- select-mode="single" -->
-                    <!-- header="Select a Group" -->
-                    <!-- @select="setGroup"> -->
-                    <!-- </data-table> -->
-                    <!-- </div> -->
                 </div>
                 <div>
                     <div>
@@ -285,25 +279,21 @@
                             <v-card>
                                 <data-table :columns="columns"
                                             :data="childSelectionList"
-                                            select-mode="single"
                                             class="child-selector"
                                             :header="header"
-                                            @select="addChild">
+                                            @row_onclick="addChild">
                                 </data-table>
                             </v-card>
                         </v-dialog>
                     </div>
 
-
-
-
                     <data-table :columns="columns"
                                 :data="childrenDisplay"
                                 :header="header"
                                 class="children"
-                                select-mode="multi"
-                                @select="removeChild"
-                                @show-detail="showDetail">
+                                :show-actions="true"
+                                @delete_item="removeChild"
+                                @row_onclick="showChildDetail">
                     </data-table>
                 </div>
 
@@ -311,11 +301,12 @@
                     <button class="btn btn-primary make-decision-button" @click="makeDecision">Make a Decision</button>
                     <data-table :columns="decisionsColumns"
                                 :data="decisionsDisplay"
+                                @row_onclick="showDecisionDetail"
                                 header="Decisions">
                     </data-table>
                 </div>
             </div>
-            <pre>{{value}}</pre>
+            <pre>{{group}}</pre>
 
         </div>
     </template>
@@ -351,42 +342,25 @@
                 </div>
                 <div>
                     <div>
-                        <label>Parent:</label>
-                        <span v-if="voter.groupId" class="linked parent-group" @click="showDetail(voter.groupId, 'Groups')">{{group.name}}</span>
-                        <button class="btn btn-primary add-parent-button" @click="setupParentSelect">Add Parent</button>
-                    </div>
-                    <div v-if="isSelectingGroup"
-                         class="modal group">
                         <data-table :columns="groupColumns"
-                                    :data="groups"
-                                    :selected-value="voter.groupId"
-                                    select-mode="single"
-                                    header="Parent"
-                                    @select="selectParent">
+                                    :data="groupsDisplay"
+                                    @row-onclick="showDetail(voter.groupId, 'Groups')"
+                                    header="Groups">
                         </data-table>
                     </div>
                 </div>
             </div>
+
+            <pre>{{voter}}</pre>
         </div>
     </template>
-    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>-->
     <script src="script/webcomponents-loader.js">
     </script>
     <script src="/script/vue.js">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-    <!-- <script src="../script/vue.min.js">
-    </script> -->
     <script src="/script/jquery-3.4.1.js">
     </script>
-    <!--<script src="/script/jquery-ui.js">
-    </script>-->
-    <!--<script src="/script/jquery.datetimepicker.full.min.js">
-    </script>
-    <script src="/script/jquery.datatables.min.js">
-    </script>
-    <script src="/script/jquery.fileupload.js">
-    </script>-->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="/script/jstree.js">
     </script>

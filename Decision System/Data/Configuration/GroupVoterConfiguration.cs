@@ -15,7 +15,7 @@ namespace DecisionSystem.Configuration
             builder.HasKey(gv => new { gv.GroupId, gv.VoterId});
 
             builder.HasOne(gv => gv.Group)
-                .WithMany(g => g.GroupVoters);
+                .WithMany(g => g.Voters);
         }
     }
 }
