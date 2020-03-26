@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Models
 {
-    public class Decision : BaseModel, IAggregateRoot
+    public class Decision : BaseModel<DecisionDto>, IAggregateRoot
     {
 
         private long creationDate;
@@ -24,9 +24,9 @@ namespace Core.Models
         public virtual List<Option> Options { get; set; }
         public virtual List<Comment> Comments { get; set; }
         public virtual List<Attachment> Attachments { get; set; }
-        
+
         [ForeignKey("statusId")]
-        public virtual Status Status { get => status; set => status = value; }
+        public Status Status { get => status; set => status = value; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
         public string Description { get => description; set => description = value; }
         public long ExpirationDate { get => expirationDate; set => expirationDate = value; }
@@ -37,7 +37,13 @@ namespace Core.Models
         public long StatusId { get => statusId; set => statusId = value; }
 
         public Decision()
-        {}
+        {
+            GroupDecisions = new List<GroupDecision>();
+            Votes = new List<Vote>();
+            Options = new List<Option>();
+            Comments = new List<Comment>();
+            Attachments = new List<Attachment>();
+        }
 
         public Decision(List<Vote> votes, List<Option> options, List<Comment> comments, List<Attachment> attachments, Status status, long creationDate, string description, long expirationDate, string name, long statusDate, int statusId)
         {

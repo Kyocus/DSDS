@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DecisionSystem.Repository
 {
-    public class VoteRepository : Repository<Vote>, IVoteRepository
+    public class VoteRepository : Repository<Vote, VoteDto>, IVoteRepository
     {
         public VoteRepository(DbContext context, ILogger<Vote> logger) : base(context, logger)
         {

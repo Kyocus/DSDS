@@ -14,10 +14,10 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CommentController : BaseController<Comment>
+    public class CommentController : BaseController<Comment, CommentDto>
     {
 
-        public CommentController(ILogger<CommentController> logger, IRepository<Comment> repository, IDomain<Comment> domain) : base(logger, repository, domain)
+        public CommentController(ILogger<CommentController> logger, IRepository<Comment> repository, IDomain<Comment, CommentDto> domain) : base(logger, repository, domain)
         {
         }
 

@@ -3,7 +3,7 @@ using System;
 
 namespace Core.Models
 {
-    public class Status : BaseModel, IAggregateRoot
+    public class Status : BaseModel<StatusDto>, IAggregateRoot
     {
         private string name;
 
@@ -18,5 +18,6 @@ namespace Core.Models
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
+
     }
 }

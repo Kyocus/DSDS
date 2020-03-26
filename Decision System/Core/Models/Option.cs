@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Core.Models
 {
-    public class Option : BaseModel, IAggregateRoot
+    public class Option : BaseModel<OptionDto>, IAggregateRoot
     {
         private string name;
         private string description;
@@ -16,13 +16,12 @@ namespace Core.Models
 
         public Option()
         {
-
+            Attachments = new List<Attachment>(); 
         }
-        public Option(string name, string description, List<int> attachmentIds)
+        public Option(string name, string description)
         {
             Name = name;
             Description = description;
-            //AttachmentIds = attachmentIds;
         }
 
     }

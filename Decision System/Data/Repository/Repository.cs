@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Core.Extentions;
 using Core.Interfaces;
 using Core.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,72 +12,105 @@ using Microsoft.Extensions.Logging;
 
 namespace DecisionSystem.Repository
 {
-    public abstract class Repository<T> : IRepository<T> where T : BaseModel, IAggregateRoot
+    public abstract class Repository<TEntity, TDto> : IRepository<TEntity> where TEntity : BaseModel<TDto>, IAggregateRoot where TDto : IDto
     {
         protected DbContext context;
         private readonly ILogger _logger;
 
-        public Repository(DbContext repositoryContext, ILogger<T> logger)
+        public Repository(DbContext repositoryContext, ILogger<TEntity> logger)
         {
             this.context = repositoryContext;
             _logger = logger;
         }
 
-        public IQueryable<T> FindAll()
+
+        public virtual async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null)
         {
-            return this.context.Set<T>().AsNoTracking();
+            var query = context.Set<TEntity>()
+                .Include(context.GetIncludePaths(typeof(TEntity)));
+            
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            return await query.ToListAsync();
         }
 
-        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
+        public virtual IQueryable<TEntity> FindAll()
         {
-            return this.context.Set<T>().Where(expression).AsNoTracking();
+            return this.context.Set<TEntity>().AsNoTracking();
         }
 
-        public T Create(T entity)
+        public virtual IQueryable<TEntity> FindByCondition(Expression<Func<TEntity, bool>> expression)
+        {
+            return this.context.Set<TEntity>().Where(expression).AsNoTracking();
+        }
+
+        public virtual TEntity Create(TEntity entity)
         {
             try
             {
-                EntityEntry<T> returnMe = this.context.Set<T>().Add(entity);
+                EntityEntry<TEntity> returnMe = this.context.Set<TEntity>().Add(entity);
                 context.SaveChanges();
                 return returnMe.Entity;
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 _logger.LogError("could not insert Decision");
             }
 
             return null;
         }
 
-        public T Update(T entity)
+        public virtual async Task<TEntity> UpdateAsync(TEntity entity)
         {
             try
             {
-                EntityEntry<T> returnMe = this.context.Set<T>().Update(entity);
-                context.SaveChanges();
-                return returnMe.Entity;
+                var updateMe = context.Entry(await context.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == entity.Id));
+                updateMe.CurrentValues.SetValues(entity);
+                await context.SaveChangesAsync();
+                return updateMe.Entity;
             }
-            catch (Exception e) { 
-                _logger.LogError("could not update Decision");
+            catch (Exception e)
+            {
+                _logger.LogError("could not update record\r\n" + e.Message);
             }
 
             return null;
         }
 
-        public void Delete(int id) {
-            context.Set<T>().Remove(context.Set<T>().Find(id));
+        public virtual TEntity Update(TEntity entity)
+        {
+            try
+            {
+                EntityEntry<TEntity> returnMe = this.context.Set<TEntity>().Update(entity);
+                context.SaveChanges();
+                return returnMe.Entity;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("could not update record\r\n" + e.Message);
+            }
+
+            return null;
+        }
+
+        public virtual void Delete(long id)
+        {
+            context.Set<TEntity>().Remove(context.Set<TEntity>().Find(id));
             context.SaveChanges();
         }
 
-        public T FindById(long id)
+        public virtual TEntity FindById(long id)
         {
-            return context.Find<T>(id);
+            return context.Find<TEntity>(id);
         }
 
-        public IEnumerable<T> List(ISpecification<T> spec)
+        public virtual IEnumerable<TEntity> List(ISpecification<TEntity> spec)
         {
             // fetch a Queryable that includes all expression-based includes
             var queryableResultWithIncludes = spec.Includes
-                .Aggregate(context.Set<T>().AsQueryable(),
+                .Aggregate(context.Set<TEntity>().AsQueryable(),
                     (current, include) => current.Include(include));
 
             // modify the IQueryable to include any string-based include statements
@@ -91,8 +125,9 @@ namespace DecisionSystem.Repository
         }
 
 
-        private T stripVirtualProps(T entity) {
-            foreach (var prop in typeof(T).GetProperties())
+        private TEntity stripVirtualProps(TEntity entity)
+        {
+            foreach (var prop in typeof(TEntity).GetProperties())
             {
                 if (prop.GetGetMethod().IsVirtual)
                 {

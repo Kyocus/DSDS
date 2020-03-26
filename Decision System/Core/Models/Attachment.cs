@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
 {
-    public class Attachment : BaseModel, IAggregateRoot
+    public class Attachment : BaseModel<AttachmentDto>, IAggregateRoot
     {
         private string name;
         private string path;
@@ -32,7 +32,6 @@ namespace Core.Models
 
         public Attachment()
         {
-
         }
 
         public Attachment(string name, string path, Voter uploader, long uploadDate, int uploaderId, int optionId)

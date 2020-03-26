@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DecisionSystem.Repository
 {
-    public class AttachmentRepository : Repository<Attachment>, IAttachmentRepository
+    public class AttachmentRepository : Repository<Attachment, AttachmentDto>, IAttachmentRepository
     {
         public AttachmentRepository(DbContext context, ILogger<Attachment> logger) : base(context, logger)
         {

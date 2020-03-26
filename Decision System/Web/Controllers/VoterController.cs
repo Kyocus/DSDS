@@ -14,23 +14,24 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class VoterController : BaseController<Voter>
+    public class VoterController : BaseController<Voter, VoterDto>
     {
 
-        public VoterController(ILogger<VoterController> logger, IRepository<Voter> repository, IDomain<Voter> domain) : base(logger, repository, domain)
+        public VoterController(ILogger<VoterController> logger, IRepository<Voter> repository, IDomain<Voter, VoterDto> domain) : base(logger, repository, domain)
         {
         }
 
-        //[HttpGet]
-        //public IEnumerable<Voter> Get()
-        //{
-        //    List<Voter> entities = new List<Voter>();
-        //    entities.Add(new Voter(1, "First", "the first entity", DateTime.UtcNow.Ticks));
-        //    entities.Add(new Voter(2, "Second", "the second entity", DateTime.UtcNow.Ticks));
-        //    entities.Add(new Voter(3, "Third", "the third entity", DateTime.UtcNow.Ticks));
-        //    entities.Add(new Voter(4, "Fourth", "the fourth entity", DateTime.UtcNow.Ticks));
+        [NonAction]
+        public override VoterDto Post(VoterDto dto)
+        {
+            throw new NotImplementedException();
+        }
 
-        //    return entities;
-        //}
+        [HttpPost]
+        public VoterDto Post(PersistVoterDto dto)
+        {
+            return ((VoterDomain)_domain).Create(dto);
+        }
+
     }
 }

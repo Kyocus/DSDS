@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DecisionSystem.Repository
 {
-    public class CommentRepository : Repository<Comment> , ICommentRepository
+    public class CommentRepository : Repository<Comment, CommentDto> , ICommentRepository
     {
         public CommentRepository(DbContext context, ILogger<Comment> logger) : base(context, logger)
         {

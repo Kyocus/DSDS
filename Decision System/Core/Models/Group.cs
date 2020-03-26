@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Models
 {
-    public class Group : BaseModel, IAggregateRoot
+    public class Group : BaseModel<GroupDto>, IAggregateRoot
     {
         private string name;
         private string description;
@@ -20,12 +20,44 @@ namespace Core.Models
 
         public List<GroupGroup> ParentGroups { get; set; }
         public List<GroupGroup> ChildGroups { get; set; }
-        public List<GroupVoter> Voters { get; set; }
+        public List<GroupVoter> GroupVoters { get; set; }
         public long CreationDate { get => creationDate; set => creationDate = value; }
 
         public Group()
         {
+            ParentGroups = new List<GroupGroup>();
+            ChildGroups = new List<GroupGroup>();
+            GroupVoters = new List<GroupVoter>();
+        }
 
+
+        public override GroupDto AsDto()
+        {
+            GroupDto returnMe = new GroupDto();
+
+            returnMe.Description = Description;
+            returnMe.CreationDate = CreationDate;
+            returnMe.Id = Id;
+            returnMe.Name = Name;
+
+            if (Decisions != null)
+            {
+                returnMe.Decisions = Decisions.Select(x => x.Decision.AsType<DecisionDto>()).ToList();
+            }
+            if (ParentGroups != null)
+            {
+                returnMe.ParentGroups = ParentGroups.Select(x => x.ParentGroup.AsType<GroupSummaryDto>()).ToList();
+            }
+            if (ChildGroups != null)
+            {
+                returnMe.ChildGroups = ChildGroups.Select(x => x.ChildGroup.AsType<GroupSummaryDto>()).ToList();
+            }
+            if (GroupVoters != null)
+            {
+                returnMe.Voters = GroupVoters.Select(x => x.Voter.AsDto()).ToList();
+            }
+
+            return returnMe;
         }
     }
 }

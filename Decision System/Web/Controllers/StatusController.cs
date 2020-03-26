@@ -14,9 +14,9 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class StatusController : BaseController<Status>
+    public class StatusController : BaseController<Status, StatusDto>
     {
-        public StatusController(ILogger<StatusController> logger, IRepository<Status> repository, IDomain<Status> domain) : base(logger, repository, domain)
+        public StatusController(ILogger<StatusController> logger, IRepository<Status> repository, IDomain<Status, StatusDto> domain) : base(logger, repository, domain)
         {
         }
 

@@ -14,10 +14,10 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DecisionController : BaseController<Decision>
+    public class DecisionController : BaseController<Decision, DecisionDto>
     {
 
-        public DecisionController(ILogger<DecisionController> logger, IRepository<Decision> repository, IDomain<Decision> domain) : base(logger, repository, domain)
+        public DecisionController(ILogger<DecisionController> logger, IRepository<Decision> repository, IDomain<Decision, DecisionDto> domain) : base(logger, repository, domain)
         {
         }
 

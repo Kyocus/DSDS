@@ -14,9 +14,9 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class VoteController : BaseController<Vote>
+    public class VoteController : BaseController<Vote, VoteDto>
     {
-        public VoteController(ILogger<VoteController> logger, IRepository<Vote> repository, IDomain<Vote> domain) : base(logger, repository, domain)
+        public VoteController(ILogger<VoteController> logger, IRepository<Vote> repository, IDomain<Vote, VoteDto> domain) : base(logger, repository, domain)
         {
         }
 

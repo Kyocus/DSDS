@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DecisionSystem.Repository
 {
-    public class StatusRepository : Repository<Status>, IStatusRepository
+    public class StatusRepository : Repository<Status, StatusDto>, IStatusRepository
     {
         public StatusRepository(DbContext context, ILogger<Status> logger) : base(context, logger)
         {

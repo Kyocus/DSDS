@@ -52,7 +52,7 @@ var dataAccess = {
     },
     postVoter: function (voter) {
         return $.ajax({
-            url: window.location.origin + "/voter",
+            url: window.location.origin + "/Voter",
             type: "POST",
             data: JSON.stringify(new Voter(voter)),
             contentType: "application/json"
@@ -62,7 +62,7 @@ var dataAccess = {
         return $.ajax({
             url: window.location.origin + "/group",
             type: "POST",
-            data: JSON.stringify(new Group(group)),
+            data: JSON.stringify(new PersistGroup(group)),
             contentType: "application/json"
         });
     },
@@ -81,14 +81,30 @@ var dataAccess = {
         return $.ajax({
             url: window.location.origin + "/group",
             type: "PUT",
-            data: JSON.stringify(new Group(group)),
+            data: JSON.stringify(new PersistGroup(group)),
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    putGroupVoter: function (groupId, voterId) {
+        return $.ajax({
+            url: window.location.origin + "/group/" + groupId + "/AddVoter/" + voterId,
+            type: "PUT",
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    putGroupGroup: function (groupId, childId) {
+        return $.ajax({
+            url: window.location.origin + "/group/" + groupId + "/AddGroup/" + childId,
+            type: "PUT",
             datatype: "json",
             contentType: "application/json"
         });
     },
     putVoter: function (voter) {
         return $.ajax({
-            url: window.location.origin + "/voter",
+            url: window.location.origin + "/Voter",
             type: "PUT",
             data: JSON.stringify(new Voter(voter)),
             datatype: "json",
@@ -134,7 +150,7 @@ var dataAccess = {
         //    return x.id === id;
         //}));
         return $.ajax({
-            url: window.location.origin + "/voter/" + id,
+            url: window.location.origin + "/Voter/" + id,
             type: "DELETE",
             datatype: "json",
             contentType: "application/json"
@@ -243,6 +259,34 @@ var PersistDecision = (function () {
 })();
 
 // this can be a group of Voters or a group of Groups
+var PersistGroup = (function () {
+
+    function constructor(data) {
+        if (data) {
+            this.decisions = data.decisions ? data.decisions : [];
+            this.childGroups = data.childGroups ? data.childGroups : [];
+            this.parentGroups = data.parentGroups ? data.parentGroups : [];
+            this.voters = data.voters ? data.voters.map(x => x.id) : [];
+            this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+            this.description = data.description ? data.description : "";
+            this.id = data.id ? data.id : 0;
+            this.name = data.name ? data.name : "";
+            this.type = data.type ? data.type : ENTITY_GROUP_TYPE;
+        } else {
+            this.childGroups = [];
+            this.parentGroups = [];
+            this.voters = [];
+            this.creationDate = new Date().getTime();
+            this.description = "";
+            this.id = 0;
+            this.name = "";
+            this.type = ENTITY_GROUP_TYPE;
+        }
+    }
+
+    return constructor;
+})();
+
 var Group = (function () {
 
     function constructor(data) {
@@ -250,7 +294,7 @@ var Group = (function () {
             this.decisions = data.decisions ? data.decisions : [];
             this.childGroups = data.childGroups ? data.childGroups : [];
             this.parentGroups = data.parentGroups ? data.parentGroups : [];
-            this.voters = data.voters ? data.voters : [];
+            this.voters = data.voters ? data.voters.map(x => new Voter(x)) : [];
             this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
             this.description = data.description ? data.description : "";
             this.id = data.id ? data.id : 0;
@@ -430,11 +474,17 @@ Vue.component('data-table', {
             ]
         };
     },
-    props: ["columns", "data", "header", "selectMode", "showActions"],
+    props: {
+        showActions: { type: Boolean }
+        , header: { type: String }
+        , data: { type: Array }
+        , columns: { type: Array }
+        , selectMode: { type: String }
+    },
     methods: {
-        row_onclick: function (id) {
+        row_onclick: function (item) {
             console.log("data-table emitting row_onclick");
-            this.$emit("row_onclick", id, this.header);
+            this.$emit("row_onclick", item, this.header);
         },
         deleteItem: function (id) {
             console.log("data-table emitting deleteItem");
@@ -532,7 +582,10 @@ Vue.component('decision-detail', {
             decision: new Decision()
         };
     },
-    props: ["value", "editable"],
+    props: {
+        value: { type: Object }
+        , editable: { type: Boolean }
+    },
     methods: {
         sortComments: function (key) {
             this.currentSorting = key;
@@ -652,7 +705,12 @@ Vue.component('group-detail', {
             group: new Group()
         };
     },
-    props: ["value", "editable", "voters", "groups"],
+    props: {
+        value: { type: Object }
+        , editable: { type: Boolean }
+        , voters: { type: Array }
+        , groups: { type: Array }
+    },
     methods: {
         makeDecision: function () {
             var d = new Decision();
@@ -736,7 +794,7 @@ Vue.component('group-detail', {
             console.log("group-detail save_onclick emitting change", this.group);
         }
         , delete_onclick: function () {
-            this.$emit("delete", this.group);
+            this.$emit("delete", this.group.id);
             console.log("group-detail delete_onclick emitting change", this.group);
         }
 
@@ -766,9 +824,12 @@ Vue.component('group-detail', {
         votersDisplay: function () {
             var self = this;
             if (self.value.voters) {
-                return self.value.voters.map(function (c) {
-                    return getItemById(c, self.voters);
-                });
+                return self.value.voters;
+                //    .map(function (c) {
+                //    //todo maybe not store all the voters in one collection
+                //    //and instead just use the ones sent back from the server
+                //    return getItemById(c, self.voters);
+                //});
             } else {
                 return [];
             }
@@ -793,7 +854,7 @@ Vue.component('group-detail', {
                 return !exclusionList ||
                     (exclusionList &&
                         exclusionList.findIndex(function (y) {
-                            return y === x.id;
+                            return y.id === x.id;
                         }) === -1);
             });
         }
@@ -824,7 +885,11 @@ Vue.component('voter-detail', {
             voter: new Voter()
         };
     },
-    props: ["value", "editable", "groups"],
+    props: {
+        value: { type: Object }
+        , editable: { type: Boolean }
+        , groups: { type: Array }
+    },
     methods: {
         showDetail: function (id, header) {
             console.log("voter-detail emitting showDetail");
@@ -924,11 +989,12 @@ var vue = new Vue({
             var self = this;
             console.log("deleteDecision", id);
             this.currentDecision = null;
-            dataAccess.deleteDecision(id, function (result) {
+            dataAccess.deleteDecision(id).then(function (result) {
                 self.decisions.splice(self.decisions.findIndex(x => x.id === id), 1);
-            }, function () {
-                console.log("error during delete");
-            });
+            })
+                .catch(function () {
+                    console.log("error during delete");
+                });
         },
         persistDecision: function (data) {
             if (data.id === 0) {
@@ -971,33 +1037,39 @@ var vue = new Vue({
             var self = this;
             console.log("updateDecision", data);
             this.currentDecision = data;
-            dataAccess.putDecision(id, data, function (result) {
-                self.decisions[self.decisions.findIndex(x => x.id === result.id)] = new Decision(result);
-                self.currentDecision = new Decision(result);
-            }, function () {
-                console.log("error during update");
-            });
+            dataAccess.putDecision(id, data)
+                .then(function (result) {
+                    self.decisions[self.decisions.findIndex(x => x.id === result.id)] = new Decision(result);
+                    self.currentDecision = new Decision(result);
+                })
+                .catch(function () {
+                    console.log("error during update");
+                });
         },
         deleteGroup: function (id) {
             var self = this;
             console.log("deleteGroup", id);
-            this.currentGroup = null;
+            this.currentGroup = new Group();
 
-            dataAccess.deleteGroup(id, function (result) {
-                self.groups.splice(self.groups.findIndex(x => x.id === id), 1);
-            }, function () {
-                console.log("error during delete");
-            });
+            dataAccess.deleteGroup(id)
+                .then(function (result) {
+                    self.groups.splice(self.groups.findIndex(x => x.id === id), 1);
+                })
+                .catch(function () {
+                    console.log("error during delete");
+                });
         },
-        deleteVoter: function (id) {
+        deleteVoter: function (voter) {
             var self = this;
-            console.log("deleteVoter", id);
+            console.log("deleteVoter", voter);
             this.currentVoter = null;
-            dataAccess.deleteVoter(id, function (result) {
-                self.voters.splice(self.voters.findIndex(x => x.id === id), 1);
-            }, function () {
-                console.log("error during delete");
-            });
+            dataAccess.deleteVoter(voter.id)
+                .then(function (result) {
+                    self.voters.splice(self.voters.findIndex(x => x.id === voter.id), 1);
+                })
+                .catch(function () {
+                    console.log("error during delete");
+                });
 
         },
         saveGroup: function (data) {
@@ -1146,17 +1218,15 @@ var vue = new Vue({
             this.currentHeader = "Voters";
             this.currentComponent = "data-table";
         },
-        showVoterDetail: function (id) {
-            if (id) {
+        showVoterDetail: function (voter) {
+
+            if ((voter != null) && (voter.id)) {
                 this.currentVoter =
-                    //new Voter(
                     this.voters.find(function (x) {
-                        return x.id === id;
-                    })
-                    //)
-                    ;
+                        return x.id === voter.id;
+                    });
             } else {
-                this.currentVoter = new Voter();
+                this.currentVoter = new Voter(voter);
             }
 
             this.currentColumns = "";
@@ -1172,6 +1242,7 @@ var vue = new Vue({
             if (this.currentGroup.groups.findIndex(x => x.id === id) === -1) {
                 this.groups[this.groups.findIndex(x => x.id === id)].groups.push(this.currentGroup.id);
                 this.currentGroup.groups.push(id);
+                dataAccess.putGroupGroup(this.currentGroup.id, id);
             }
             else {
                 //tell the user they can't add the same thing twice
@@ -1180,10 +1251,11 @@ var vue = new Vue({
         removeVoterFromGroup: function (index) {
             this.currentGroup.voter.splice(index, 1);
         },
-        addVoterToGroup: function (id) {
-            if (this.currentGroup.voters.findIndex(x => x.id === id) === -1) {
-                this.voters[this.voters.findIndex(x => x.id === id)].groups.push(this.currentGroup.id);
-                this.currentGroup.voters.push(id);
+        addVoterToGroup: function (item) {
+            if (this.currentGroup.voters.findIndex(x => x.id === item.id) === -1) {
+                this.voters[this.voters.findIndex(x => x.id === item.id)].groups.push(this.currentGroup.id);
+                this.currentGroup.voters.push(item);
+                dataAccess.putGroupVoter(this.currentGroup.id, item.id);
             }
             else {
                 //tell the user they can't add the same thing twice
@@ -1204,6 +1276,8 @@ var vue = new Vue({
                 }
                 : this.currentComponent === "group-detail"
                     ? {
+                        "voters": this.voters,
+                        "groups": this.groups,
                         "change": this.persistGroup,
                         "delete": this.deleteGroup,
                         "show-detail": this.showDetail,
@@ -1232,20 +1306,20 @@ var vue = new Vue({
             return this.currentComponent === "decision-detail"
                 ? {
                     "value": this.currentDecision,
-                    "editable": "true"
+                    "editable": true
                 }
                 : this.currentComponent === "group-detail"
                     ? {
                         "value": this.currentGroup,
                         "groups": this.groups,
                         "voters": this.voters,
-                        "editable": "true"
+                        "editable": true
                     }
                     : this.currentComponent === "voter-detail"
                         ? {
                             "value": this.currentVoter,
                             "groups": this.groups,
-                            "editable": "true"
+                            "editable": true
                         }
                         : this.currentComponent === "data-table"
                             ? {
@@ -1260,22 +1334,27 @@ var vue = new Vue({
     }
     , mounted: function () {
         var self = this;
-        dataAccess.getDecisions(function (data) {
-            self.decisions = data.map(x => new Decision(x));
-        },
-            function () {
+        dataAccess.getDecisions()
+            .then(function (data) {
+                self.decisions = data.map(x => new Decision(x));
+            })
+            .catch(function (err) {
                 console.log("failed to get decisions");
             });
-        dataAccess.getGroups(function (data) {
-            self.groups = data.map(x => new Group(x));
-        },
-            function () {
+
+        dataAccess.getGroups()
+            .then(function (data) {
+                self.groups = data.map(x => new Group(x));
+            })
+            .catch(function (err) {
                 console.log("failed to get groups");
             });
-        dataAccess.getVoters(function (data) {
-            self.voters = data.map(x => new Voter(x));
-        },
-            function () {
+
+        dataAccess.getVoters()
+            .then(function (data) {
+                self.voters = data.map(x => new Voter(x));
+            })
+            .catch(function (err) {
                 console.log("failed to get voters");
             });
     }

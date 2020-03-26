@@ -62,13 +62,14 @@ namespace DecisionSystem
             services.AddScoped<Vote>();
             services.AddScoped<Voter>();
 
-            services.AddScoped<IDomain<Attachment>, AttachmentDomain>();
-            services.AddScoped<IDomain<Comment>, CommentDomain>();
-            services.AddScoped<IDomain<Decision>, DecisionDomain>();
-            services.AddScoped<IDomain<Group>, GroupDomain>();
-            services.AddScoped<IDomain<Status>, StatusDomain>();
-            services.AddScoped<IDomain<Vote>, VoteDomain>();
-            services.AddScoped<IDomain<Voter>, VoterDomain>();
+            services.AddScoped<IDomain<Attachment, AttachmentDto>, AttachmentDomain>();
+            services.AddScoped<IDomain<Comment, CommentDto>, CommentDomain>();
+            services.AddScoped<IDomain<Decision, DecisionDto>, DecisionDomain>();
+            //services.AddScoped<IDomain<Group, PersistGroupDto>, GroupDomain>();
+            services.AddScoped<IDomain<Group, GroupDto>, GroupDomain>();
+            services.AddScoped<IDomain<Status, StatusDto>, StatusDomain>();
+            services.AddScoped<IDomain<Vote, VoteDto>, VoteDomain>();
+            services.AddScoped<IDomain<Voter, VoterDto>, VoterDomain>();
 
             services.AddCors();
 

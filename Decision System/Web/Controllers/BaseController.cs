@@ -13,15 +13,15 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BaseController<T> where T : IAggregateRoot
+    public class BaseController<TEntity, TDto> where TEntity : BaseModel<TDto>, IAggregateRoot where TDto : BaseDto<TEntity>, IDto
     {
-        private readonly ILogger<BaseController<T>> _logger;
+        private readonly ILogger<BaseController<TEntity, TDto>> _logger;
 
-        protected IRepository<T> _repository;
+        protected IRepository<TEntity> _repository;
 
-        protected IDomain<T> _domain;
+        protected IDomain<TEntity, TDto> _domain;
 
-        public BaseController(ILogger<BaseController<T>> logger, IRepository<T> repo, IDomain<T> domain)
+        public BaseController(ILogger<BaseController<TEntity, TDto>> logger, IRepository<TEntity> repo, IDomain<TEntity, TDto> domain)
         {
             _logger = logger;
             _repository = repo;
@@ -29,23 +29,39 @@ namespace DecisionSystem.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<TDto> GetAll()
         {
-            //List<T> entities = new List<T>();
-            //return _repository.FindAll();
             return _domain.GetAll();
         }
 
         [HttpPost]
-        public T Post(T entity) {
-            return _domain.Create(entity);
+        public virtual TDto Post(TDto dto)
+        {
+            return _domain.Create(dto);
         }
+        //[HttpPut]
+        //public virtual TDto Put(TDto dto) {
+        //    return _domain.Update(dto);
+        //}
         [HttpPut]
-        public T Put(T entity) {
-            return _domain.Update(entity);
+        public virtual async Task<TDto> Put(TDto dto)
+        {
+            var result = await _domain.UpdateAsync(dto);
+
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+
         }
         [HttpDelete]
-        public void Delete(int id) {
+        [Route("{id}")]
+        public virtual void Delete(int id)
+        {
             _domain.Delete(id);
         }
     }

@@ -14,20 +14,63 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GroupController : BaseController<Group>
+    public class GroupController : BaseController<Group, GroupDto>
     {
-        public GroupController(ILogger<GroupController> logger, IRepository<Group> repository, IDomain<Group> domain) : base(logger, repository, domain)
+        public GroupController(ILogger<GroupController> logger, IRepository<Group> repository, IDomain<Group, GroupDto> domain) : base(logger, repository, domain)
         {
         }
 
-        //[HttpGet]
-        //public IEnumerable<Group> Get()
-        //{
-        //    List<Group> entities = new List<Group>();
-        //    entities.Add(new Group(1, "name 1", "description 1", 2, DateTime.UtcNow.Ticks));
-        //    entities.Add(new Group(2, "name 2", "description 2", -1, DateTime.UtcNow.Ticks));
+        [HttpGet]
+        public override IEnumerable<GroupDto> GetAll()
+        {
+            return ((GroupDomain)_domain).GetAll();
+        }
 
-        //    return entities;
-        //}
+        [HttpPost]
+        public GroupDto Post(PersistGroupDto dto)
+        {
+            return ((GroupDomain)_domain).Create(dto);
+        }
+
+        [NonAction]
+        public override GroupDto Post(GroupDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        [NonAction]
+        public override Task<GroupDto> Put(GroupDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPut]
+        public Task<GroupDto> Put(PersistGroupDto dto)
+        {
+            var dom = (GroupDomain)_domain;
+
+            return dom.UpdateAsync(dom.AsGroupDto(dto));
+        }
+
+        [HttpPut]
+        [Route("{groupId}/AddVoter/{voterId}")]
+        public GroupDto AddVoter(int groupId, int voterId)
+        {
+            return ((GroupDomain)_domain).AddVoter(groupId, voterId);
+        }
+
+        [HttpPut]
+        [Route("{groupId}/AddGroup/{childId}")]
+        public GroupDto AddGroup(int groupId, int childId)
+        {
+            return ((GroupDomain)_domain).AddGroup(groupId, childId).AsType<GroupDto>();
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public override void Delete(int id)
+        {
+            _domain.Delete(id);
+        }
     }
 }

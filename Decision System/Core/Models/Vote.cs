@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
 {
-    public class Vote : BaseModel, IAggregateRoot
+    public class Vote : BaseModel<VoteDto>, IAggregateRoot
     {
         private long time;
         private long entityId;

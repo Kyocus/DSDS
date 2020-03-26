@@ -35,7 +35,7 @@
                 </div>
             </v-content>
         </v-app>
-        <label>currentColumns</label>
+        <!--<label>currentColumns</label>
         <pre>{{currentColumns}}</pre>
 
         <label>currentComponent</label>
@@ -63,7 +63,7 @@
         <pre>{{voters}}</pre>
 
         <label>groups</label>
-        <pre>{{groups}}</pre>
+        <pre>{{groups}}</pre>-->
 
     </div>
 
@@ -102,7 +102,7 @@
 
                 <template v-slot:body="{ items }">
                     <tbody v-if="header === 'Voters'">
-                        <tr v-for="item in items" @click="row_onclick(item.id)" :key="item.id" :row-id="item.id">
+                        <tr v-for="item in items" @click="row_onclick(item)" :key="item.id" :row-id="item.id">
                             <td class="linked name" >{{item.name}}</td>
                             <td class="linked group" >{{item.groupId}}</td>
                             <td class="created"> {{dateDisplay(item.creationDate)}}</td>
@@ -306,7 +306,7 @@
                     </data-table>
                 </div>
             </div>
-            <pre>{{group}}</pre>
+            <!--<pre>{{group}}</pre>-->
 
         </div>
     </template>
@@ -351,7 +351,7 @@
                 </div>
             </div>
 
-            <pre>{{voter}}</pre>
+            <!--<pre>{{voter}}</pre>-->
         </div>
     </template>
     <script src="script/webcomponents-loader.js">

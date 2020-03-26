@@ -14,9 +14,9 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AttachmentController : BaseController<Attachment>
+    public class AttachmentController : BaseController<Attachment, AttachmentDto>
     {
-        public AttachmentController(ILogger<AttachmentController> logger, IRepository<Attachment> repository, IDomain<Attachment> domain) : base(logger, repository, domain)
+        public AttachmentController(ILogger<AttachmentController> logger, IRepository<Attachment> repository, IDomain<Attachment, AttachmentDto> domain) : base(logger, repository, domain)
         {
         }
 
