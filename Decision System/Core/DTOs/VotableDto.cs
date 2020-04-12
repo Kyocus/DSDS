@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DecisionSystem.Classes
+namespace Core.Models
 {
     public class VotableDto : BaseDto<Votable>
     {

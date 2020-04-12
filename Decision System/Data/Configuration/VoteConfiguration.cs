@@ -16,12 +16,12 @@ namespace DecisionSystem.Configuration
             builder.Property(t => t.Time)
                     .IsRequired();
 
-            builder.HasData(new { Id = 1l, EntityId = 1l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
-            builder.HasData(new { Id = 2l, EntityId = 2l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
-            builder.HasData(new { Id = 3l, EntityId = 3l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
-            builder.HasData(new { Id = 4l, EntityId = 1l, OptionId = 2l, Time = DateTime.UtcNow.Ticks });
-            builder.HasData(new { Id = 5l, EntityId = 2l, OptionId = 3l, Time = DateTime.UtcNow.Ticks });
-            builder.HasData(new { Id = 7l, EntityId = 7l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
+            builder.HasData(new { Id = 1l, VoterId = 1l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
+            builder.HasData(new { Id = 2l, VoterId = 2l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
+            builder.HasData(new { Id = 3l, VoterId = 3l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
+            builder.HasData(new { Id = 4l, VoterId = 1l, OptionId = 2l, Time = DateTime.UtcNow.Ticks });
+            builder.HasData(new { Id = 5l, VoterId = 2l, OptionId = 3l, Time = DateTime.UtcNow.Ticks });
+            builder.HasData(new { Id = 7l, VoterId = 7l, OptionId = 1l, Time = DateTime.UtcNow.Ticks });
 
         }
     }

@@ -72,5 +72,20 @@ namespace DecisionSystem.Controllers
         {
             _domain.Delete(id);
         }
+
+        [HttpGet]
+        [Route("User/{id}")]
+        public IEnumerable<GroupDto> GetByUserId(long id)
+        {
+            return ((GroupDomain)_domain).GetByUserId(id);
+        }
+
+        [HttpGet]
+        [Route("Find/{text}")]
+        public IEnumerable<GroupDto> GetByQuery(string query)
+        {
+            return ((GroupDomain)_domain).Query(query);
+        }
+
     }
 }

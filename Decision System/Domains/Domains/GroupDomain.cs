@@ -58,8 +58,8 @@ namespace Core.Domains
 
                 var result = _repository.Update(group);
 
-                return result != null 
-                    ? result.AsDto() 
+                return result != null
+                    ? result.AsDto()
                     : null;
             }
             else
@@ -109,10 +109,22 @@ namespace Core.Domains
 
         public List<GroupDto> GetAll()
         {
-            return  _repository.FindAll()
+            return _repository.FindAll()
                 .Select(x => x.AsDto()).ToList();
             //return  _repository.FindAllAsync().Result
             //    .Select(x => x.AsDto()).ToList();
         }
+
+        public List<GroupDto> GetByUserId(long id)
+        {
+            return _repository.FindAll()
+                .Where(x => x.GroupVoters
+                    .Where(v =>
+                        v.Voter.User.Id == id
+                    ).Count() > 0)
+                .Select(x => x.AsDto())
+                .ToList();
+        }
+
     }
 }

@@ -1,3 +1,4 @@
+
 const ENTITY_GROUP_TYPE = 0;
 const GROUP_GROUP_TYPE = 1;
 
@@ -17,7 +18,82 @@ statuses.set(2, "Confirmed");
 statuses.set(3, "Denied");
 statuses.set(4, "Archived");
 
+//todo pass in the controller and the action and build the url
+//not sure if this is better than passing the url from the caller
+class RequestBuilder {
+    #isCacheEnabled = false;
+    // include, *same-origin, omit
+    #credentials = "same-origin";
+    // no-cors, *cors, same-origin
+    #mode = "cors";
+    // *default, no-cache, reload, force-cache, only-if-cached
+    #cache = "default";
+    // manual, *follow, error
+    #redirect = 'follow';
+    // no-referrer, *client
+    #referrerPolicy = 'no-referrer';
+
+    #headers = {
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    constructor(isCacheEnabled, credentials, mode, cache, redirect, refer, headers) {
+        this.#isCacheEnabled = isCacheEnabled ? true : false;
+        this.#credentials = credentials ? credentials : this.#credentials;
+        this.#mode = mode ? mode : this.#mode;
+        this.#cache = cache ? cache : this.#cache;
+        this.#redirect = redirect ? redirect : this.#redirect;
+        this.#referrerPolicy = refer ? refer : this.#referrerPolicy;
+        this.#headers = headers ? headers : this.#headers;
+    }
+
+    async Get(url) {
+        return await this.#send(url, "GET");
+    }
+
+    async Put(url, data) {
+        return await this.#send(url, data, "PUT");
+    }
+
+    async Post(url, data) {
+        return await this.#send(url, data, "POST");
+    }
+
+    async Delete(url) {
+        return await this.#send(url, "DELETE");
+    }
+
+    #send = async function (url = '', data = {}, method) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+            // *GET, POST, PUT, DELETE, etc.
+            method: method,
+            mode: this.#mode,
+            cache: this.#cache,
+            credentials: this.#credentials,
+            headers: this.#headers,
+            redirect: this.#redirect,
+            referrerPolicy: this.#referrerPolicy,
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+}
+
 var dataAccess = {
+    queryGroups: function (text) {
+        return $.ajax({
+            url: window.location.origin + "/Group/Find/" + text,
+            type: "GET"
+        });
+    },
+    getGroupsByUserId: function (userId) {
+        return $.ajax({
+            url: window.location.origin + "/Group/User/" + userId,
+            type: "GET"
+        });
+    },
     getGroups: function () {
         //success(testGroups);
         return $.ajax({
@@ -31,6 +107,12 @@ var dataAccess = {
         //}));
         return $.ajax({
             url: window.location.origin + "/group/" + id,
+            type: "GET"
+        });
+    },
+    getDecisionsByUserId: function (userId) {
+        return $.ajax({
+            url: window.location.origin + "/Decision/User/" + userId,
             type: "GET"
         });
     },
@@ -50,11 +132,19 @@ var dataAccess = {
             type: "GET"
         });
     },
+    postUser: function (user) {
+        return $.ajax({
+            url: window.location.origin + "/User",
+            type: "POST",
+            data: JSON.stringify(new User(user)),
+            contentType: "application/json"
+        });
+    },
     postVoter: function (voter) {
         return $.ajax({
             url: window.location.origin + "/Voter",
             type: "POST",
-            data: JSON.stringify(new Voter(voter)),
+            data: JSON.stringify(new PersistVoter(voter)),
             contentType: "application/json"
         });
     },
@@ -82,6 +172,15 @@ var dataAccess = {
             url: window.location.origin + "/group",
             type: "PUT",
             data: JSON.stringify(new PersistGroup(group)),
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
+    putUser: function (user) {
+        return $.ajax({
+            url: window.location.origin + "/User",
+            type: "PUT",
+            data: JSON.stringify(new User(user)),
             datatype: "json",
             contentType: "application/json"
         });
@@ -134,6 +233,14 @@ var dataAccess = {
             contentType: "application/json"
         });
     },
+    deleteUser: function (id) {
+        return $.ajax({
+            url: window.location.origin + "/User/" + id,
+            type: "DELETE",
+            datatype: "json",
+            contentType: "application/json"
+        });
+    },
     deleteGroup: function (id) {
         //success(testDecisions.filter(function (x) {
         //    return x.id === id;
@@ -154,6 +261,42 @@ var dataAccess = {
             type: "DELETE",
             datatype: "json",
             contentType: "application/json"
+        });
+    },
+    getVotesByUserId: function (userId) {
+        return $.ajax({
+            url: window.location.origin + "/Vote/User/" + userId,
+            type: "GET"
+        });
+    },
+    getVotes: function () {
+        return $.ajax({
+            url: window.location.origin + "/Vote",
+            type: "GET"
+        });
+    },
+    getVote: function (id) {
+        return $.ajax({
+            url: window.location.origin + "/Vote/" + id,
+            type: "GET"
+        });
+    },
+    getUsers: function () {
+        return $.ajax({
+            url: window.location.origin + "/User",
+            type: "GET"
+        });
+    },
+    getUser: function (id) {
+        return $.ajax({
+            url: window.location.origin + "/User/" + id,
+            type: "GET"
+        });
+    },
+    getUserByName: function (name) {
+        return $.ajax({
+            url: window.location.origin + "/User/Find/" + name,
+            type: "GET"
         });
     },
     getVoters: function () {
@@ -315,6 +458,35 @@ var Group = (function () {
     return constructor;
 })();
 
+var User = (function () {
+
+    function constructor(data) {
+        var self = this;
+        if (data) {
+            self.id = data.id ? data.id : 0;
+            self.firstName = data.firstName ? data.firstName : "";
+            self.lastName = data.lastName ? data.lastName : "";
+            self.middleName = data.middleName ? data.middleName : "";
+            self.address = data.address ? data.address : "";
+            self.city = data.city ? data.city : "";
+            self.state = data.state ? data.state : "";
+        }
+        else {
+            self.id = 0;
+            self.firstName = "";
+            self.lastName = "";
+            self.middleName = "";
+            self.address = "";
+            self.city = "";
+            self.state = "";
+        }
+
+        self.name = self.lastName + ", " + self.firstName + " " + self.middleName;
+    }
+
+    return constructor;
+})();
+
 var Voter = (function () {
 
     function constructor(data) {
@@ -322,16 +494,37 @@ var Voter = (function () {
         if (data) {
             self.id = data.id ? data.id : 0;
             self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
-            self.description = data.description ? data.description : "";
-            self.name = data.name ? data.name : "";
-            // Group
-            self.groups = data.groups ? data.groups : [];
+            self.groups = data.groups ? data.groups : "";
+            self.user = data.user ? data.user : new User();
         } else {
             self.id = 0;
             self.creationDate = new Date().getTime();
-            self.description = "";
-            self.name = "";
             self.groups = [];
+            self.user = new User();
+        }
+    }
+
+    return constructor;
+})();
+
+var PersistVoter = (function () {
+
+    function constructor(data) {
+        var self = this;
+        if (data) {
+            self.id = data.id ? data.id : 0;
+            self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+
+            if (!!data.user) {
+                self.userId = data.user.id ? data.user.id : 0;
+            }
+            else if (!!data.userId) {
+                self.userId = data.userId ? data.userId : 0;
+            }
+        } else {
+            self.id = 0;
+            self.creationDate = new Date().getTime();
+            self.userId = 0;
         }
     }
 
@@ -480,8 +673,13 @@ Vue.component('data-table', {
         , data: { type: Array }
         , columns: { type: Array }
         , selectMode: { type: String }
+        , query: { type: Function }
     },
     methods: {
+        search_onchange: function (text) {
+            console.log("data-table emitting search_onclick");
+            this.$emit("search_onchange", text);
+        },
         row_onclick: function (item) {
             console.log("data-table emitting row_onclick");
             this.$emit("row_onclick", item, this.header);
@@ -712,11 +910,15 @@ Vue.component('group-detail', {
         , groups: { type: Array }
     },
     methods: {
-        makeDecision: function () {
+        search_onchange: function (text) {
+            console.log("group-detail emitting search_onclick");
+            this.$emit("search_onchange", text);
+        },
+        makeDecision_onclick: function () {
             var d = new Decision();
-            decisions.push(d);
             this.value.decisions.push(d);
-            this.showDetail(d.id, "Decisions");
+            this.value.decisions.push(d);
+            this.showDecisionDetail(d.id);
         },
         showChildDetail: function (id) {
             console.log("group-detail emitting showChildDetail");
@@ -842,9 +1044,11 @@ Vue.component('group-detail', {
         },
         decisionsDisplay: function () {
 
-            return this.value.decisions ? this.value.decisions.map(function (c) {
-                return getItemById(c, decisions);
-            }) : [];
+            return this.value.decisions;
+
+            //return this.value.decisions ? this.value.decisions.map(function (c) {
+            //    return getItemById(c, decisions);
+            //}) : [];
         },
         childSelectionList: function () {
             var self = this;
@@ -883,14 +1087,23 @@ Vue.component('voter-detail', {
         return {
             isSelectingGroup: false,
             voter: new Voter()
+            , isLoading: false
+            , search: null
+            , currentUserName: ""
         };
     },
     props: {
         value: { type: Object }
         , editable: { type: Boolean }
         , groups: { type: Array }
+        , users: { type: Array }
     },
     methods: {
+        findUser: function (text) {
+            console.log("voter-detail emitting findUser");
+            this.$emit("find-user", text);
+            this.isLoading = true;
+        },
         showDetail: function (id, header) {
             console.log("voter-detail emitting showDetail");
             this.$emit("show-detail", id, header);
@@ -920,6 +1133,11 @@ Vue.component('voter-detail', {
             this.$emit("delete", this.voter);
             console.log("group-detail delete_onclick emitting delete", this.voter);
         }
+        , user_onchange: function (user) {
+            console.log("user_onchange", user);
+            this.voter.user = user;
+            this.currentUserName = user.name;
+        }
     },
     computed: {
         groupColumns: function () {
@@ -934,6 +1152,9 @@ Vue.component('voter-detail', {
             //what to do here
             return getItemById(this.voter.groups, this.groups);
         },
+        usersDisplay: function () {
+            return this.users.map(x => x.lastName + ", " + x.firstName + " " + x.middleName);
+        }
     },
     watch: {
         value: {
@@ -943,6 +1164,21 @@ Vue.component('voter-detail', {
                 //console.log("voter-detail emitting change", current, this.index);
             },
             deep: true
+        }
+        , users: {
+            handler: function (current, old) {
+                this.isLoading = false;
+            },
+            deep: false
+        }
+        , search: {
+            handler: function (current, old) {
+                if ((current != null) && (current.length > 2)) {
+                    this.isLoading = true;
+                    this.findUser(current);
+                }
+            },
+            deep: false
         }
     },
     mounted: function () {
@@ -969,6 +1205,8 @@ var vue = new Vue({
             decisions: [],
             voters: [],
             groups: [],
+            users: []
+            , queryUsersTimeout: null
         };
     },
     methods: {
@@ -1108,7 +1346,7 @@ var vue = new Vue({
             var self = this;
             this.currentVoter = data;
 
-            dataAccess.postVoter(data)
+            dataAccess.postVoter(new PersistVoter(data))
                 .then(function (result) {
                     var v = new Voter(result);
                     self.voters.push(v);
@@ -1146,6 +1384,26 @@ var vue = new Vue({
             //this.currentGroup = new Group();
             //this.groups.push(this.currentGroup);
             this.showGroupDetail(null, false, false);
+        },
+        queryUsers: function (text) {
+            console.log("queryUsers", text)
+            var self = this;
+            clearTimeout(self.queryUsersTimeout);
+
+            self.queryUsersTimeout = setTimeout(function () {
+                dataAccess.getUserByName(text)
+                    .then(function (result) {
+                        self.users = self.users.concat(result.map(x => new User(x)))
+                    });
+            }, 1000);
+        },
+        queryGroups: function (text) {
+            //this.currentVoter = new Voter();
+            //this.voters.push(this.currentVoter);
+            dataAccess.queryGroups(text)
+                .then(function (result) {
+                    this.groups.concat(result.map(x => new Group(x)))
+                });
         },
         createVoter: function () {
             //this.currentVoter = new Voter();
@@ -1279,6 +1537,7 @@ var vue = new Vue({
                         "voters": this.voters,
                         "groups": this.groups,
                         "change": this.persistGroup,
+                        "search_onchange": this.queryGroups,
                         "delete": this.deleteGroup,
                         "show-detail": this.showDetail,
                         "removeGroup": this.removeGroupFromGroup,
@@ -1291,6 +1550,8 @@ var vue = new Vue({
                             "change": this.persistVoter,
                             "delete": this.deleteVoter,
                             "show-detail": this.showDetail,
+                            "search_onchange": this.queryUsers,
+                            "find-user": this.queryUsers
                         }
                         : this.currentComponent === "data-table"
                             ? {
@@ -1319,14 +1580,14 @@ var vue = new Vue({
                         ? {
                             "value": this.currentVoter,
                             "groups": this.groups,
+                            "users": this.users,
                             "editable": true
                         }
                         : this.currentComponent === "data-table"
                             ? {
                                 "columns": this.currentColumns,
                                 "data": this.currentData,
-                                "header": this.currentHeader,
-                                "select-mode": "",
+                                "header": this.currentHeader
                             }
                             : {};
 
@@ -1334,7 +1595,7 @@ var vue = new Vue({
     }
     , mounted: function () {
         var self = this;
-        dataAccess.getDecisions()
+        dataAccess.getDecisionsByUserId(1)
             .then(function (data) {
                 self.decisions = data.map(x => new Decision(x));
             })
@@ -1342,7 +1603,7 @@ var vue = new Vue({
                 console.log("failed to get decisions");
             });
 
-        dataAccess.getGroups()
+        dataAccess.getGroupsByUserId(1)
             .then(function (data) {
                 self.groups = data.map(x => new Group(x));
             })
@@ -1356,6 +1617,14 @@ var vue = new Vue({
             })
             .catch(function (err) {
                 console.log("failed to get voters");
+            });
+
+        dataAccess.getUsers()
+            .then(function (data) {
+                self.users = data.map(x => new User(x));
+            })
+            .catch(function (err) {
+                console.log("failed to get users");
             });
     }
 });

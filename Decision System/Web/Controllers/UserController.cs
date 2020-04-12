@@ -14,18 +14,18 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DecisionController : BaseController<Decision, DecisionDto>
+    public class UserController : BaseController<User, UserDto>
     {
 
-        public DecisionController(ILogger<DecisionController> logger, IRepository<Decision> repository, IDomain<Decision, DecisionDto> domain) : base(logger, repository, domain)
+        public UserController(ILogger<UserController> logger, IRepository<User> repository, IDomain<User, UserDto> domain) : base(logger, repository, domain)
         {
         }
 
         [HttpGet]
-        [Route("User/{id}")]
-        public IEnumerable<DecisionDto> GetByUserId(long id)
-        {
-            return ((DecisionDomain)_domain).GetByUserId(id);
+        [Route("Find/{query}")]
+        public List<UserDto> GetUsersByName(string query) {
+            return ((UserDomain)_domain).GetUsersByName(query);
         }
+
     }
 }

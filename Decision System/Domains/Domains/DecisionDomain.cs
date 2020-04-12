@@ -4,6 +4,8 @@ using DecisionSystem.Repository;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Principal;
 using System.Text;
 
 namespace Core.Domains
@@ -14,6 +16,18 @@ namespace Core.Domains
         public DecisionDomain(IRepository<Decision> repo, ILogger<DecisionDomain> logger) : base(repo, logger)
         {
             _logger = logger;
+        }
+
+
+        public List<DecisionDto> GetByUserId(long id)
+        {
+            return _repository.FindAll()
+                .Where(x => x.Votes
+                    .Where(v =>
+                        v.Voter.User.Id == id
+                    ).Count() > 0)
+                .Select(x => x.AsDto())
+                .ToList();
         }
     }
 }

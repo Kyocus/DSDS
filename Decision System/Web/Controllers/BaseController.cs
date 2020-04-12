@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Core.Interfaces;
 using Core.Domains;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DecisionSystem.Controllers
 {
@@ -29,6 +30,7 @@ namespace DecisionSystem.Controllers
         }
 
         [HttpGet]
+        //[Authorize]
         public virtual IEnumerable<TDto> GetAll()
         {
             return _domain.GetAll();
@@ -63,6 +65,19 @@ namespace DecisionSystem.Controllers
         public virtual void Delete(int id)
         {
             _domain.Delete(id);
+        }
+
+        public virtual bool CanDelete() {
+            return true;
+        }
+        public virtual bool CanGet() {
+            return true;
+        }
+        public virtual bool CanPost() {
+            return true;
+        }
+        public virtual bool CanPut() {
+            return true;
         }
     }
 }

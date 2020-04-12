@@ -30,7 +30,7 @@
                 </nav-bar>
 
                 <div v-if="currentComponent.length > 0">
-                    <button class="btn btn-primary create-button" @click="create_onclick">Create</button>
+                    <v-btn  class="create-button" color="primary" @click="create_onclick">Create</v-btn>
                     <component :is="currentComponent" v-bind="currentProperties" v-on="currentEvents" />
                 </div>
             </v-content>
@@ -90,6 +90,7 @@
             <v-text-field v-model="search"
                           append-icon="mdi-magnify"
                           label="Search"
+                          @change="search_onchange"
                           single-line
                           hide-details></v-text-field>
             <v-data-table :headers="headers"
@@ -137,8 +138,8 @@
                 </template>
 
             </v-data-table>
-            <pre>{{data}}</pre>
-            <pre>{{showActions}}</pre>
+            <!--<pre>{{data}}</pre>-->
+            <!--<pre>{{showActions}}</pre>-->
 
         </div>
     </template>
@@ -146,11 +147,12 @@
         <div class="container">
             <h2>Decision</h2>
             <div v-if="editable">
-                <button class="btn btn-primary button save-button" @click="save_onclick">Save</button>
-                <button class="btn btn-primary button delete-button" @click="delete_onclick">Delete</button>
+                <v-btn  class="save-button" color="primary" @click="save_onclick">Save</v-btn>
+                <v-btn  class="delete-button" color="error" @click="delete_onclick">Delete</v-btn>
             </div>
             <div v-if="votable">
-                <button v-for="(item, index) in options" @click="vote(index)" class="btn btn-primary vote-button">{{item}}</button>
+                <v-btn color="error" @click="delete_onclick">Delete</v-btn>
+                <v-btn v-for="(item, index) in options" @click="vote(index)" color="primary" class="vote-button">{{item}}</v-btn>
             </div>
             <div v-if="!editable">
                 <div>
@@ -175,12 +177,12 @@
                     <div>
                         <label>Attachments:</label>
                         <input class="file-upload" type="file" />
-                        <button @click="uploadAttachment" class="btn btn-primary add-attachment-button">Upload</button>
+                        <v-btn class="add-attachment-button" color="primary" @click="uploadAttachment">Upload</v-btn>
                     </div>
 
                     <div v-for="item in decision.attachments">
                         <a class="attachment-link" :href="item.href">{{item.name}}</a>
-                        <button class="btn btn-primary delete-button">X</button>
+                        <v-btn class="delete-button" color="error" >X</v-btn>
                     </div>
                 </div>
             </div>
@@ -205,7 +207,7 @@
                     <div class="comment-narrative">{{item.narrative}}</div>
                 </div>
                 <textarea> </textarea>
-                <button class="btn btn-primary add-comment-button" @click="addComment">Comment</button>
+                <v-btn class="add-comment-button" @click="addComment" color="primary">Comment</v-btn>
             </div>
         </div>
     </template>
@@ -242,8 +244,8 @@
             </div>
             <div v-if="editable">
                 <div>
-                    <button class="btn btn-primary save-button" @click="save_onclick">Save</button>
-                    <button class="btn btn-primary delete-button" @click="delete_onclick">Delete</button>
+                    <v-btn class="save-button" @click="save_onclick" color="primary">Save</v-btn>
+                    <v-btn class="delete-button" @click="delete_onclick" color="error">Delete</v-btn>
                 </div>
                 <div>
                     <label>Type:</label>
@@ -279,9 +281,11 @@
                             <v-card>
                                 <data-table :columns="columns"
                                             :data="childSelectionList"
+                                            :query="childrenQuery"
                                             class="child-selector"
                                             :header="header"
-                                            @row_onclick="addChild">
+                                            @row_onclick="addChild"
+                                            @search_onchange="search_onchange">
                                 </data-table>
                             </v-card>
                         </v-dialog>
@@ -298,9 +302,10 @@
                 </div>
 
                 <div>
-                    <button class="btn btn-primary make-decision-button" @click="makeDecision">Make a Decision</button>
+                    <v-btn class="make-decision-button" @click="makeDecision_onclick" color="primary">Make a Decision</v-btn>
                     <data-table :columns="decisionsColumns"
                                 :data="decisionsDisplay"
+                                :query="decisionsQuery"
                                 @row_onclick="showDecisionDetail"
                                 header="Decisions">
                     </data-table>
@@ -329,16 +334,43 @@
             </div>
             <div v-if="editable">
                 <div v-if="editable">
-                    <button class="btn btn-primary save-button" @click="save_onclick">Save</button>
-                    <button class="btn btn-primary delete-button" @click="delete_onclick">Delete</button>
+                    <v-btn class="save-button" @click="save_onclick" color="primary">Save</v-btn>
+                    <v-btn class="delete-button" @click="delete_onclick" color="error">Delete</v-btn>
                 </div>
                 <div>
-                    <label>Name:</label>
-                    <input class="voter-name" type="text" v-model="voter.name" />
-                </div>
-                <div>
-                    <label>Description:</label>
-                    <textarea class="voter-description" v-model="voter.description"> </textarea>
+                    <label>User:</label>
+                    <!--<input class="voter-user" type="text" v-model="voter.user" />-->
+                    <v-autocomplete @change="user_onchange"
+                                    class="voter-user"
+                                    :items="users"
+                                    :loading="isLoading"
+                                    :search-input.sync="search"
+                                    cache-items
+                                    color="white"
+                                    hide-no-data
+                                    hide-selected
+                                    item-text="name"
+                                    item-value="id"
+                                    label="Search Users"
+                                    placeholder="Start typing to Search"
+                                    prepend-icon="mdi-database-search"
+                                    return-object>
+
+                        <template v-slot:item="{ item }">
+                            <v-list-item-avatar color="indigo"
+                                                class="headline font-weight-light white--text">
+                                {{ item.name.charAt(0) }}
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item.name"></v-list-item-title>
+                                <v-list-item-subtitle v-text="item.id"></v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-icon>mdi-coin</v-icon>
+                            </v-list-item-action>
+                        </template>
+
+                    </v-autocomplete>
                 </div>
                 <div>
                     <div>
@@ -351,6 +383,7 @@
                 </div>
             </div>
 
+            <!--<pre>{{users}}</pre>-->
             <!--<pre>{{voter}}</pre>-->
         </div>
     </template>

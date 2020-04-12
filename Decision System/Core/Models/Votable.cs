@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Core.Interfaces;
+using Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DecisionSystem.Classes
+namespace Core.Models
 {
-    public class Votable
+    public class Votable : BaseModel<VotableDto>, IAggregateRoot
     {
 
         private int upvotes;

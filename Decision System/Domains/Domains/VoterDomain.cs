@@ -21,45 +21,7 @@ namespace Core.Domains
 
         public VoterDto Create(PersistVoterDto dto)
         {
-            return EntityAsDto(_repository.Create(DtoAsEntity(AsVoterDto(dto))));
-        }
-
-        public Voter DtoAsEntity(VoterDto dto)
-        {
-            Voter returnMe = new Voter();
-
-            returnMe.Description = dto.Description;
-            returnMe.CreationDate = dto.CreationDate;
-            returnMe.Id = dto.Id;
-            returnMe.Name = dto.Name;
-
-            returnMe.GroupVoters = null;
-
-            return returnMe;
-        }
-
-        public VoterDto EntityAsDto(Voter entity)
-        {
-            VoterDto returnMe = new VoterDto();
-
-            returnMe.Description = entity.Description;
-            returnMe.CreationDate = entity.CreationDate;
-            returnMe.Id = entity.Id;
-            returnMe.Name = entity.Name;
-            returnMe.Groups = entity.Groups
-            .Select((Group x) =>
-            {
-                GroupSummaryDto returnMe = new GroupSummaryDto();
-
-                returnMe.Description = x.Description;
-                returnMe.Id = x.Id;
-                returnMe.Name = x.Name;
-
-                return returnMe;
-
-            }).ToList();
-
-            return returnMe;
+            return _repository.Create(AsVoterDto(dto).AsEntity()).AsDto();
         }
 
 
@@ -67,11 +29,10 @@ namespace Core.Domains
         {
             VoterDto returnMe = new VoterDto();
 
-            returnMe.Name = dto.Name;
-            returnMe.Description = dto.Description;
             returnMe.CreationDate = dto.CreationDate;
-
-            returnMe.Groups = null;
+            returnMe.Groups = new List<GroupSummaryDto>();
+            returnMe.User = null;
+            returnMe.UserId = dto.UserId;
 
             return returnMe;
         }

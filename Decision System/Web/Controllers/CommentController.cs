@@ -21,13 +21,11 @@ namespace DecisionSystem.Controllers
         {
         }
 
-        //[HttpGet]
-        //public IEnumerable<Comment> Get()
-        //{
-        //    List<Comment> entities = new List<Comment>();
-        //    entities.Add(new Comment(DateTime.UtcNow.Ticks, 1));
-
-        //    return entities;
-        //}
+        [HttpGet]
+        [Route("User/{id}")]
+        public IEnumerable<CommentDto> GetByUserId(long id)
+        {
+            return ((CommentDomain)_domain).GetByUserId(id);
+        }
     }
 }

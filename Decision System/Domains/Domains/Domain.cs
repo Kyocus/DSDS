@@ -3,7 +3,9 @@ using Core.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,27 +22,51 @@ namespace Core.Domains
             _logger = logger;
         }
 
-        public TDto Get(int id)
+        public virtual TDto Get(int id)
         {
             return _repository.FindById(id).AsDto();
         }
 
-        public IEnumerable<TDto> GetAll()
+        public virtual IEnumerable<TDto> GetAll()
         {
-            return _repository.FindAll().ToList().Select(x => (TDto)x.AsDto());
+            return _repository.FindAll().ToList().Select(x => x.AsDto());
         }
 
-        public TDto Create(TDto dto)
+        public virtual IEnumerable<TDto> Query(string query)
+        {
+            Func<TEntity, bool> queryProperties = new Func<TEntity, bool>((x) => {
+                foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(x))
+                {
+                    string name = descriptor.Name;
+                    object value = descriptor.GetValue(x);
+
+                    if (value == query)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+
+            return _repository
+                .FindAllAsync().Result
+                .Where(queryProperties)
+                .Select(x => x.AsDto())
+                .ToList();
+        }
+
+        public virtual TDto Create(TDto dto)
         {
             return _repository.Create(dto.AsEntity()).AsDto();
         }
 
-        public TDto Update(TDto dto)
+        public virtual TDto Update(TDto dto)
         {
             return _repository.Update(dto.AsEntity()).AsDto();
         }
 
-        public async Task<TDto> UpdateAsync(TDto dto)
+        public virtual async Task<TDto> UpdateAsync(TDto dto)
         {
             var result = await _repository.UpdateAsync(dto.AsEntity());
 
@@ -48,13 +74,14 @@ namespace Core.Domains
             {
                 return result.AsDto();
             }
-            else {
+            else
+            {
                 return null;
             }
 
         }
 
-        public void Delete(int id)
+        public virtual void Delete(int id)
         {
             try
             {

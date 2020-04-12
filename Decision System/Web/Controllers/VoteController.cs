@@ -20,13 +20,11 @@ namespace DecisionSystem.Controllers
         {
         }
 
-        //[HttpGet]
-        //public IEnumerable<Vote> Get()
-        //{
-        //    List<Vote> entities = new List<Vote>();
-        //    entities.Add(new Vote(1, DateTime.UtcNow.Ticks, 1, 1));
-
-        //    return entities;
-        //}
+        [HttpGet]
+        [Route("User/{id}")]
+        public IEnumerable<VoteDto> GetByUserId(long id)
+        {
+            return ((VoteDomain)_domain).GetByUserId(id);
+        }
     }
 }

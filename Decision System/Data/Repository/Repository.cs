@@ -23,12 +23,11 @@ namespace DecisionSystem.Repository
             _logger = logger;
         }
 
-
         public virtual async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null)
         {
             var query = context.Set<TEntity>()
                 .Include(context.GetIncludePaths(typeof(TEntity)));
-            
+
             if (predicate != null)
             {
                 query = query.Where(predicate);
@@ -39,6 +38,18 @@ namespace DecisionSystem.Repository
         public virtual IQueryable<TEntity> FindAll()
         {
             return this.context.Set<TEntity>().AsNoTracking();
+        }
+
+        public virtual IQueryable<TEntity> FindByString(string value)
+        {
+            var stringProperties = typeof(TEntity).GetProperties()
+                //.Where(prop => prop.PropertyType == value.GetType())
+                ;
+
+            return context.Set<TEntity>()
+                .Where(customer =>
+                    stringProperties.Any(prop =>
+                        prop.GetValue(customer, null).ToString() == value));
         }
 
         public virtual IQueryable<TEntity> FindByCondition(Expression<Func<TEntity, bool>> expression)

@@ -7,15 +7,15 @@ namespace Core.Models
     public class Vote : BaseModel<VoteDto>, IAggregateRoot
     {
         private long time;
-        private long entityId;
+        private long voterId;
         private long optionId;
 
         [ForeignKey("EntityId")]
-        public virtual Voter Entity { get; set; }
+        public virtual Voter Voter { get; set; }
         public long Time { get => time; set => time = value; }
         
         [Required]
-        public long EntityId { get => entityId; set => entityId = value; }
+        public long VoterId { get => voterId; set => voterId = value; }
         public long OptionId{ get => optionId; set => optionId = value; }
 
         public Vote()
@@ -26,7 +26,7 @@ namespace Core.Models
         {
             Id = id;
             Time = time;
-            EntityId = entityId;
+            VoterId = entityId;
             OptionId = optionId;
         }
     }

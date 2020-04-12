@@ -17,6 +17,9 @@ using DecisionSystem.Repository;
 using Core.Models;
 using Core.Domains;
 using Core.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DecisionSystem
 {
@@ -43,15 +46,9 @@ namespace DecisionSystem
             services.AddScoped<IRepository<Status>, StatusRepository>();
             services.AddScoped<IRepository<Vote>, VoteRepository>();
             services.AddScoped<IRepository<Voter>, VoterRepository>();
+            services.AddScoped<IRepository<User>, UserRepository>();
 
-            //services.AddScoped<IRepository<Attachment>>();
-            //services.AddScoped<IRepository<Comment>>();
-            //services.AddScoped<IRepository<Decision>>();
-            //services.AddScoped<IRepository<Group>>();
-            //services.AddScoped<IRepository<Status>>();
-            //services.AddScoped<IRepository<Vote>>();
-            //services.AddScoped<IRepository<Voter>>();
-
+            services.AddScoped<AuthenticationHandler>();
             services.AddScoped<Attachment>();
             services.AddScoped<Comment>();
             services.AddScoped<Decision>();
@@ -61,20 +58,49 @@ namespace DecisionSystem
             services.AddScoped<Status>();
             services.AddScoped<Vote>();
             services.AddScoped<Voter>();
+            services.AddScoped<User>();
 
             services.AddScoped<IDomain<Attachment, AttachmentDto>, AttachmentDomain>();
             services.AddScoped<IDomain<Comment, CommentDto>, CommentDomain>();
             services.AddScoped<IDomain<Decision, DecisionDto>, DecisionDomain>();
-            //services.AddScoped<IDomain<Group, PersistGroupDto>, GroupDomain>();
             services.AddScoped<IDomain<Group, GroupDto>, GroupDomain>();
             services.AddScoped<IDomain<Status, StatusDto>, StatusDomain>();
             services.AddScoped<IDomain<Vote, VoteDto>, VoteDomain>();
             services.AddScoped<IDomain<Voter, VoterDto>, VoterDomain>();
+            services.AddScoped<IDomain<User, UserDto>, UserDomain>();
 
             services.AddCors();
 
             services.AddDbContext<DataContext>(opt =>
             opt.UseInMemoryDatabase("EntityList"));
+
+            services.AddCertificateForwarding(options =>
+            {
+                options.CertificateHeader = "X-SSL-CERT";
+                options.HeaderConverter = (headerValue) =>
+                {
+                    X509Certificate2 clientCertificate = null;
+
+                    if (!string.IsNullOrWhiteSpace(headerValue))
+                    {
+                        byte[] bytes = StringToByteArray(headerValue);
+                        clientCertificate = new X509Certificate2(bytes);
+                    }
+
+                    return clientCertificate;
+                };
+            });
+
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = $"https://{Configuration["Auth0:Domain"]}/";
+                options.Audience = Configuration["Auth0:Audience"];
+            });
 
             services.AddMvc();
             services.AddRazorPages()
@@ -89,6 +115,20 @@ namespace DecisionSystem
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
 
+
+        }
+
+        private static byte[] StringToByteArray(string hex)
+        {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+
+            for (int i = 0; i < NumberChars; i += 2)
+            {
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            }
+
+            return bytes;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -103,6 +143,8 @@ namespace DecisionSystem
 
             app.UseRouting();
 
+            app.UseCertificateForwarding();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
