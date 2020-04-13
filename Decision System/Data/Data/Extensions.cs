@@ -20,7 +20,7 @@ namespace Core.Extentions
             var entityType = context.Model.FindEntityType(clrEntityType);
             var includedNavigations = new HashSet<INavigation>();
             var stack = new Stack<IEnumerator<INavigation>>();
-            
+
             while (true)
             {
                 var entityNavigations = new List<INavigation>();
@@ -35,6 +35,7 @@ namespace Core.Extentions
 
                 if (entityNavigations.Count == 0)
                 {
+                    //finished adding properties, return
                     if (stack.Count > 0)
                     {
                         yield return string.Join(".", stack.Reverse().Select(e => e.Current.Name));
@@ -42,6 +43,7 @@ namespace Core.Extentions
                 }
                 else
                 {
+                    //still more properties to add
                     foreach (var navigation in entityNavigations)
                     {
                         var inverseNavigation = navigation.FindInverse();

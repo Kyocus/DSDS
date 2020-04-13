@@ -29,7 +29,10 @@ namespace Core.Domains
 
         public virtual IEnumerable<TDto> GetAll()
         {
-            return _repository.FindAll().ToList().Select(x => x.AsDto());
+            return _repository
+                //.FindAll()
+                .FindAllAsync().Result
+                .ToList().Select(x => x.AsDto());
         }
 
         public virtual IEnumerable<TDto> Query(string query)

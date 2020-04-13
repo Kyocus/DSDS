@@ -1,5 +1,5 @@
-*{
-	box-sizing: border-box;
+* {
+    box-sizing: border-box;
 }
 
 
@@ -14,39 +14,35 @@
 	cursor: pointer;
 }*/
 
-h2{
-	text-align: center;
-	background-color: lightsteelblue;
+h2 {
+    text-align: center;
+    background-color: lightsteelblue;
 }
 
-td.linked 
-,a.linked 
-,div.linked 
-,span.linked 
-{
-	color: blue;
-	text-decoration: underline;
-	cursor: pointer;
+td.linked, a.linked, div.linked, span.linked {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
-.group-description 
-,.voter-description 
-,.decision-description 
-{
-	width: 30em;
-	height: auto;
-	outline: solid thin lightgray;
+.group-description, .voter-description, .decision-description {
+    width: 30em;
+    height: auto;
+    outline: solid thin lightgray;
 }
 
 .inline-block {
-	display: inline-block;
+    display: inline-block;
 }
 
 label {
-	vertical-align: top;
+    vertical-align: top;
 }
 
 input {
-	width: 30em;
+    width: 30em;
 }
 
+.button-row {
+    margin-bottom: 1em;
+}

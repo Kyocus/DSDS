@@ -104,8 +104,8 @@
                 <template v-slot:body="{ items }">
                     <tbody v-if="header === 'Voters'">
                         <tr v-for="item in items" @click="row_onclick(item)" :key="item.id" :row-id="item.id">
-                            <td class="linked name" >{{item.name}}</td>
-                            <td class="linked group" >{{item.groupId}}</td>
+                            <td class="name" >{{item.user.name}}</td>
+                            <td class="group" >{{item.groups.length}}</td>
                             <td class="created"> {{dateDisplay(item.creationDate)}}</td>
                         </tr>
                     </tbody>
@@ -272,7 +272,7 @@
                         <span v-if="group.parentId" class="linked parent-group" @click="showGroupDetail(group.parentId, 'Groups')">{{parent.name}}</span>
                     </div>
                 </div>
-                <div>
+                <div v-if="group.id > 0">
                     <div>
                         <v-dialog v-model="isAddingChild">
                             <template v-slot:activator="{ on }">
@@ -281,7 +281,6 @@
                             <v-card>
                                 <data-table :columns="columns"
                                             :data="childSelectionList"
-                                            :query="childrenQuery"
                                             class="child-selector"
                                             :header="header"
                                             @row_onclick="addChild"
@@ -301,11 +300,10 @@
                     </data-table>
                 </div>
 
-                <div>
+                <div v-if="group.id > 0">
                     <v-btn class="make-decision-button" @click="makeDecision_onclick" color="primary">Make a Decision</v-btn>
                     <data-table :columns="decisionsColumns"
                                 :data="decisionsDisplay"
-                                :query="decisionsQuery"
                                 @row_onclick="showDecisionDetail"
                                 header="Decisions">
                     </data-table>
@@ -333,41 +331,44 @@
                 </div>
             </div>
             <div v-if="editable">
-                <div v-if="editable">
+                <div v-if="editable" class="button-row">
                     <v-btn class="save-button" @click="save_onclick" color="primary">Save</v-btn>
                     <v-btn class="delete-button" @click="delete_onclick" color="error">Delete</v-btn>
                 </div>
                 <div>
                     <label>User:</label>
-                    <!--<input class="voter-user" type="text" v-model="voter.user" />-->
                     <v-autocomplete @change="user_onchange"
                                     class="voter-user"
+                                    :value="user"
+                                    :label="user"
                                     :items="users"
                                     :loading="isLoading"
                                     :search-input.sync="search"
                                     cache-items
                                     color="white"
+                                    dense
+                                    single-line
                                     hide-no-data
                                     hide-selected
                                     item-text="name"
                                     item-value="id"
                                     label="Search Users"
-                                    placeholder="Start typing to Search"
+                                    placeholder="Start typing to Search (3 characters minimum)"
                                     prepend-icon="mdi-database-search"
                                     return-object>
 
                         <template v-slot:item="{ item }">
                             <v-list-item-avatar color="indigo"
                                                 class="headline font-weight-light white--text">
-                                {{ item.name.charAt(0) }}
+                                {{ item.lastName.charAt(0) + item.firstName.charAt(0) }}
                             </v-list-item-avatar>
                             <v-list-item-content>
                                 <v-list-item-title v-text="item.name"></v-list-item-title>
                                 <v-list-item-subtitle v-text="item.id"></v-list-item-subtitle>
                             </v-list-item-content>
-                            <v-list-item-action>
+                            <!--<v-list-item-action>
                                 <v-icon>mdi-coin</v-icon>
-                            </v-list-item-action>
+                            </v-list-item-action>-->
                         </template>
 
                     </v-autocomplete>

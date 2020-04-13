@@ -494,8 +494,8 @@ var Voter = (function () {
         if (data) {
             self.id = data.id ? data.id : 0;
             self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
-            self.groups = data.groups ? data.groups : "";
-            self.user = data.user ? data.user : new User();
+            self.groups = data.groups ? data.groups.map(x => new Group(x)) : [];
+            self.user = data.user ? new User(data.user) : new User();
         } else {
             self.id = 0;
             self.creationDate = new Date().getTime();
@@ -978,6 +978,12 @@ Vue.component('group-detail', {
             this.$emit("addVoter", data);
             //this.group.voters.push(data);
         },
+        childrenQuery: function () {
+            var self = this;
+            return self.value.type === GROUP_GROUP_TYPE
+                ? dataAccess.getGroups
+                : dataAccess.getVoters;
+        },
         removeChild: function (index) {
             var self = this;
             return self.value.type === GROUP_GROUP_TYPE
@@ -1088,8 +1094,9 @@ Vue.component('voter-detail', {
             isSelectingGroup: false,
             voter: new Voter()
             , isLoading: false
-            , search: null
-            , currentUserName: ""
+            , search: ""
+            , timeout: null
+            , user: new User()
         };
     },
     props: {
@@ -1136,7 +1143,6 @@ Vue.component('voter-detail', {
         , user_onchange: function (user) {
             console.log("user_onchange", user);
             this.voter.user = user;
-            this.currentUserName = user.name;
         }
     },
     computed: {
@@ -1173,10 +1179,15 @@ Vue.component('voter-detail', {
         }
         , search: {
             handler: function (current, old) {
-                if ((current != null) && (current.length > 2)) {
-                    this.isLoading = true;
-                    this.findUser(current);
-                }
+                let self = this;
+                clearTimeout(this.timeout);
+
+                this.timeout = setTimeout(function () {
+                    if ((current != null) && (current.length > 2)) {
+                        self.isLoading = true;
+                        self.findUser(current);
+                    }
+                }, 1000);
             },
             deep: false
         }
@@ -1185,6 +1196,11 @@ Vue.component('voter-detail', {
         // for some reason we need this to establish reactivity,
         // without it, we don't get reactivity until an emit is triggered
         this.voter = new Voter(this.value);
+        this.search = this.voter.user.name;
+        this.user = this.users.find(x => x.id === this.voter.user.id);
+        if (!this.user) {
+            this.user = new User();
+        }
     },
     template: $("#tmpVoterDetail").html()
 });
@@ -1206,7 +1222,6 @@ var vue = new Vue({
             voters: [],
             groups: [],
             users: []
-            , queryUsersTimeout: null
         };
     },
     methods: {
@@ -1388,14 +1403,11 @@ var vue = new Vue({
         queryUsers: function (text) {
             console.log("queryUsers", text)
             var self = this;
-            clearTimeout(self.queryUsersTimeout);
 
-            self.queryUsersTimeout = setTimeout(function () {
-                dataAccess.getUserByName(text)
-                    .then(function (result) {
-                        self.users = self.users.concat(result.map(x => new User(x)))
-                    });
-            }, 1000);
+            dataAccess.getUserByName(text)
+                .then(function (result) {
+                    self.users = self.users.concat(result.map(x => new User(x)))
+                });
         },
         queryGroups: function (text) {
             //this.currentVoter = new Voter();
