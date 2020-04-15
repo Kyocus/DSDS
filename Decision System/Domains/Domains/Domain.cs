@@ -22,7 +22,7 @@ namespace Core.Domains
             _logger = logger;
         }
 
-        public virtual TDto Get(int id)
+        public virtual TDto Get(long id)
         {
             return _repository.FindById(id).AsDto();
         }
@@ -43,7 +43,7 @@ namespace Core.Domains
                     string name = descriptor.Name;
                     object value = descriptor.GetValue(x);
 
-                    if (value == query)
+                    if (value.ToString().Contains(query))
                     {
                         return true;
                     }
@@ -61,8 +61,18 @@ namespace Core.Domains
 
         public virtual TDto Create(TDto dto)
         {
-            return _repository.Create(dto.AsEntity()).AsDto();
+            var result = _repository.Create(dto.AsEntity()).AsDto();
+
+            if (result != null)
+            {
+                return Get(result.Id);
+            }
+            else
+            {
+                return null;
+            }
         }
+
 
         public virtual TDto Update(TDto dto)
         {
@@ -84,7 +94,7 @@ namespace Core.Domains
 
         }
 
-        public virtual void Delete(int id)
+        public virtual void Delete(long id)
         {
             try
             {

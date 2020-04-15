@@ -677,7 +677,7 @@ Vue.component('data-table', {
     },
     methods: {
         search_onchange: function (text) {
-            console.log("data-table emitting search_onclick");
+            console.log("data-table emitting search_onchange");
             this.$emit("search_onchange", text);
         },
         row_onclick: function (item) {
@@ -911,7 +911,7 @@ Vue.component('group-detail', {
     },
     methods: {
         search_onchange: function (text) {
-            console.log("group-detail emitting search_onclick");
+            console.log("group-detail emitting search_onchange");
             this.$emit("search_onchange", text);
         },
         makeDecision_onclick: function () {
@@ -1225,9 +1225,19 @@ var vue = new Vue({
         };
     },
     methods: {
+        search_onchange: function (query) {
+            if (this.currentHeader.indexOf("Decision") > -1) {
+                this.queryDecisions(query);
+            }
+            else if (this.currentHeader.indexOf("Group") > -1) {
+                this.queryGroups(query);
+            }
+            else /*if (this.currentHeader === "Voters")*/ {
+                this.queryVoters(query);
+            }
+        },
 
         create_onclick: function (event) {
-
             if (this.currentHeader.indexOf("Decision") > -1) {
                 this.createDecision();
             }
@@ -1410,11 +1420,11 @@ var vue = new Vue({
                 });
         },
         queryGroups: function (text) {
-            //this.currentVoter = new Voter();
-            //this.voters.push(this.currentVoter);
+            let self = this;
+            console.log("queryGroups", text);
             dataAccess.queryGroups(text)
                 .then(function (result) {
-                    this.groups.concat(result.map(x => new Group(x)))
+                    self.groups = self.groups.concat(result.map(x => new Group(x)))
                 });
         },
         createVoter: function () {
@@ -1570,7 +1580,8 @@ var vue = new Vue({
 
                                 //todo this event needs a way to have the id and not the mouse event
                                 //or the row needs the id
-                                "row_onclick": this.showDetail
+                                "row_onclick": this.showDetail,
+                                "search_onchange": this.search_onchange
                             }
                             : {};
 
@@ -1603,6 +1614,24 @@ var vue = new Vue({
                             }
                             : {};
 
+        }
+    }
+    , watch: {
+
+        decisions: function (current, old) {
+            if (this.currentHeader.indexOf("Decision") > -1) {
+                this.currentData = current;
+            }
+        },
+        voters: function (current, old) {
+            if (this.currentHeader === "Voters") {
+                this.currentData = current;
+            }
+        },
+        groups: function (current, old) {
+            if (this.currentHeader.indexOf("Group") > -1) {
+                this.currentData = current;
+            }
         }
     }
     , mounted: function () {

@@ -8,11 +8,11 @@ namespace Core.Domains
 {
     public interface IDomain<TEntity, TDto>
     {
-        TDto Get(int id);
+        TDto Get(long id);
         IEnumerable<TDto> GetAll();
         TDto Create(TDto entity);
         TDto Update(TDto entity);
         Task<TDto> UpdateAsync(TDto entity);
-        void Delete(int id);
+        void Delete(long id);
     }
 }

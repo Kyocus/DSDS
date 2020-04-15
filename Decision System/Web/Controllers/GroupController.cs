@@ -81,7 +81,7 @@ namespace DecisionSystem.Controllers
         }
 
         [HttpGet]
-        [Route("Find/{text}")]
+        [Route("Find/{query}")]
         public IEnumerable<GroupDto> GetByQuery(string query)
         {
             return ((GroupDomain)_domain).Query(query);

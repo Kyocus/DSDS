@@ -29,7 +29,11 @@ namespace Core.Domains
 
         public GroupDto Create(PersistGroupDto dto)
         {
-            return _repository.Create(AsGroupDto(dto).AsEntity()).AsDto();
+            var entity = AsGroupDto(dto).AsEntity();
+            entity.CreationDate = DateTime.Now.Ticks;
+
+            var result = _repository.Create(entity);
+            return result.AsDto();
         }
 
         public GroupDto AddVoter(int groupId, int voterId)

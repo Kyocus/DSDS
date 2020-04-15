@@ -21,7 +21,15 @@ namespace Core.Domains
 
         public VoterDto Create(PersistVoterDto dto)
         {
-            return _repository.Create(AsVoterDto(dto).AsEntity()).AsDto();
+            var result = _repository.Create(AsVoterDto(dto).AsEntity());
+            if (result != null)
+            {
+                return Get(result.Id);
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
