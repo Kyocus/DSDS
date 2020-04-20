@@ -6,10 +6,10 @@ namespace Core.Models
 {
     public class VoteDto : BaseDto<Vote>, IDto
     {
-        public virtual Voter Entity { get; set; }
+        public virtual VoterDto Voter { get; set; }
         public long Time { get; set; }
 
-        public long EntityId { get; set; }
+        public long VoterId { get; set; }
         public long OptionId { get; set; }
 
         public VoteDto()

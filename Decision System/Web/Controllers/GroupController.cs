@@ -21,19 +21,35 @@ namespace DecisionSystem.Controllers
         }
 
         [HttpGet]
-        public override IEnumerable<GroupDto> GetAll()
+        public override ActionResult<IEnumerable<GroupDto>> GetAll()
         {
-            return ((GroupDomain)_domain).GetAll();
+            try
+            {
+                var result = ((GroupDomain)_domain).GetAll();
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
-        public GroupDto Post(PersistGroupDto dto)
+        public ActionResult<GroupDto> Post(PersistGroupDto dto)
         {
-            return ((GroupDomain)_domain).Create(dto);
+            try
+            {
+                var result = ((GroupDomain)_domain).Create(dto);
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [NonAction]
-        public override GroupDto Post(GroupDto dto)
+        public override ActionResult<GroupDto> Post(GroupDto dto)
         {
             throw new NotImplementedException();
         }
@@ -45,25 +61,49 @@ namespace DecisionSystem.Controllers
         }
 
         [HttpPut]
-        public Task<GroupDto> Put(PersistGroupDto dto)
+        public async Task<ActionResult<GroupDto>> Put(PersistGroupDto dto)
         {
             var dom = (GroupDomain)_domain;
 
-            return dom.UpdateAsync(dom.AsGroupDto(dto));
+            try
+            {
+                var result = dom.UpdateAsync(dom.AsGroupDto(dto));
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPut]
         [Route("{groupId}/AddVoter/{voterId}")]
-        public GroupDto AddVoter(int groupId, int voterId)
+        public async Task<ActionResult<GroupDto>> AddVoter(int groupId, int voterId)
         {
-            return ((GroupDomain)_domain).AddVoter(groupId, voterId);
+            try
+            {
+                var result = ((GroupDomain)_domain).AddVoter(groupId, voterId);
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPut]
         [Route("{groupId}/AddGroup/{childId}")]
-        public GroupDto AddGroup(int groupId, int childId)
+        public async Task<ActionResult<GroupDto>> AddGroup(long groupId, long childId)
         {
-            return ((GroupDomain)_domain).AddGroup(groupId, childId).AsType<GroupDto>();
+            try
+            {
+                var result = ((GroupDomain)_domain).AddGroup(groupId, childId).AsType<GroupDto>();
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [HttpDelete]
@@ -75,16 +115,32 @@ namespace DecisionSystem.Controllers
 
         [HttpGet]
         [Route("User/{id}")]
-        public IEnumerable<GroupDto> GetByUserId(long id)
+        public async Task<ActionResult<IEnumerable<GroupDto>>> GetByUserId(long id)
         {
-            return ((GroupDomain)_domain).GetByUserId(id);
+            try
+            {
+                var result = ((GroupDomain)_domain).GetByUserId(id);
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet]
         [Route("Find/{query}")]
-        public IEnumerable<GroupDto> GetByQuery(string query)
+        public async Task<ActionResult<IEnumerable<GroupDto>>> GetByQuery(string query)
         {
-            return ((GroupDomain)_domain).Query(query);
+            try
+            {
+                var result = ((GroupDomain)_domain).Query(query);
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
     }

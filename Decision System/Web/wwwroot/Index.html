@@ -111,18 +111,16 @@
                     </tbody>
 
                     <tbody v-else-if="header === 'Decisions'">
-                        <tr v-for="item in items" @click="row_onclick(item.id)" :key="item.id" :row-id="item.id">
+                        <tr v-for="item in items" @click="row_onclick(item)" :key="item.id" :row-id="item.id">
                             <td class="linked name">{{item.name}}</td>
-                            <td class="status">{{item.statusId}}</td>
-                            <td class="linked group">{{item.groupId}}</td>
+                            <td class="status">{{item.status}}</td>
                             <td class="created">{{item.creationDate}}</td>
                             <td class="expiration">{{item.expirationDate}}</td>
-                            <td class="attachments">{{item.attachments}}</td>
                         </tr>
                     </tbody>
 
                     <tbody v-else="header === 'Groups'">
-                        <tr v-for="item in items" @click="row_onclick(item.id)" :key="item.id" :row-id="item.id">
+                        <tr v-for="item in items" @click="row_onclick(item)" :key="item.id" :row-id="item.id">
                             <td class="linked name">{{item.name}}</td>
                             <td class="linked group">{{item.parentId}}</td>
                             <td class="linked children">{{item.type}}</td>
@@ -147,12 +145,12 @@
         <div class="container">
             <h2>Decision</h2>
             <div v-if="editable">
-                <v-btn  class="save-button" color="primary" @click="save_onclick">Save</v-btn>
-                <v-btn  class="delete-button" color="error" @click="delete_onclick">Delete</v-btn>
+                <v-btn class="save-button" color="primary" @click="save_onclick">Save</v-btn>
+                <v-btn class="delete-button" color="error" @click="delete_onclick">Delete</v-btn>
             </div>
             <div v-if="votable">
                 <v-btn color="error" @click="delete_onclick">Delete</v-btn>
-                <v-btn v-for="(item, index) in options" @click="vote(index)" color="primary" class="vote-button">{{item}}</v-btn>
+                <v-btn v-for="(item, index) in options" :key="item.id" @click="vote(index)" color="primary" class="vote-button">{{item}}</v-btn>
             </div>
             <div v-if="!editable">
                 <div>
@@ -182,13 +180,12 @@
 
                     <div v-for="item in decision.attachments">
                         <a class="attachment-link" :href="item.href">{{item.name}}</a>
-                        <v-btn class="delete-button" color="error" >X</v-btn>
+                        <v-btn class="delete-button" color="error">X</v-btn>
                     </div>
                 </div>
             </div>
             <div v-if="showVotes">
-                <data-table :columns="votesColumns"
-                            :data="votesDisplay"
+                <data-table :data="votesDisplay"
                             header="Votes">
                 </data-table>
             </div>
@@ -209,6 +206,8 @@
                 <textarea> </textarea>
                 <v-btn class="add-comment-button" @click="addComment" color="primary">Comment</v-btn>
             </div>
+            <pre>{{decision}}</pre>
+
         </div>
     </template>
     <template id="tmpGroupDetail">
@@ -228,15 +227,13 @@
                     <span v-if="value.parentId" class="linked parent-group" @click="showGroupDetail(value.parentId, 'Groups')">{{parent.name}}</span>
                 </div>
                 <div>
-                    <data-table :columns="columns"
-                                :data="childrenDisplay"
+                    <data-table :data="childrenDisplay"
                                 @row_onclick="showChildDetail"
                                 :header="header">
                     </data-table>
                 </div>
                 <div>
-                    <data-table :columns="decisionsColumns"
-                                :data="decisionsDisplay"
+                    <data-table :data="decisionsDisplay"
                                 @row_onclick="showDecisionDetail"
                                 header="Decisions">
                     </data-table>
@@ -268,8 +265,12 @@
                 </div>
                 <div>
                     <div>
-                        <label>Parent:</label>
-                        <span v-if="group.parentId" class="linked parent-group" @click="showGroupDetail(group.parentId, 'Groups')">{{parent.name}}</span>
+                        <!--<label>Parent:</label>-->
+                        <!--<span v-if="group.parentId" class="linked parent-group" @click="showGroupDetail(group.parentId, 'Groups')">{{parent.name}}</span>-->
+                        <data-table :data="group.parentGroups"
+                                    @row_onclick="showGroupDetail"
+                                    header="Parent Groups">
+
                     </div>
                 </div>
                 <div v-if="group.id > 0">
@@ -279,8 +280,7 @@
                                 <v-btn color="primary" dark v-on="on">Add Child</v-btn>
                             </template>
                             <v-card>
-                                <data-table :columns="columns"
-                                            :data="childSelectionList"
+                                <data-table :data="childSelectionList"
                                             class="child-selector"
                                             :header="header"
                                             @row_onclick="addChild"
@@ -290,8 +290,7 @@
                         </v-dialog>
                     </div>
 
-                    <data-table :columns="columns"
-                                :data="childrenDisplay"
+                    <data-table :data="childrenDisplay"
                                 :header="header"
                                 class="children"
                                 :show-actions="true"
@@ -302,14 +301,13 @@
 
                 <div v-if="group.id > 0">
                     <v-btn class="make-decision-button" @click="makeDecision_onclick" color="primary">Make a Decision</v-btn>
-                    <data-table :columns="decisionsColumns"
-                                :data="decisionsDisplay"
+                    <data-table :data="decisionsDisplay"
                                 @row_onclick="showDecisionDetail"
                                 header="Decisions">
                     </data-table>
                 </div>
             </div>
-            <!--<pre>{{group}}</pre>-->
+            <pre>{{group}}</pre>
 
         </div>
     </template>
@@ -373,10 +371,9 @@
 
                     </v-autocomplete>
                 </div>
-                <div>
+                <div v-if="voter.id > 0">
                     <div>
-                        <data-table :columns="groupColumns"
-                                    :data="groupsDisplay"
+                        <data-table :data="groupsDisplay"
                                     @row-onclick="showDetail(voter.groupId, 'Groups')"
                                     header="Groups">
                         </data-table>

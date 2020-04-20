@@ -14,7 +14,7 @@ namespace DecisionSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BaseController<TEntity, TDto> where TEntity : BaseModel<TDto>, IAggregateRoot where TDto : BaseDto<TEntity>, IDto
+    public class BaseController<TEntity, TDto> : Controller where TEntity : BaseModel<TDto>, IAggregateRoot where TDto : BaseDto<TEntity>, IDto
     {
         private readonly ILogger<BaseController<TEntity, TDto>> _logger;
 
@@ -31,20 +31,34 @@ namespace DecisionSystem.Controllers
 
         [HttpGet]
         //[Authorize]
-        public virtual IEnumerable<TDto> GetAll()
+        public virtual ActionResult<IEnumerable<TDto>> GetAll()
         {
-            return _domain.GetAll();
+            try
+            {
+                var result = _domain.GetAll();
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
-        public virtual TDto Post(TDto dto)
+        public virtual ActionResult<TDto> Post(TDto dto)
         {
-            return _domain.Create(dto);
+            try
+            {
+                var result = _domain.Create(dto);
+
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
-        //[HttpPut]
-        //public virtual TDto Put(TDto dto) {
-        //    return _domain.Update(dto);
-        //}
+
         [HttpPut]
         public virtual async Task<TDto> Put(TDto dto)
         {

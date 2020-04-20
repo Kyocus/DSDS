@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Core.Domains
 {
@@ -18,8 +19,42 @@ namespace Core.Domains
             _logger = logger;
         }
 
+        public async Task<DecisionDto> Create(DecisionDto dto)
+        {
+            var entity = dto.AsEntity();
+            entity.CreationDate = DateTime.Now.Ticks;
+            entity.ExpirationDate = DateTime.Now.AddYears(1).Ticks;
 
-        public List<DecisionDto> GetByUserId(long id)
+            GroupDecision gd = new GroupDecision();
+            gd.GroupId = dto.GroupId;
+            gd.DecisionId = dto.Id;
+
+            entity.GroupDecisions.Add(gd);
+
+            var result = _repository.Create(entity).AsDto();
+
+            if (result != null)
+            {
+                return Get(result.Id);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public IEnumerable<DecisionDto> GetByGroupId(long id)
+        {
+            return _repository.FindAll()
+                .Where(x => x.GroupDecisions
+                    .Where(v =>
+                        v.GroupId == id
+                    ).Count() > 0)
+                .Select(x => x.AsDto())
+                .ToList();
+        }
+
+        public IEnumerable<DecisionDto> GetByUserId(long id)
         {
             return _repository.FindAll()
                 .Where(x => x.Votes

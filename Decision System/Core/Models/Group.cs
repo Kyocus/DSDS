@@ -42,7 +42,7 @@ namespace Core.Models
 
             if (Decisions != null)
             {
-                returnMe.Decisions = Decisions.Select(x => x.Decision.AsType<DecisionDto>()).ToList();
+                returnMe.Decisions = Decisions.Select(x => x.Decision.AsDto()).ToList();
             }
             if (ParentGroups != null)
             {

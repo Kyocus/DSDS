@@ -22,15 +22,23 @@ namespace DecisionSystem.Controllers
         }
 
         [NonAction]
-        public override VoterDto Post(VoterDto dto)
+        public override ActionResult<VoterDto> Post(VoterDto dto)
         {
             throw new NotImplementedException();
         }
 
         [HttpPost]
-        public VoterDto Post(PersistVoterDto dto)
+        public ActionResult<VoterDto> Post(PersistVoterDto dto)
         {
-            return ((VoterDomain)_domain).Create(dto);
+            try
+            {
+                var result = ((VoterDomain)_domain).Create(dto);
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
     }

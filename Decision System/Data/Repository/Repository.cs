@@ -37,7 +37,7 @@ namespace DecisionSystem.Repository
 
         public virtual IQueryable<TEntity> FindAll()
         {
-            return this.context.Set<TEntity>().AsNoTracking();
+            return context.Set<TEntity>().AsNoTracking();
         }
 
         public virtual IQueryable<TEntity> FindByString(string value)
@@ -54,7 +54,7 @@ namespace DecisionSystem.Repository
 
         public virtual IQueryable<TEntity> FindByCondition(Expression<Func<TEntity, bool>> expression)
         {
-            return this.context.Set<TEntity>().Where(expression).AsNoTracking();
+            return context.Set<TEntity>().Where(expression).AsNoTracking();
         }
 
         public virtual TEntity Create(TEntity entity)

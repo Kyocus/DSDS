@@ -72,7 +72,7 @@ namespace Core.Domains
             }
         }
 
-        public Group AddGroup(int groupId, int childId)
+        public Group AddGroup(long groupId, long childId)
         {
             //groupvoter insert?
             var group = _repository.FindById(groupId);

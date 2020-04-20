@@ -9,10 +9,10 @@ namespace Core.Models
     public class GroupVoter
     {
         public Group Group { get; set; }
-        public int GroupId { get; set; }
+        public long GroupId { get; set; }
 
         public Voter Voter { get; set; }
-        public int VoterId { get; set; }
+        public long VoterId { get; set; }
 
         public GroupVoter()
         {

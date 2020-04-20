@@ -10,10 +10,10 @@ namespace Core.Models
     {
 
         public Group ParentGroup { get; set; }
-        public int ParentGroupId { get ; set ; }
+        public long ParentGroupId { get ; set ; }
 
         public Group ChildGroup { get; set; }
-        public int ChildGroupId { get ; set ; }
+        public long ChildGroupId { get ; set ; }
 
         public GroupGroup()
         {

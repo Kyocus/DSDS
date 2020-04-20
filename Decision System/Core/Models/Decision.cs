@@ -59,5 +59,42 @@ namespace Core.Models
             StatusDate = statusDate;
             StatusId = statusId;
         }
+
+
+        public override DecisionDto AsDto()
+        {
+            DecisionDto returnMe = new DecisionDto();
+
+            returnMe.Description = Description;
+            returnMe.CreationDate = CreationDate;
+            returnMe.Id = Id;
+            returnMe.Name = Name;
+            returnMe.ExpirationDate = ExpirationDate;
+
+            var gd = GroupDecisions.Find(x => x.DecisionId == Id);
+
+            if (gd != null)
+            {
+                returnMe.GroupId = gd.GroupId;
+
+                if (gd.Group != null)
+                {
+                    var gs = new GroupSummaryDto();
+                    gs.Description = gd.Group.Description;
+                    gs.Id = gd.Group.Id;
+                    gs.Name = gd.Group.Name;
+
+                    returnMe.Group = gs;
+                }
+            }
+
+            if (Attachments != null)
+            {
+                returnMe.Attachments = Attachments.Select(x => x.AsDto()).ToList();
+            }
+
+            return returnMe;
+        }
+
     }
 }

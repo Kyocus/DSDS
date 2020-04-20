@@ -13,7 +13,7 @@ namespace Core.Models
         {
 
         }
-        public Status(int id, string name)
+        public Status(long id, string name)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
