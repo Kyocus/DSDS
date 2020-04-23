@@ -26,7 +26,7 @@ namespace DecisionSystem.Controllers
             try
             {
                 var result = ((GroupDomain)_domain).GetAll();
-                return CreatedAtAction("Post", result);
+                return CreatedAtAction("GetAll", result);
             }
             catch (Exception e)
             {

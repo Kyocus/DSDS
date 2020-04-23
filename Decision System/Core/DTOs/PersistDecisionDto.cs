@@ -24,11 +24,12 @@ namespace Core.Models
         public override Decision AsEntity()
         {
             Decision returnMe = new Decision();
+            DateTimeOffset dto = new DateTimeOffset(DateTime.Now);
 
-            returnMe.CreationDate = DateTime.Now.Ticks;
+            returnMe.CreationDate = dto.ToUnixTimeSeconds();
             returnMe.Description = Description;
             returnMe.Name = Name;
-            returnMe.ExpirationDate = DateTime.Now.AddYears(1).Ticks;
+            returnMe.ExpirationDate = dto.AddYears(1).ToUnixTimeSeconds();
 
             return returnMe;
         }

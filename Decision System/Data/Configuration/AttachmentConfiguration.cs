@@ -12,6 +12,8 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Attachment> builder)
         {
+            DateTimeOffset dto = new DateTimeOffset(DateTime.Now);
+
             builder.Property(t => t.Name)
                     .IsRequired();
 
@@ -24,7 +26,7 @@ namespace DecisionSystem.Configuration
                 uploaderId = 1l,
                 OptionId = 1l,
                 optionId = 1l,
-                UploadDate = DateTime.UtcNow.Ticks
+                UploadDate = dto.ToUnixTimeSeconds()
             });
 
         }

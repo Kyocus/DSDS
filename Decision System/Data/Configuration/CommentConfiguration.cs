@@ -12,6 +12,8 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Comment> builder)
         {
+            DateTimeOffset dto = new DateTimeOffset(DateTime.Now);
+            
             builder.Property(t => t.Time)
                     .IsRequired();
 
@@ -19,7 +21,7 @@ namespace DecisionSystem.Configuration
             {
                 Id = 1l,
                 VoterId = 1l,
-                Time = DateTime.UtcNow.Ticks,
+                Time = dto.ToUnixTimeSeconds()
             });
 
         }

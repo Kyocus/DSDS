@@ -12,6 +12,8 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Group> builder)
         {
+            DateTimeOffset dto = new DateTimeOffset(DateTime.Now);
+
             builder.HasKey(o => o.Id);
             builder.Property(t => t.Name)
                     .IsRequired();
@@ -23,7 +25,7 @@ namespace DecisionSystem.Configuration
                 Description = "description 1",
                 ParentGroupId = 1l,
                 parentGroupId = 1l,
-                CreationDate = DateTime.UtcNow.Ticks
+                CreationDate = dto.ToUnixTimeSeconds()
             });
 
         }

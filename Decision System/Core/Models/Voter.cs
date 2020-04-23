@@ -13,7 +13,6 @@ namespace Core.Models
         private string description;
         private long creationDate;
 
-        [Required]
         public User User { get; set; }
         [Required]
         public long UserId { get; set; }

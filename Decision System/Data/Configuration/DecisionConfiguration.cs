@@ -12,6 +12,8 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<Decision> builder)
         {
+            DateTimeOffset dto = new DateTimeOffset(DateTime.Now);
+
             builder.Property(o => o.Id).ValueGeneratedOnAdd();
             builder.Property(t => t.Name).IsRequired();
             builder.Property(t => t.ExpirationDate).IsRequired();
@@ -25,13 +27,13 @@ namespace DecisionSystem.Configuration
             builder.HasData(new
             {
                 Id = 4l,
-                CreationDate = DateTime.UtcNow.Ticks,
+                CreationDate = dto.ToUnixTimeSeconds(),
                 Description = "description",
-                ExpirationDate = DateTime.UtcNow.Ticks,
+                ExpirationDate = dto.ToUnixTimeSeconds(),
                 Name = "name",
                 StatusId = 1l,
                 statusId = 1l,
-                StatusDate = DateTime.UtcNow.Ticks
+                StatusDate = dto.ToUnixTimeSeconds()
             });
 
         }

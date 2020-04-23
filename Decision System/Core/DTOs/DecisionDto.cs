@@ -50,6 +50,7 @@ namespace Core.Models
             returnMe.CreationDate = CreationDate;
             returnMe.Description = Description;
             returnMe.Name = Name;
+            returnMe.Id = Id;
             returnMe.GroupDecisions.Add(gd);
             returnMe.StatusId = StatusId;
             returnMe.ExpirationDate = ExpirationDate;

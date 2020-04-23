@@ -29,8 +29,9 @@ namespace Core.Domains
 
         public GroupDto Create(PersistGroupDto dto)
         {
+            DateTimeOffset time = new DateTimeOffset(DateTime.Now);
             var entity = AsGroupDto(dto).AsEntity();
-            entity.CreationDate = DateTime.Now.Ticks;
+            entity.CreationDate = time.ToUnixTimeSeconds();
 
             var result = _repository.Create(entity);
             return result.AsDto();

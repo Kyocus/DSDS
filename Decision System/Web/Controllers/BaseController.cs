@@ -31,6 +31,22 @@ namespace DecisionSystem.Controllers
 
         [HttpGet]
         //[Authorize]
+        [Route("{id}")]
+        public virtual ActionResult<IEnumerable<TDto>> Get(long id)
+        {
+            try
+            {
+                var result = _domain.Get(id);
+                return CreatedAtAction("Post", result);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        //[Authorize]
         public virtual ActionResult<IEnumerable<TDto>> GetAll()
         {
             try

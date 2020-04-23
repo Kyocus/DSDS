@@ -24,7 +24,8 @@ namespace Core.Domains
 
         public virtual TDto Get(long id)
         {
-            return _repository.FindById(id).AsDto();
+            var result = _repository.FindById(id);
+            return result != null ? result.AsDto() : null;
         }
 
         public virtual IEnumerable<TDto> GetAll()
@@ -37,7 +38,8 @@ namespace Core.Domains
 
         public virtual IEnumerable<TDto> Query(string query)
         {
-            Func<TEntity, bool> queryProperties = new Func<TEntity, bool>((x) => {
+            Func<TEntity, bool> queryProperties = new Func<TEntity, bool>((x) =>
+            {
                 foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(x))
                 {
                     string name = descriptor.Name;

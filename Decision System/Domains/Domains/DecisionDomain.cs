@@ -21,9 +21,11 @@ namespace Core.Domains
 
         public async Task<DecisionDto> Create(DecisionDto dto)
         {
+            DateTimeOffset time = new DateTimeOffset(DateTime.Now);
+
             var entity = dto.AsEntity();
-            entity.CreationDate = DateTime.Now.Ticks;
-            entity.ExpirationDate = DateTime.Now.AddYears(1).Ticks;
+            entity.CreationDate = time.ToUnixTimeSeconds();
+            entity.ExpirationDate = time.AddYears(1).ToUnixTimeSeconds();
 
             GroupDecision gd = new GroupDecision();
             gd.GroupId = dto.GroupId;

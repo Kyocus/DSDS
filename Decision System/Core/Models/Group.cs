@@ -42,19 +42,59 @@ namespace Core.Models
 
             if (Decisions != null)
             {
-                returnMe.Decisions = Decisions.Select(x => x.Decision.AsDto()).ToList();
+                returnMe.Decisions = Decisions.Select(x =>
+                {
+                    if (x.Decision != null)
+                    {
+                        return x.Decision.AsDto();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).ToList();
             }
             if (ParentGroups != null)
             {
-                returnMe.ParentGroups = ParentGroups.Select(x => x.ParentGroup.AsType<GroupSummaryDto>()).ToList();
+                returnMe.ParentGroups = ParentGroups.Select(x =>
+                {
+                    if (x.ParentGroup != null)
+                    {
+                        return x.ParentGroup.AsType<GroupSummaryDto>();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).ToList();
             }
             if (ChildGroups != null)
             {
-                returnMe.ChildGroups = ChildGroups.Select(x => x.ChildGroup.AsType<GroupSummaryDto>()).ToList();
+                returnMe.ChildGroups = ChildGroups.Select(x =>
+                {
+                    if (x.ChildGroup != null)
+                    {
+                        return x.ChildGroup.AsType<GroupSummaryDto>();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).ToList();
             }
             if (GroupVoters != null)
             {
-                returnMe.Voters = GroupVoters.Select(x => x.Voter.AsDto()).ToList();
+                returnMe.Voters = GroupVoters.Select(x =>
+                {
+                    if (x.Voter != null)
+                    {
+                        return x.Voter.AsDto();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).ToList();
             }
 
             return returnMe;

@@ -36,6 +36,7 @@ namespace Core.Models
             returnMe.Voter = this.Voter.AsEntity();
             returnMe.VoterId = VoterId;
             returnMe.Time = Time;
+            returnMe.Id = Id;
             returnMe.Rating = Rating.AsEntity();
 
             return returnMe;

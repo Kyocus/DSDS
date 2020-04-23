@@ -21,8 +21,9 @@ namespace Core.Domains
 
         public VoterDto Create(PersistVoterDto dto)
         {
+            DateTimeOffset time = new DateTimeOffset(DateTime.Now);
             var entity = AsVoterDto(dto).AsEntity();
-            entity.CreationDate = DateTime.Now.Ticks;
+            entity.CreationDate = time.ToUnixTimeSeconds();
 
             var result = _repository.Create(entity);
             if (result != null)

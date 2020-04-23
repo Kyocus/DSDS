@@ -12,6 +12,8 @@ namespace DecisionSystem.Configuration
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            DateTimeOffset dto = new DateTimeOffset(DateTime.Now);
+
             builder.HasKey(o => o.Id);
 
             builder.HasData(
@@ -24,7 +26,7 @@ namespace DecisionSystem.Configuration
                     ,City = "a city"
                     ,State = "a state"
                     ,Zip = "12345"
-                    ,CreationDate = DateTime.UtcNow.Ticks
+                    ,CreationDate = dto.ToUnixTimeSeconds()
                 },
                 new { 
                     Id = 2l
@@ -35,7 +37,7 @@ namespace DecisionSystem.Configuration
                     ,City = "another city"
                     ,State = "another state"
                     ,Zip = "12345"
-                    ,CreationDate = DateTime.UtcNow.Ticks
+                    ,CreationDate = dto.ToUnixTimeSeconds()
                 },
                 new { 
                     Id = 3l
@@ -46,7 +48,7 @@ namespace DecisionSystem.Configuration
                     ,City = "brisbeeland"
                     ,State = "underland"
                     ,Zip = "12345"
-                    ,CreationDate = DateTime.UtcNow.Ticks
+                    ,CreationDate = dto.ToUnixTimeSeconds()
                 },
                 new { 
                     Id = 4l
@@ -57,7 +59,7 @@ namespace DecisionSystem.Configuration
                     ,City = "city u98t8iju3w8i4roij489oirf"
                     ,State = "state 98u3iro3u9f09398jiefgjeo48ti"
                     ,Zip = "12345"
-                    ,CreationDate = DateTime.UtcNow.Ticks
+                    ,CreationDate = dto.ToUnixTimeSeconds()
                 }
             );
         }

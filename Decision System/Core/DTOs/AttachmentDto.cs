@@ -39,21 +39,22 @@ namespace Core.Models
             OptionId = optionId;
         }
 
-        //public override Attachment AsEntity() {
-        //    Attachment returnMe = new Attachment();
+        public override Attachment AsEntity()
+        {
+            Attachment returnMe = new Attachment();
 
-        //    returnMe.Id = Id;
-        //    returnMe.Name = Name;
-        //    returnMe.Option = Option;
-        //    returnMe.OptionId = OptionId;
-        //    returnMe.Path = Path;
-        //    returnMe.UploadDate = UploadDate;
-        //    returnMe.Uploader = Uploader;
-        //    returnMe.UploaderId = UploaderId;
+            returnMe.Id = Id;
+            returnMe.Name = Name;
+            returnMe.Option = Option;
+            returnMe.OptionId = OptionId;
+            returnMe.Path = Path;
+            returnMe.UploadDate = UploadDate;
+            returnMe.Uploader = Uploader;
+            returnMe.UploaderId = UploaderId;
 
-        //    return returnMe;
-        
-        //}
+            return returnMe;
+
+        }
 
     }
 }
