@@ -43,8 +43,14 @@ namespace Core.Domains
 
             returnMe.CreationDate = dto.CreationDate;
             returnMe.Groups = new List<GroupSummaryDto>();
-            returnMe.User = null;
-            returnMe.UserId = dto.UserId;
+            returnMe.Id = dto.Id;
+            returnMe.FirstName = dto.FirstName;
+            returnMe.MiddleName = dto.MiddleName;
+            returnMe.LastName = dto.LastName;
+            returnMe.Address = dto.Address;
+            returnMe.City = dto.City;
+            returnMe.State = dto.State;
+            returnMe.Zip = dto.Zip;
 
             return returnMe;
         }

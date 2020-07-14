@@ -6,31 +6,40 @@ using System.Threading.Tasks;
 
 namespace Core.Models
 {
+
     public class VoterDto : BaseDto<Voter>, IDto
     {
-        public List<GroupSummaryDto> Groups { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Zip { get; set; }
         public long CreationDate { get; set; }
-        public long UserId { get; set; }
-        public UserDto User { get; set; }
 
+        public List<GroupSummaryDto> Groups { get; set; }
 
         public VoterDto()
         {
 
         }
 
-        public override Voter AsEntity() {
+        public Voter AsEntity()
+        {
             Voter returnMe = new Voter();
-            
+
             returnMe.Id = Id;
-            returnMe.UserId = UserId;
-            if (User != null) { 
-                returnMe.User = User.AsEntity();
-            }
             returnMe.Groups = null;
             returnMe.GroupVoters = null;
             returnMe.CreationDate = CreationDate;
-            
+            returnMe.FirstName = FirstName;
+            returnMe.LastName = LastName;
+            returnMe.MiddleName = MiddleName;
+            returnMe.Address = Address;
+            returnMe.City = City;
+            returnMe.State = State;
+
             return returnMe;
         }
     }

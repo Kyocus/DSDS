@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Core.Interfaces;
 using Core.Domains;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace DecisionSystem.Controllers
 {
@@ -22,11 +23,16 @@ namespace DecisionSystem.Controllers
 
         protected IDomain<TEntity, TDto> _domain;
 
-        public BaseController(ILogger<BaseController<TEntity, TDto>> logger, IRepository<TEntity> repo, IDomain<TEntity, TDto> domain)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public BaseController(IHttpContextAccessor httpContextAccessor, ILogger<BaseController<TEntity, TDto>> logger, IRepository<TEntity> repo, IDomain<TEntity, TDto> domain)
         {
+
             _logger = logger;
             _repository = repo;
             _domain = domain;
+            _httpContextAccessor = httpContextAccessor;
+
+
         }
 
         [HttpGet]
@@ -97,16 +103,47 @@ namespace DecisionSystem.Controllers
             _domain.Delete(id);
         }
 
-        public virtual bool CanDelete() {
+        [HttpGet]
+        protected string GetUser()
+        {
+            return _httpContextAccessor.HttpContext.User.FindFirst("edipi").Value;
+        }
+
+        public virtual bool CanDelete()
+        {
             return true;
         }
-        public virtual bool CanGet() {
+
+        /// <summary>
+        /// The EDIPI of the current user based on provided client certificate.
+        /// </summary>
+        protected virtual string CurrentUserEdipi
+        {
+            get
+            {
+                if (User != null && User.Claims != null)
+                {
+                    var edipi = User.Claims.Where(c => c.Type == "edipi").FirstOrDefault()?.Value;
+                    return edipi;
+                }
+                else
+                {
+                    _logger.LogWarning("CurrentUserEdipi was called but no authenticated identity was found.");
+                    return string.Empty;
+                }
+            }
+        }
+
+        public virtual bool CanGet()
+        {
             return true;
         }
-        public virtual bool CanPost() {
+        public virtual bool CanPost()
+        {
             return true;
         }
-        public virtual bool CanPut() {
+        public virtual bool CanPut()
+        {
             return true;
         }
     }

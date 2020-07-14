@@ -107,5 +107,57 @@ namespace Core.Domains
                 _logger.LogError("Error during delete\r\n" + e.Message);
             }
         }
+
+        /// <summary>
+        /// Get the current claims principal.
+        /// </summary>
+        /// <returns></returns>
+        protected ClaimsPrincipal GetClaimsPrincipal()
+        {
+            return HttpContext.HttpContext.User;
+        }
+
+        /// <summary>
+        /// Get the current edipi of the user.
+        /// </summary>
+        /// <returns></returns>
+        protected string GetCurrentUserEdipi()
+        {
+            return GetClaimsPrincipal().Claims
+                .Where(c => c.Type.Equals("edipi"))
+                .Select(c => c.Value)
+                .SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Get the email of the current user.
+        /// </summary>
+        /// <returns></returns>
+        protected string GetCurrentUserEmail()
+        {
+            return GetClaimsPrincipal().Claims
+                .Where(c => c.Type.Equals(ClaimTypes.Email))
+                .Select(c => c.Value)
+                .SingleOrDefault();
+        }
+
+        protected User GetUserByEdipi(string edipi)
+        {
+            return new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(edipi);
+        }
+
+        protected User GetCurrentUser()
+        {
+            var user = new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(GetCurrentUserEdipi());
+
+            if (user == null)
+            {
+                throw new Exception("You don't exist");
+            }
+
+            return user;
+        }
+
+
     }
 }

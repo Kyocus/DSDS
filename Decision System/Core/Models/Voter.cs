@@ -9,14 +9,26 @@ namespace Core.Models
 {
     public class Voter : BaseModel<VoterDto>, IAggregateRoot
     {
-        private string name;
-        private string description;
-        private long creationDate;
 
-        public User User { get; set; }
-        [Required]
-        public long UserId { get; set; }
+        private long creationDate;
+        private string firstName;
+        private string middleName;
+        private string lastName;
+        private string address;
+        private string city;
+        private string state;
+        private string zip;
+
         public long CreationDate { get => creationDate; set => creationDate = value; }
+        public string FirstName { get => firstName; set => firstName = value; }
+        public string MiddleName { get => middleName; set => middleName = value; }
+        public string LastName { get => lastName; set => lastName = value; }
+        public string Name { get => firstName + " " + middleName + " " + lastName; }
+        public string Address { get => address; set => address = value; }
+        public string City { get => city; set => city = value; }
+        public string State { get => state; set => state = value; }
+        public string Zip { get => zip; set => zip = value; }
+
         public List<Group> Groups { get; set; }
         public List<GroupVoter> GroupVoters { get; set; }
 
@@ -30,13 +42,15 @@ namespace Core.Models
         {
             VoterDto returnMe = new VoterDto();
 
-            returnMe.Id = Id;
-            returnMe.UserId = UserId;
-            if (User != null)
-            {
-                returnMe.User = User.AsDto();
-            }
-            returnMe.CreationDate = CreationDate;
+            returnMe.Id = this.Id;
+            returnMe.FirstName = FirstName;
+            returnMe.LastName = LastName;
+            returnMe.MiddleName = MiddleName;
+            returnMe.Address = Address;
+            returnMe.City = City;
+            returnMe.State = State;
+            returnMe.Zip = Zip;
+            returnMe.CreationDate = this.CreationDate;
 
             if (Groups != null)
             {

@@ -825,7 +825,7 @@ class RequestBuilder {
     }
 
     async Get(url) {
-        return await this.#send(url, "GET");
+        return await this.#get(url);
     }
 
     async Put(url, data) {
@@ -838,6 +838,21 @@ class RequestBuilder {
 
     async Delete(url) {
         return await this.#send(url, "DELETE");
+    }
+
+    #get = async function (url = '') {
+        // Default options are marked with *
+        const response = await fetch(url, {
+            // *GET, POST, PUT, DELETE, etc.
+            method: "GET",
+            mode: this.#mode,
+            cache: this.#cache,
+            credentials: this.#credentials,
+            headers: this.#headers,
+            redirect: this.#redirect,
+            referrerPolicy: this.#referrerPolicy
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
     }
 
     #send = async function (url = '', data = {}, method) {
@@ -1163,7 +1178,7 @@ var PersistDecision = (function () {
     function constructor(data) {
 
         if (data) {
-            this.id = data.id
+            this.id = (data.id !== null && data.id !== undefined)
                 ? parseInt(data.id.replace(/id/, ""), 0)
                 : parseInt(generateId().replace(/id/, ""), 0);
             this.description = data.description ? data.description : "";
@@ -1193,8 +1208,11 @@ var PersistGroup = (function () {
             this.voters = data.voters ? data.voters.map(x => x.id) : [];
             this.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
             this.description = data.description ? data.description : "";
-            this.id = data.id
-                ? parseInt(data.id.replace(/id/, ""), 0)
+
+            this.id = (data.id !== null && data.id !== undefined)
+                ? data.id.replace
+                    ? parseInt(data.id.replace(/id/, ""), 0)
+                    : data.id
                 : parseInt(generateId().replace(/id/, ""), 0);
             this.name = data.name ? data.name : "";
             this.type = data.type ? data.type : ENTITY_GROUP_TYPE;
@@ -1242,12 +1260,18 @@ var Group = (function () {
     return constructor;
 })();
 
-var User = (function () {
+
+var PersistVoter = (function () {
 
     function constructor(data) {
         var self = this;
         if (data) {
-            self.id = data.id ? data.id : generateId();
+            self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
+            self.id = (data.id !== null && data.id !== undefined)
+                ? data.id.replace
+                    ? parseInt(data.id.replace(/id/, ""), 0)
+                    : data.id
+                : parseInt(generateId().replace(/id/, ""), 0);
             self.firstName = data.firstName ? data.firstName : "";
             self.lastName = data.lastName ? data.lastName : "";
             self.middleName = data.middleName ? data.middleName : "";
@@ -1256,7 +1280,9 @@ var User = (function () {
             self.state = data.state ? data.state : "";
         }
         else {
-            self.id = generateId();
+            self.id = parseInt(generateId().replace(/id/, ""), 10);
+            self.creationDate = new Date().getTime();
+            self.userId = 0;
             self.firstName = "";
             self.lastName = "";
             self.middleName = "";
@@ -1272,52 +1298,41 @@ var User = (function () {
 })();
 
 var Voter = (function () {
-
     function constructor(data) {
         var self = this;
+
         if (data) {
+            self.id = data.id ? data.id : generateId();
+            self.firstName = data.firstName ? data.firstName : "";
+            self.lastName = data.lastName ? data.lastName : "";
+            self.middleName = data.middleName ? data.middleName : "";
+            self.address = data.address ? data.address : "";
+            self.city = data.city ? data.city : "";
+            self.state = data.state ? data.state : "";
             self.id = data.id ? data.id : generateId();
             self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
             self.groups = data.groups ? data.groups.map(x => new Group(x)) : [];
-            self.user = data.user ? new User(data.user) : new User();
         }
         else {
             self.id = generateId();
+            self.firstName = "";
+            self.lastName = "";
+            self.middleName = "";
+            self.address = "";
+            self.city = "";
+            self.state = "";
+            self.id = generateId();
             self.creationDate = new Date().getTime();
             self.groups = [];
-            self.user = new User();
         }
+
+
+        self.name = self.lastName + ", " + self.firstName + " " + self.middleName;
     }
 
     return constructor;
 })();
 
-var PersistVoter = (function () {
-
-    function constructor(data) {
-        var self = this;
-        if (data) {
-            self.id = data.id
-                ? parseInt(data.id.replace(/id/, ""), 0)
-                : parseInt(generateId().replace(/id/, ""), 0);
-            self.creationDate = data.creationDate ? data.creationDate : new Date().getTime();
-
-            if (!!data.user) {
-                self.userId = data.user.id ? data.user.id : 0;
-            }
-            else if (!!data.userId) {
-                self.userId = data.userId ? data.userId : 0;
-            }
-        }
-        else {
-            this.id = parseInt(generateId().replace(/id/, ""), 10);
-            self.creationDate = new Date().getTime();
-            self.userId = 0;
-        }
-    }
-
-    return constructor;
-})();
 
 Vue.component('nav-bar', {
     methods: {
@@ -1806,7 +1821,6 @@ Vue.component('voter-detail', {
             , isLoading: false
             , search: ""
             , timeout: null
-            , user: new User()
         };
     },
     props: {
@@ -1852,7 +1866,7 @@ Vue.component('voter-detail', {
         }
         , user_onchange: function (user) {
             console.log("user_onchange", user);
-            this.voter.user = user;
+            this.voter = user;
         }
     },
     computed: {
@@ -1874,7 +1888,7 @@ Vue.component('voter-detail', {
             handler: function (current, old) {
                 //this.$emit("change", current);
                 this.voter = new Voter(current);
-                this.user = new User(current);
+                //this.user = new User(current);
                 //console.log("voter-detail emitting change", current, this.index);
             },
             deep: true
@@ -1904,10 +1918,10 @@ Vue.component('voter-detail', {
         // for some reason we need this to establish reactivity,
         // without it, we don't get reactivity until an emit is triggered
         this.voter = new Voter(this.value);
-        this.search = this.voter.user.name;
-        this.user = this.users.find(x => x.id === this.voter.user.id);
+        this.search = this.voter.name;
+        this.user = this.users.find(x => x.id === this.voter.id);
         if (!this.user) {
-            this.user = new User();
+            this.user = new Voter();
         }
     },
     template: $("#tmpVoterDetail").html()
@@ -1999,7 +2013,7 @@ var vue = new Vue({
                 });
         },
         persistDecision: function (data) {
-            if (data.id.indexOf("id") > -1) {
+            if (isNaN(data.id) && data.id.indexOf("id") > -1) {
                 this.saveDecision(data);
             }
             else {
@@ -2007,7 +2021,7 @@ var vue = new Vue({
             }
         },
         persistGroup: function (data) {
-            if (data.id.indexOf("id") > -1) {
+            if (isNaN(data.id) && data.id.indexOf("id") > -1) {
                 this.saveGroup(data);
             }
             else {
@@ -2015,7 +2029,7 @@ var vue = new Vue({
             }
         },
         persistVoter: function (data) {
-            if (data.id.indexOf("id") > -1) {
+            if (isNaN(data.id) && data.id.indexOf("id") > -1) {
                 this.saveVoter(data);
             }
             else {
@@ -2113,7 +2127,7 @@ var vue = new Vue({
             dataAccess.postVoter(new PersistVoter(data))
                 .then(function (result) {
                     var v = new Voter(result);
-                    self.cacheVoter(v);
+                    self.cacheVoters([v]);
                     self.currentVoter = v;
                     //console.log("result", v.id);
                 }).catch(function (err) {
@@ -2419,7 +2433,9 @@ var vue = new Vue({
                 console.log("failed to get decisions");
             });
 
-        dataAccess.getGroupsByUserId(1)
+        //todo this should only get groups that relate to the id of the current user
+        dataAccess.getGroups()
+        //dataAccess.getGroupsByUserId(1)
             .then(function (data) {
                 self.groups = data.map(x => new Group(x));
             })

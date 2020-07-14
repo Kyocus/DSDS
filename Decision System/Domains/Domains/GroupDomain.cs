@@ -125,7 +125,7 @@ namespace Core.Domains
             return _repository.FindAll()
                 .Where(x => x.GroupVoters
                     .Where(v =>
-                        v.Voter.User.Id == id
+                        v.Voter.Id == id
                     ).Count() > 0)
                 .Select(x => x.AsDto())
                 .ToList();

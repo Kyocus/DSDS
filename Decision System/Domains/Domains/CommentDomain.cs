@@ -21,10 +21,9 @@ namespace Core.Domains
         public List<CommentDto> GetByUserId(long id)
         {
             return _repository.FindAll()
-                .Where(x => x.Voter.User.Id == id)
+                .Where(x => x.Voter.Id == id)
                 .Select(x => x.AsDto())
                 .ToList();
         }
-
     }
 }

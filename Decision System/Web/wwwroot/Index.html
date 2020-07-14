@@ -30,7 +30,7 @@
                 </nav-bar>
 
                 <div v-if="currentComponent.length > 0">
-                    <v-btn  class="create-button" color="primary" @click="create_onclick">Create</v-btn>
+                    <v-btn class="create-button" color="primary" @click="create_onclick">Create</v-btn>
                     <component :is="currentComponent" v-bind="currentProperties" v-on="currentEvents" />
                 </div>
             </v-content>
@@ -105,8 +105,8 @@
                 <template v-slot:body="{ items }">
                     <tbody v-if="header === 'Voters'">
                         <tr v-for="item in items" @click="row_onclick(item)" :key="item.id" :row-id="item.id">
-                            <td class="name" >{{item.user.name}}</td>
-                            <td class="group" >{{item.groups.length}}</td>
+                            <td class="name">{{item.lastName + ", " + item.firstName + " " + item.middleName}}</td>
+                            <td class="group">{{item.groups.length}}</td>
                             <td class="created"> {{dateDisplay(item.creationDate)}}</td>
                         </tr>
                     </tbody>
@@ -132,7 +132,7 @@
                 </template>
 
                 <template v-if="showActions" v-slot:item.action="{ item }">
-<!--                    <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>-->
+                    <!--                    <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>-->
                     <v-icon small @click="deleteItem(item.id)">mdi-delete</v-icon>
                 </template>
 
@@ -335,43 +335,112 @@
                     <v-btn class="delete-button" @click="delete_onclick" color="error">Delete</v-btn>
                 </div>
                 <div>
-                    <label>User:</label>
-                    <v-autocomplete @change="user_onchange"
-                                    class="voter-user"
-                                    :value="user"
-                                    :label="user"
-                                    :items="users"
-                                    :loading="isLoading"
-                                    :search-input.sync="search"
-                                    cache-items
-                                    color="white"
-                                    dense
-                                    single-line
-                                    hide-no-data
-                                    hide-selected
-                                    item-text="name"
-                                    item-value="id"
-                                    label="Search Users"
-                                    placeholder="Start typing to Search (3 characters minimum)"
-                                    prepend-icon="mdi-database-search"
-                                    return-object>
 
-                        <template v-slot:item="{ item }">
-                            <v-list-item-avatar color="indigo"
-                                                class="headline font-weight-light white--text">
-                                {{ item.lastName.charAt(0) + item.firstName.charAt(0) }}
-                            </v-list-item-avatar>
-                            <v-list-item-content>
-                                <v-list-item-title v-text="item.name"></v-list-item-title>
-                                <v-list-item-subtitle v-text="item.id"></v-list-item-subtitle>
-                            </v-list-item-content>
-                            <!--<v-list-item-action>
-                                <v-icon>mdi-coin</v-icon>
-                            </v-list-item-action>-->
-                        </template>
+                    <label>Creation Date</label>
+                    <v-text-field v-model="voter.creationDate"
+                                  append-icon="mdi-magnify"
+                                  label="Creation Date"
+                                  class="creation-date"
+                                  single-line
+                                  hide-details></v-text-field>
 
-                    </v-autocomplete>
+                    <v-text-field v-model="voter.firstName"
+                                  append-icon="mdi-magnify"
+                                  label="First Name"
+                                  class="first-name"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+                    <v-text-field v-model="voter.middleName"
+                                  append-icon="mdi-magnify"
+                                  label="Middle Name"
+                                  class="middle-name"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+                    <v-text-field v-model="voter.lastName"
+                                  append-icon="mdi-magnify"
+                                  label="Last Name"
+                                  class="last-name"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+                    <v-text-field v-model="voter.address"
+                                  append-icon="mdi-magnify"
+                                  label="Address"
+                                  class="address"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+                    <v-text-field v-model="voter.city"
+                                  append-icon="mdi-magnify"
+                                  label="City"
+                                  class="city"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+                    <v-text-field v-model="voter.state"
+                                  append-icon="mdi-magnify"
+                                  label="State"
+                                  class="state"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+                    <v-text-field v-model="voter.zip"
+                                  append-icon="mdi-magnify"
+                                  label="Zip"
+                                  class="zip"
+                                  single-line
+                                  hide-details></v-text-field>
+
+
+
+
+                    <!--
+                <label>User:</label>
+                <v-autocomplete @change="user_onchange"
+                                class="voter-user"
+                                :value="user"
+                                :label="user"
+                                :items="users"
+                                :loading="isLoading"
+                                :search-input.sync="search"
+                                cache-items
+                                color="white"
+                                dense
+                                single-line
+                                hide-no-data
+                                hide-selected
+                                item-text="name"
+                                item-value="id"
+                                label="Search Users"
+                                placeholder="Start typing to Search (3 characters minimum)"
+                                prepend-icon="mdi-database-search"
+                                return-object>
+
+                    <template v-slot:item="{ item }">
+                        <v-list-item-avatar color="indigo"
+                                            class="headline font-weight-light white--text">
+                            {{ item.lastName.charAt(0) + item.firstName.charAt(0) }}
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <v-list-item-title v-text="item.name"></v-list-item-title>
+                            <v-list-item-subtitle v-text="item.id"></v-list-item-subtitle>
+                        </v-list-item-content>
+                        <!--<v-list-item-action>
+            <v-icon>mdi-coin</v-icon>
+        </v-list-item-action>
+    </template>
+
+                        </v-autocomplete>-->
                 </div>
+
                 <div v-if="voter.id > 0">
                     <div>
                         <data-table :data="groupsDisplay"
