@@ -25,7 +25,7 @@ namespace Core.Models
 
         }
 
-        public Voter AsEntity()
+        public override Voter AsEntity()
         {
             Voter returnMe = new Voter();
 

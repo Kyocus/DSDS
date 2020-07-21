@@ -1,18 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Core.Models;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
-namespace DecisionSystem.Data
+namespace Test
 {
-    public class DataContext : DbContext
+    public partial class TestDataContext : DbContext
     {
-        public DataContext() { }
+        public TestDataContext()
+        {
 
-        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+        }
+
+        public TestDataContext(DbContextOptions<TestDataContext> options) : base(options)
+        {
+
+        }
 
         public DbSet<Attachment> Attachments { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -32,4 +37,5 @@ namespace DecisionSystem.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
+
 }

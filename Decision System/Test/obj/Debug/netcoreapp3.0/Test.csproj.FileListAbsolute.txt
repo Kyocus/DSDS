@@ -182,3 +182,4 @@ C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Test\obj\Debug\netcoreapp3.
 C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Test\obj\Debug\netcoreapp3.0\Test.csproj.CopyComplete
 C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Test\obj\Debug\netcoreapp3.0\Test.dll
 C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Test\obj\Debug\netcoreapp3.0\Test.pdb
+C:\Users\arcon\Documents\GitHub\DSDS\Decision System\Test\obj\Debug\netcoreapp3.0\Test.genruntimeconfig.cache

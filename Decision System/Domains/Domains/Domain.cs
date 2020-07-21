@@ -1,11 +1,14 @@
 ﻿using Core.Interfaces;
 using Core.Models;
+using DecisionSystem.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +18,9 @@ namespace Core.Domains
     {
         protected readonly IRepository<TEntity> _repository;
         private ILogger<Domain<TEntity, TDto>> _logger;
+        private DataContext Database { get; set; }
+        public IHttpContextAccessor HttpContext { get; set; }
+
 
         public Domain(IRepository<TEntity> repo, ILogger<Domain<TEntity, TDto>> logger)
         {
@@ -141,21 +147,28 @@ namespace Core.Domains
                 .SingleOrDefault();
         }
 
-        protected User GetUserByEdipi(string edipi)
+        protected User GetUserById(string id)
         {
-            return new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(edipi);
+            return null;
+            //private readonly IDomain<Voter, VoterDto> _voterDomain = new VoterDomain(new VoterRepository<Voter>(), new Logger<VoterDomain>())
+
+            //return new UserDomain(_repo, _logger);
+            //    new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(edipi);
+
+            //var user = new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(GetCurrentUserEdipi());
+
         }
 
         protected User GetCurrentUser()
         {
-            var user = new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(GetCurrentUserEdipi());
+            //var user = new UserDomain(new UserRepository(Database), HttpContext, Database).GetUserByEDIPI(GetCurrentUserEdipi());
 
-            if (user == null)
-            {
-                throw new Exception("You don't exist");
-            }
+            //if (user == null)
+            //{
+            //    throw new Exception("You don't exist");
+            //}
 
-            return user;
+            return null;
         }
 
 

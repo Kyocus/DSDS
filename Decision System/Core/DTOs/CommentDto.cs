@@ -30,7 +30,7 @@ namespace Core.Models
             VoterId = entityId;
         }
 
-        public Comment AsEntity() {
+        public override Comment AsEntity() {
             Comment returnMe = new Comment();
 
             returnMe.Voter = this.Voter.AsEntity();
